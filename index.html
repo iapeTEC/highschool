@@ -238,204 +238,227 @@
   </main>
 
   <script>
-    // ===== Config =====
-    const DEFAULT_MINUTES = 30; // quiz length
-    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbypfaTGCxqAci7l2_6rYu5Am_z89pF3nyaLSTrEGXORh56jatw_VO78E42VcIPo8fh70w/exec';
+  // ===== Config =====
+  const DEFAULT_MINUTES = 30; // quiz length
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
 
-    // ===== State =====
-    let started = false, ended = false;
-    let startTime = null, endTime = null, timerInterval = null;
-    let secondsLeft = DEFAULT_MINUTES * 60;
+  // ===== State =====
+  let started = false, ended = false;
+  let startTime = null, endTime = null, timerInterval = null;
+  let secondsLeft = DEFAULT_MINUTES * 60;
 
-    // Focus/anti-cheat tracking
-    let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
-    let copyCount = 0, pasteCount = 0, findCount = 0;
+  // Focus/anti-cheat tracking
+  let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
+  let copyCount = 0, pasteCount = 0, findCount = 0;
 
-    // DOM
-    const startBtn = document.getElementById('startBtn');
-    const submitBtn = document.getElementById('submitBtn');
-    const timerEl = document.getElementById('timer');
-    const form = document.getElementById('quizForm');
-    const nameInput = document.getElementById('studentName');
-    const testIdInput = document.getElementById('testId');
-    const focusFlag = document.getElementById('focusFlag');
-    const tabCountEl = document.getElementById('tabCount');
-    const downloadCsvBtn = document.getElementById('downloadCsvBtn');
-    const resetBtn = document.getElementById('resetBtn');
+  // DOM
+  const startBtn = document.getElementById('startBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const timerEl = document.getElementById('timer');
+  const form = document.getElementById('quizForm');
+  const nameInput = document.getElementById('studentName');
+  const testIdInput = document.getElementById('testId');
+  const focusFlag = document.getElementById('focusFlag');
+  const tabCountEl = document.getElementById('tabCount');
+  const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+  const resetBtn = document.getElementById('resetBtn');
 
-    // Lock form until start
-    [...form.elements].forEach(el=>el.disabled = true);
+  // Lock form until start
+  [...form.elements].forEach(el=>el.disabled = true);
 
-    function fmt(secs){
-      const m = Math.floor(secs/60).toString().padStart(2,'0');
-      const s = (secs%60).toString().padStart(2,'0');
-      return `${m}:${s}`;
+  function fmt(secs){
+    const m = Math.floor(secs/60).toString().padStart(2,'0');
+    const s = (secs%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  function tick(){
+    secondsLeft--; if(secondsLeft < 0){ secondsLeft = 0; }
+    timerEl.textContent = fmt(secondsLeft);
+    if(secondsLeft === 0){
+      autoSubmit('time');
     }
+  }
 
-    function tick(){
-      secondsLeft--; if(secondsLeft < 0){ secondsLeft = 0; }
-      timerEl.textContent = fmt(secondsLeft);
-      if(secondsLeft === 0){
-        autoSubmit('time');
-      }
-    }
+  function startTimer(){
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 1000);
+  }
 
-    function startTimer(){
-      clearInterval(timerInterval);
-      timerInterval = setInterval(tick, 1000);
-    }
+  function startTest(){
+    const name = nameInput.value.trim();
+    if(!name){ alert('Please enter your full name before starting.'); return; }
+    started = true; startTime = new Date();
+    // Não limpe o valor do input; apenas desabilite
+    nameInput.disabled = true; testIdInput.disabled = true;
+    startBtn.disabled = true; submitBtn.disabled = false;
+    [...form.elements].forEach(el=>el.disabled = false);
+    startTimer();
+    localStorage.setItem('m3_session', JSON.stringify({ts: Date.now(), name}));
+  }
 
-    function startTest(){
-      const name = nameInput.value.trim();
-      if(!name){ alert('Please enter your full name before starting.'); return; }
-      started = true; startTime = new Date();
-      nameInput.disabled = true; testIdInput.disabled = true;
-      startBtn.disabled = true; submitBtn.disabled = false;
-      [...form.elements].forEach(el=>el.disabled = false);
-      startTimer();
-      localStorage.setItem('m3_session', JSON.stringify({ts: Date.now(), name}));
-    }
+  function grade(){
+    const answers = {}; let totalCorrect = 0, totalPossible = 0;
+    const byDiff = {easy:0, medium:0, hard:0};
+    const possibleByDiff = {easy:0, medium:0, hard:0};
+    const nodes = form.querySelectorAll('section.card');
+    nodes.forEach((sec, idx)=>{
+      const diff = sec.dataset.difficulty;
+      if(diff === 'writing') return; // skip autograde
+      const name = `q${idx+1}`; // relies on order
+      const checked = sec.querySelector('input[type=radio]:checked');
+      const correct = sec.querySelector('input[data-correct]');
+      const isCorrect = !!(checked && checked === correct);
+      answers[name] = checked ? checked.value : null;
+      if(diff in possibleByDiff){ possibleByDiff[diff]++; }
+      if(isCorrect){ totalCorrect++; if(diff in byDiff) byDiff[diff]++; }
+      totalPossible++;
+    });
 
-    function grade(){
-      const answers = {}; let totalCorrect = 0, totalPossible = 0;
-      const byDiff = {easy:0, medium:0, hard:0};
-      const possibleByDiff = {easy:0, medium:0, hard:0};
-      const nodes = form.querySelectorAll('section.card');
-      nodes.forEach((sec, idx)=>{
-        const diff = sec.dataset.difficulty;
-        if(diff === 'writing') return; // skip autograde
-        const name = `q${idx+1}`; // relies on order
-        const checked = sec.querySelector('input[type=radio]:checked');
-        const correct = sec.querySelector('input[data-correct]');
-        const isCorrect = !!(checked && checked === correct);
-        answers[name] = checked ? checked.value : null;
-        if(diff in possibleByDiff){ possibleByDiff[diff]++; }
-        if(isCorrect){ totalCorrect++; if(diff in byDiff) byDiff[diff]++; }
-        totalPossible++;
+    const writing = {
+      q14: form.querySelector('[name=q14]').value.trim(),
+      q15: form.querySelector('[name=q15]').value.trim()
+    };
+
+    return {
+      answers, writing,
+      score: { totalCorrect, totalPossible, byDifficulty: byDiff, possibleByDifficulty: possibleByDiff }
+    };
+  }
+
+  function collectPayload(reason='manual'){
+    const g = grade();
+    const now = new Date();
+    // Garante que sempre haja um nome no payload
+    const studentNameSafe = (nameInput.value || '').trim() || '(no name)';
+    return {
+      testId: (testIdInput.value.trim() || 'Module3-Revolution-Quiz-v1'),
+      studentName: studentNameSafe,
+      startISO: startTime?.toISOString() || null,
+      endISO: now.toISOString(),
+      durationSec: startTime ? Math.round((now - startTime)/1000) : null,
+      reason,
+      score: g.score,
+      answers: g.answers,
+      writing: g.writing,
+      focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount }
+    };
+  }
+
+  function toCSV(obj){
+    const s = obj;
+    const row = [
+      new Date().toISOString(), s.testId, JSON.stringify(s.studentName), s.startISO, s.endISO, s.durationSec,
+      s.score.totalCorrect, s.score.totalPossible,
+      s.score.byDifficulty.easy, s.score.byDifficulty.medium, s.score.byDifficulty.hard,
+      s.focus.tabSwitches, s.focus.blurCount, s.focus.totalBlurMs, s.focus.copyCount, s.focus.pasteCount, s.focus.findCount,
+      JSON.stringify(s.answers), JSON.stringify(s.writing)
+    ];
+    const header = [
+      'timestamp','testId','studentName','startISO','endISO','durationSec','correct','possible','easyCorrect','mediumCorrect','hardCorrect','tabSwitches','blurCount','totalBlurMs','copyCount','pasteCount','findCount','answers','writing'
+    ];
+    return header.join(',') + '\n' + row.join(',');
+  }
+
+  async function sendResults(payload){
+    try{
+      const res = await fetch(ENDPOINT, {
+        method:'POST',
+        headers:{ 'Content-Type':'text/plain' }, // CORS-friendly
+        body: JSON.stringify(payload)
       });
-
-      const writing = {
-        q14: form.querySelector('[name=q14]').value.trim(),
-        q15: form.querySelector('[name=q15]').value.trim()
-      };
-
-      return {
-        answers, writing,
-        score: { totalCorrect, totalPossible, byDifficulty: byDiff, possibleByDifficulty: possibleByDiff }
-      };
+      return { posted: res.ok, status: res.status };
+    }catch(err){
+      console.warn('POST failed', err);
+      return { posted:false, error: String(err) };
     }
+  }
 
-    function collectPayload(reason='manual'){
-      const g = grade();
-      const now = new Date();
-      return {
-        testId: (testIdInput.value.trim() || 'Module3-Revolution-Quiz-v1'),
-        studentName: nameInput.value.trim(),
-        startISO: startTime?.toISOString() || null,
-        endISO: now.toISOString(),
-        durationSec: startTime ? Math.round((now - startTime)/1000) : null,
-        reason,
-        score: g.score,
-        answers: g.answers,
-        writing: g.writing,
-        focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount }
-      };
+  function downloadCSV(name, csv){
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_Module3_Quiz.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  function lockTest(){
+    [...form.elements].forEach(el=>el.disabled = true);
+    submitBtn.disabled = true; downloadCsvBtn.disabled = false;
+    document.getElementById('notes').innerHTML = '<strong>Locked:</strong> Time is up or test submitted. Your answers were recorded.';
+    document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
+  }
+
+  async function finalize(reason){
+    if(ended) return; ended = true; endTime = new Date(); clearInterval(timerInterval);
+    const payload = collectPayload(reason);
+    const csv = toCSV(payload);
+    const postRes = await sendResults(payload);
+    downloadCSV(payload.studentName || 'anonymous', csv); // free fallback
+    lockTest();
+    console.log('Result payload:', payload, 'POST:', postRes);
+    alert('Submission saved. Results were sent to the server and a CSV was downloaded.');
+  }
+
+  function autoSubmit(reason){ finalize(reason); }
+
+  // Events
+  startBtn.addEventListener('click', startTest);
+  submitBtn.addEventListener('click', ()=> finalize('manual'));
+  downloadCsvBtn.addEventListener('click', ()=>{
+    const csv = toCSV(collectPayload('download-only'));
+    downloadCSV((nameInput.value || '').trim() || 'anonymous', csv);
+  });
+  resetBtn.addEventListener('click', ()=>{ location.reload(); });
+
+  // ===== Anti-cheat robusto =====
+  // 1) Conta troca de aba quando o doc fica hidden
+  document.addEventListener('visibilitychange', ()=>{
+    if(!started || ended) return;
+    if(document.visibilityState === 'hidden'){
+      tabSwitches++; tabCountEl.textContent = `Tab switches: ${tabSwitches}`;
+      focusFlag.textContent = 'Focus LOST'; focusFlag.className = 'badge';
+      isBlurred = true; blurStart = Date.now();
+    } else {
+      focusFlag.textContent = 'Focus OK'; focusFlag.className = 'badge';
+      if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
     }
+  });
 
-    function toCSV(obj){
-      const s = obj;
-      const row = [
-        new Date().toISOString(), s.testId, JSON.stringify(s.studentName), s.startISO, s.endISO, s.durationSec,
-        s.score.totalCorrect, s.score.totalPossible,
-        s.score.byDifficulty.easy, s.score.byDifficulty.medium, s.score.byDifficulty.hard,
-        s.focus.tabSwitches, s.focus.blurCount, s.focus.totalBlurMs, s.focus.copyCount, s.focus.pasteCount, s.focus.findCount,
-        JSON.stringify(s.answers), JSON.stringify(s.writing)
-      ];
-      const header = [
-        'timestamp','testId','studentName','startISO','endISO','durationSec','correct','possible','easyCorrect','mediumCorrect','hardCorrect','tabSwitches','blurCount','totalBlurMs','copyCount','pasteCount','findCount','answers','writing'
-      ];
-      return header.join(',') + '\n' + row.join(',');
+  // 2) Alguns navegadores só disparam blur (não hidden). Contabilize como tab switch também.
+  window.addEventListener('blur', ()=>{
+    if(!started || ended) return;
+    blurCount++;
+    // Se o doc NÃO ficou hidden, consideramos também tab switch (alt+tab / outra janela)
+    if (document.visibilityState !== 'hidden') {
+      tabSwitches++; tabCountEl.textContent = `Tab switches: ${tabSwitches}`;
     }
+    focusFlag.textContent='Focus LOST'; isBlurred=true; blurStart=Date.now();
+  });
 
-    async function sendResults(payload){
-      try{
-        const res = await fetch(ENDPOINT, {
-          method:'POST',
-          headers:{ 'Content-Type':'text/plain' }, // CORS-friendly: avoids preflight
-          body: JSON.stringify(payload)
-        });
-        return { posted: res.ok, status: res.status };
-      }catch(err){
-        console.warn('POST failed', err);
-        return { posted:false, error: String(err) };
-      }
-    }
+  window.addEventListener('focus', ()=>{
+    if(!started || ended) return;
+    focusFlag.textContent='Focus OK';
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  });
 
-    function downloadCSV(name, csv){
-      const blob = new Blob([csv], {type:'text/csv'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_Module3_Quiz.csv`;
-      document.body.appendChild(a); a.click(); a.remove();
-    }
+  // 3) Fallback em navegação/fechamento da página
+  window.addEventListener('pagehide', ()=>{
+    if(!started || ended) return;
+    tabSwitches++; tabCountEl.textContent = `Tab switches: ${tabSwitches}`;
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  });
 
-    function lockTest(){
-      [...form.elements].forEach(el=>el.disabled = true);
-      submitBtn.disabled = true; downloadCsvBtn.disabled = false;
-      document.getElementById('notes').innerHTML = '<strong>Locked:</strong> Time is up or test submitted. Your answers were recorded.';
-      document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
-    }
+  // Copy/paste/find tracking
+  document.addEventListener('copy', ()=>{ copyCount++; });
+  document.addEventListener('paste', ()=>{ pasteCount++; });
+  document.addEventListener('keydown', (e)=>{
+    if((e.ctrlKey||e.metaKey) && (e.key==='f' || e.key==='F')){ findCount++; }
+  });
+  document.addEventListener('contextmenu', (e)=> e.preventDefault());
+</script>
 
-    async function finalize(reason){
-      if(ended) return; ended = true; endTime = new Date(); clearInterval(timerInterval);
-      const payload = collectPayload(reason);
-      const csv = toCSV(payload);
-      const postRes = await sendResults(payload);
-      downloadCSV(payload.studentName || 'anonymous', csv); // free fallback
-      lockTest();
-      console.log('Result payload:', payload, 'POST:', postRes);
-      alert('Submission saved. Results were sent to the server and a CSV was downloaded.');
-    }
-
-    function autoSubmit(reason){ finalize(reason); }
-
-    // Events
-    startBtn.addEventListener('click', startTest);
-    submitBtn.addEventListener('click', ()=> finalize('manual'));
-    downloadCsvBtn.addEventListener('click', ()=>{
-      const csv = toCSV(collectPayload('download-only'));
-      downloadCSV(nameInput.value.trim() || 'anonymous', csv);
-    });
-    resetBtn.addEventListener('click', ()=>{ location.reload(); });
-
-    // Focus/visibility tracking
-    document.addEventListener('visibilitychange', ()=>{
-      if(!started || ended) return;
-      if(document.visibilityState === 'hidden'){
-        tabSwitches++; tabCountEl.textContent = `Tab switches: ${tabSwitches}`;
-        focusFlag.textContent = 'Focus LOST'; focusFlag.className = 'badge';
-        isBlurred = true; blurStart = Date.now();
-      } else {
-        focusFlag.textContent = 'Focus OK'; focusFlag.className = 'badge';
-        if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
-      }
-    });
-    window.addEventListener('blur', ()=>{
-      if(!started || ended) return; blurCount++; focusFlag.textContent='Focus LOST'; focusFlag.className='badge'; isBlurred=true; blurStart=Date.now();
-    });
-    window.addEventListener('focus', ()=>{
-      if(!started || ended) return; focusFlag.textContent='Focus OK'; focusFlag.className='badge'; if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
-    });
-
-    // Copy/paste/find tracking
-    document.addEventListener('copy', ()=>{ copyCount++; });
-    document.addEventListener('paste', ()=>{ pasteCount++; });
-    document.addEventListener('keydown', (e)=>{
-      if((e.ctrlKey||e.metaKey) && (e.key==='f' || e.key==='F')){ findCount++; }
-      if((e.ctrlKey||e.metaKey) && (['c','x','v'].includes(e.key.toLowerCase()))){ /* log only */ }
-    });
-    document.addEventListener('contextmenu', (e)=> e.preventDefault());
-  </script>
 </body>
 </html>
+
 
