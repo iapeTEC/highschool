@@ -28,17 +28,11 @@
     .options label{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start;padding:8px;background:#0e1330;border:1px solid var(--border);border-radius:10px;cursor:pointer}
     .writing{min-height:100px;width:100%;resize:vertical;background:#0f1330;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .bad{color:var(--bad)}
-    .ok{color:var(--ok)}
-    .warn{color:var(--warn)}
-    .meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .timer{font-weight:800;letter-spacing:.5px}
     .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:#101538;font-size:12px}
     footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:#cfd7ff;opacity:.85}
     .notice{background:#101538;border:1px dashed var(--border);padding:10px;border-radius:10px}
     .hidden{display:none!important}
     .strike{opacity:.45;filter:grayscale(.6)}
-    .cta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .small{font-size:12px}
   </style>
 </head>
@@ -54,7 +48,8 @@
           <span id="focusFlag" class="badge">Focus OK</span>
           <span id="tabCount" class="badge">Tab switches: 0</span>
         </div>
-        <div class="cta">
+        <div class="row">
+          <input id="testId" type="text" placeholder="Module3-Revolution-Quiz-v1" />
           <button id="startBtn">Start Test</button>
           <button id="submitBtn" disabled>Submit</button>
         </div>
@@ -230,23 +225,10 @@
 
     <div class="card">
       <h3>Results & Admin</h3>
-      <p class="muted small">Results are auto-computed for multiple choice. Writing responses are saved for manual grading. Focus changes, copy/find attempts, and timing are logged. If you provide a webhook endpoint (e.g., Google Apps Script), results will be POSTed as JSON; otherwise, a CSV file will download.</p>
-      <div class="grid">
-        <div>
-          <label class="muted small">Optional Results Endpoint (POST JSON)</label>
-          <input id="endpoint" type="text" placeholder="https://script.google.com/macros/s/AKfycby7mv_B6ZvLH75HkLYxZYDSdVhAFSdAdxLQf5rWo9sSt_AQRAUSwdhQoXyAFVxSmJH6Wg/exec" />
-        </div>
-        <div>
-          <label class="muted small">Test ID (for your records)</label>
-          <input id="testId" type="text" placeholder="Module3-Revolution-Quiz-v1" />
-        </div>
-      </div>
+      <p class="muted small">Results are auto-computed for multiple choice. Writing responses are saved for manual grading. Focus changes, copy/find attempts, and timing are logged. A CSV downloads automatically, and results are also POSTed to your Google Apps Script.</p>
       <div class="row" style="margin-top:10px">
         <button id="downloadCsvBtn" disabled>Download CSV</button>
         <button id="resetBtn">Reset</button>
-      </div>
-      <div class="notice small" style="margin-top:10px">
-        <strong>Free, simple backend (optional):</strong> Use a Google Apps Script Web App to receive JSON and write to a Google Sheet. Paste the deployed URL above. (Template code is in the HTML comments.)
       </div>
     </div>
 
@@ -255,31 +237,10 @@
     </footer>
   </main>
 
-  <!-- === Minimal Google Apps Script (optional) ===
-  1) Create a Google Sheet with headers you like (Timestamp, Name, Score, etc.)
-  2) In Google Apps Script, paste:
-
-  function doPost(e){
-    const sheet = SpreadsheetApp.openById('PUT_SHEET_ID_HERE').getSheetByName('Sheet1');
-    const data = JSON.parse(e.postData.contents);
-    const row = [
-      new Date(), data.testId, data.studentName, data.startISO, data.endISO, data.durationSec,
-      data.score.totalCorrect, data.score.totalPossible, data.score.byDifficulty.easy,
-      data.score.byDifficulty.medium, data.score.byDifficulty.hard,
-      data.focus.tabSwitches, data.focus.blurCount, data.focus.totalBlurMs,
-      JSON.stringify(data.answers), JSON.stringify(data.writing)
-    ];
-    sheet.appendRow(row);
-    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
-  }
-
-  3) Deploy > New deployment > Type: Web app > Execute as: Me; Who has access: Anyone
-  4) Copy the Web app URL and paste into the Endpoint field above.
-  -->
-
   <script>
     // ===== Config =====
     const DEFAULT_MINUTES = 30; // quiz length
+    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyvmVTcmjumr5uAGS7W-NWW5LRlRflUCvnkgk37kZqaBhSHcjjM1y84bk_B38NkFpnGaw/exec';
 
     // ===== State =====
     let started = false, ended = false;
@@ -296,10 +257,9 @@
     const timerEl = document.getElementById('timer');
     const form = document.getElementById('quizForm');
     const nameInput = document.getElementById('studentName');
+    const testIdInput = document.getElementById('testId');
     const focusFlag = document.getElementById('focusFlag');
     const tabCountEl = document.getElementById('tabCount');
-    const endpointInput = document.getElementById('endpoint');
-    const testIdInput = document.getElementById('testId');
     const downloadCsvBtn = document.getElementById('downloadCsvBtn');
     const resetBtn = document.getElementById('resetBtn');
 
@@ -329,7 +289,8 @@
       const name = nameInput.value.trim();
       if(!name){ alert('Please enter your full name before starting.'); return; }
       started = true; startTime = new Date();
-      nameInput.disabled = true; startBtn.disabled = true; submitBtn.disabled = false;
+      nameInput.disabled = true; testIdInput.disabled = true;
+      startBtn.disabled = true; submitBtn.disabled = false;
       [...form.elements].forEach(el=>el.disabled = false);
       startTimer();
       localStorage.setItem('m3_session', JSON.stringify({ts: Date.now(), name}));
@@ -367,7 +328,7 @@
     function collectPayload(reason='manual'){
       const g = grade();
       const now = new Date();
-      const payload = {
+      return {
         testId: (testIdInput.value.trim() || 'Module3-Revolution-Quiz-v1'),
         studentName: nameInput.value.trim(),
         startISO: startTime?.toISOString() || null,
@@ -379,11 +340,9 @@
         writing: g.writing,
         focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount }
       };
-      return payload;
     }
 
     function toCSV(obj){
-      // Flatten minimal useful fields for a row-based CSV
       const s = obj;
       const row = [
         new Date().toISOString(), s.testId, JSON.stringify(s.studentName), s.startISO, s.endISO, s.durationSec,
@@ -399,13 +358,16 @@
     }
 
     async function sendResults(payload){
-      const url = endpointInput.value.trim();
-      if(!url){ return { posted:false }; }
       try{
-        const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const res = await fetch(ENDPOINT, {
+          method:'POST',
+          headers:{ 'Content-Type':'text/plain' }, // CORS-friendly: avoids preflight
+          body: JSON.stringify(payload)
+        });
         return { posted: res.ok, status: res.status };
       }catch(err){
-        console.warn('POST failed', err); return { posted:false, error: String(err) };
+        console.warn('POST failed', err);
+        return { posted:false, error: String(err) };
       }
     }
 
@@ -413,7 +375,7 @@
       const blob = new Blob([csv], {type:'text/csv'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `${name.replace(/\s+/g,'_')}_Module3_Quiz.csv`;
+      a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_Module3_Quiz.csv`;
       document.body.appendChild(a); a.click(); a.remove();
     }
 
@@ -429,16 +391,15 @@
       const payload = collectPayload(reason);
       const csv = toCSV(payload);
       const postRes = await sendResults(payload);
-      // Always offer CSV download as free, no-setup fallback
-      downloadCSV(payload.studentName || 'anonymous', csv);
+      downloadCSV(payload.studentName || 'anonymous', csv); // free fallback
       lockTest();
       console.log('Result payload:', payload, 'POST:', postRes);
-      alert('Submission saved. If an endpoint was provided, results were also sent.');
+      alert('Submission saved. Results were sent to the server and a CSV was downloaded.');
     }
 
     function autoSubmit(reason){ finalize(reason); }
 
-    // Event wiring
+    // Events
     startBtn.addEventListener('click', startTest);
     submitBtn.addEventListener('click', ()=> finalize('manual'));
     downloadCsvBtn.addEventListener('click', ()=>{
@@ -452,8 +413,7 @@
       if(!started || ended) return;
       if(document.visibilityState === 'hidden'){
         tabSwitches++; tabCountEl.textContent = `Tab switches: ${tabSwitches}`;
-        focusFlag.textContent = 'Focus LOST'; focusFlag.className = 'badge warn';
-        // start blur timer
+        focusFlag.textContent = 'Focus LOST'; focusFlag.className = 'badge';
         isBlurred = true; blurStart = Date.now();
       } else {
         focusFlag.textContent = 'Focus OK'; focusFlag.className = 'badge';
@@ -461,7 +421,7 @@
       }
     });
     window.addEventListener('blur', ()=>{
-      if(!started || ended) return; blurCount++; focusFlag.textContent='Focus LOST'; focusFlag.className='badge warn'; isBlurred=true; blurStart=Date.now();
+      if(!started || ended) return; blurCount++; focusFlag.textContent='Focus LOST'; focusFlag.className='badge'; isBlurred=true; blurStart=Date.now();
     });
     window.addEventListener('focus', ()=>{
       if(!started || ended) return; focusFlag.textContent='Focus OK'; focusFlag.className='badge'; if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
@@ -472,8 +432,7 @@
     document.addEventListener('paste', ()=>{ pasteCount++; });
     document.addEventListener('keydown', (e)=>{
       if((e.ctrlKey||e.metaKey) && (e.key==='f' || e.key==='F')){ findCount++; }
-      // Optional deterrents (not foolproof):
-      if((e.ctrlKey||e.metaKey) && (['c','x','v'].includes(e.key.toLowerCase()))){ /* allow but log */ }
+      if((e.ctrlKey||e.metaKey) && (['c','x','v'].includes(e.key.toLowerCase()))){ /* log only */ }
     });
     document.addEventListener('contextmenu', (e)=> e.preventDefault());
   </script>
