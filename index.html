@@ -1,61 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Module 3 – The American Revolution | Quiz</title>
   <style>
+    /* ========== THEME ========== */
     :root{
-      --bg:#0f1220;--card:#151936;--muted:#8ea0ff;--text:#e9ecff;--accent:#7c9bff;--ok:#38c172;--warn:#ffb02e;--bad:#ff6b6b;--border:rgba(255,255,255,.12)
+      --bg:#ffffff; --card:#ffffff; --text:#0b1220; --muted:#6b7280;
+      --accent:#1f6feb; --ok:#16a34a; --ok-weak:#dcfce7; --warn:#b45309; --bad:#dc2626;
+      --border:rgba(0,0,0,.12); --shadow:rgba(0,0,0,.08);
     }
+    html[data-theme="dark"]{
+      --bg:#000000; --card:#0b0b0f; --text:#f5f7ff; --muted:#a3a7b7;
+      --accent:#7c9bff; --ok:#22c55e; --ok-weak:#062b14; --warn:#ffb02e; --bad:#ff6b6b;
+      --border:rgba(255,255,255,.14); --shadow:rgba(0,0,0,.55);
+    }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:linear-gradient(180deg,#0b0e1a,#161a39 40%,#0b0e1a);color:var(--text)}
-    header{position:sticky;top:0;z-index:10;background:rgba(15,18,32,.8);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
-    .wrap{max-width:1000px;margin:0 auto;padding:18px}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    a{color:var(--accent);text-decoration:none}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.75);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border)}
+    html[data-theme="dark"] header{background:rgba(0,0,0,.7)}
+    .wrap{max-width:1000px;margin:0 auto;padding:16px}
     h1{margin:0 0 6px;font-size:clamp(22px,2.6vw,32px)}
-    .sub{color:#cfd7ff;opacity:.9}
+    .sub{color:var(--muted)}
     .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:10px}
-    input[type=text]{background:#0f1330;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;min-width:220px}
-    button{background:var(--accent);border:none;color:#091134;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(124,155,255,.35)}
+    input[type=text]{background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;min-width:220px;outline:none}
+    input[type=text]::placeholder{color:var(--muted)}
+    button{background:var(--accent);border:none;color:#ffffff;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px var(--shadow)}
     button[disabled]{opacity:.5;cursor:not-allowed}
-    .pill{display:inline-flex;gap:8px;align-items:center;background:#0d1230;border:1px solid var(--border);padding:8px 12px;border-radius:999px}
+    .icon-btn{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);padding:8px 12px;border-radius:999px}
     .grid{display:grid;gap:16px;grid-template-columns:1fr}
     @media(min-width:880px){.grid{grid-template-columns:1fr 1fr}}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px}
-    .card h3{margin:0 0 8px;font-size:18px}
-    .muted{color:#cfd7ff;opacity:.8}
-    .options{display:grid;gap:8px;margin-top:10px}
-    .options label{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start;padding:8px;background:#0e1330;border:1px solid var(--border);border-radius:10px;cursor:pointer}
-    .writing{min-height:100px;width:100%;resize:vertical;background:#0f1330;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:0 8px 30px var(--shadow)}
+    .card h3{margin:0 0 6px;font-size:18px}
+    .muted{color:var(--muted)}
+    .options{display:grid;gap:8px;margin-top:8px}
+    .options label{
+      display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;
+      padding:10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;background:transparent;
+      transition:transform .08s ease, box-shadow .08s ease, background .12s ease, border-color .12s ease, color .12s ease;
+      box-shadow:0 2px 0 var(--shadow);
+    }
+    /* “Afunda” e fica verde quando selecionada */
+    .options label:has(input[type=radio]:checked){
+      background:var(--ok-weak); border-color:var(--ok); transform:translateY(1px);
+      box-shadow:inset 0 2px 0 rgba(0,0,0,.06);
+      color:#064e3b;
+    }
+    .options input[type=radio]{margin-top:3px}
+    .writing{min-height:100px;width:100%;resize:vertical;background:transparent;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:#101538;font-size:12px}
-    footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:#cfd7ff;opacity:.85}
-    .notice{background:#101538;border:1px dashed var(--border);padding:10px;border-radius:10px}
+    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:12px}
+    footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:var(--muted)}
+    .notice{border:1px dashed var(--border);padding:10px;border-radius:10px;color:var(--muted)}
     .hidden{display:none!important}
-    .strike{opacity:.45;filter:grayscale(.6)}
+    .strike{opacity:.5;filter:grayscale(.3)}
     .small{font-size:12px}
+    .timer{font-weight:800;letter-spacing:.5px}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap">
-      <h1>Module 3 – The American Revolution (Secure Quiz)</h1>
-      <div class="sub">Stirrings of Rebellion · Ideas Help Start a Revolution · Winning the War (Symbol of Liberty)</div>
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <h1>Module 3 – The American Revolution (Quiz)</h1>
+          <div class="sub">Stirrings of Rebellion · Ideas · Winning the War</div>
+        </div>
+        <button id="themeToggle" class="icon-btn">🌓 Theme</button>
+      </div>
+
       <div class="bar">
         <div class="row">
-          <input id="studentName" type="text" placeholder="Your full name" autocomplete="name" />
-          <span class="pill"><strong>Time Left:</strong> <span id="timer" class="timer">30:00</span></span>
+          <input id="studentName" type="text" placeholder="Full name" autocomplete="name" />
+          <span class="pill"><strong>Time:</strong> <span id="timer" class="timer">30:00</span></span>
           <span id="focusFlag" class="badge">Focus OK</span>
-          <span id="tabCount" class="badge">Tab switches: 0</span>
+          <span id="tabCount" class="badge">Tab: 0</span>
         </div>
         <div class="row">
           <input id="testId" type="text" placeholder="Module3-Revolution-Quiz-v1" />
-          <button id="startBtn">Start Test</button>
+          <button id="startBtn">Start</button>
           <button id="submitBtn" disabled>Submit</button>
         </div>
       </div>
+
       <div class="notice small" id="notes">
-        <strong>Heads up:</strong> Leaving this tab or window is recorded (visibility + blur). Copy/Find attempts are logged. When the 30-minute timer ends, all questions lock and your answers are auto-submitted.
+        Don’t leave this tab. Timer auto-submits at 30:00.
       </div>
     </div>
   </header>
@@ -77,7 +110,7 @@
       </section>
 
       <section class="card" data-difficulty="easy">
-        <h3>Q2. <em>Common Sense</em> (1776) was a pamphlet that argued for independence. Who wrote it?</h3>
+        <h3>Q2. <em>Common Sense</em> (1776) argued for independence. Who wrote it?</h3>
         <div class="options">
           <label><input type="radio" name="q2" value="a" data-correct> a) Thomas Paine</label>
           <label><input type="radio" name="q2" value="b"> b) John Locke</label>
@@ -136,7 +169,7 @@
         <h3>Q7. What did the Proclamation of 1763 do?</h3>
         <div class="options">
           <label><input type="radio" name="q7" value="a"> a) Ended the French and Indian War</label>
-          <label><input type="radio" name="q7" value="b" data-correct> b) Limited colonial settlement west of the Appalachian Mountains</label>
+          <label><input type="radio" name="q7" value="b" data-correct> b) Limited settlement west of the Appalachians</label>
           <label><input type="radio" name="q7" value="c"> c) Raised taxes on tea</label>
           <label><input type="radio" name="q7" value="d"> d) Created the Continental Army</label>
           <label><input type="radio" name="q7" value="e"> e) Declared independence</label>
@@ -157,11 +190,11 @@
       <section class="card" data-difficulty="medium">
         <h3>Q9. What was the main effect of the Tea Act of 1773?</h3>
         <div class="options">
-          <label><input type="radio" name="q9" value="a"> a) Raised the price of tea for colonists</label>
-          <label><input type="radio" name="q9" value="b" data-correct> b) Gave the British East India Company a monopoly, undercutting colonial merchants</label>
-          <label><input type="radio" name="q9" value="c"> c) Banned tea imports entirely</label>
-          <label><input type="radio" name="q9" value="d"> d) Created new colonial assemblies</label>
-          <label><input type="radio" name="q9" value="e"> e) Repealed the Townshend duties</label>
+          <label><input type="radio" name="q9" value="a"> a) Raised the price of tea</label>
+          <label><input type="radio" name="q9" value="b" data-correct> b) Monopoly to the British East India Company</label>
+          <label><input type="radio" name="q9" value="c"> c) Banned tea imports</label>
+          <label><input type="radio" name="q9" value="d"> d) Created new assemblies</label>
+          <label><input type="radio" name="q9" value="e"> e) Repealed Townshend duties</label>
         </div>
       </section>
 
@@ -169,11 +202,11 @@
       <section class="card" data-difficulty="hard">
         <h3>Q10. Which statement best describes “salutary neglect” and its impact?</h3>
         <div class="options">
-          <label><input type="radio" name="q10" value="a"> a) A strict enforcement of taxes that unified colonies</label>
-          <label><input type="radio" name="q10" value="b" data-correct> b) A long period of lax enforcement that fostered colonial self-government</label>
-          <label><input type="radio" name="q10" value="c"> c) A French policy toward British traders</label>
-          <label><input type="radio" name="q10" value="d"> d) A colonial boycott of British tea</label>
-          <label><input type="radio" name="q10" value="e"> e) A British military occupation of Philadelphia</label>
+          <label><input type="radio" name="q10" value="a"> a) Strict tax enforcement that unified colonies</label>
+          <label><input type="radio" name="q10" value="b" data-correct> b) Lax enforcement that fostered self-government</label>
+          <label><input type="radio" name="q10" value="c"> c) French policy toward British traders</label>
+          <label><input type="radio" name="q10" value="d"> d) Colonial boycott of tea</label>
+          <label><input type="radio" name="q10" value="e"> e) British occupation of Philadelphia</label>
         </div>
       </section>
 
@@ -191,11 +224,11 @@
       <section class="card" data-difficulty="hard">
         <h3>Q12. Why is Valley Forge (1777–1778) significant?</h3>
         <div class="options">
-          <label><input type="radio" name="q12" value="a"> a) It was the site of the final British surrender</label>
-          <label><input type="radio" name="q12" value="b"> b) It marked the first shots of the war</label>
-          <label><input type="radio" name="q12" value="c" data-correct> c) It was a harsh winter encampment where the army endured and improved discipline</label>
-          <label><input type="radio" name="q12" value="d"> d) It secured a Spanish alliance</label>
-          <label><input type="radio" name="q12" value="e"> e) It led directly to the Treaty of Paris</label>
+          <label><input type="radio" name="q12" value="a"> a) Final British surrender</label>
+          <label><input type="radio" name="q12" value="b"> b) First shots of the war</label>
+          <label><input type="radio" name="q12" value="c" data-correct> c) Harsh winter; discipline improved</label>
+          <label><input type="radio" name="q12" value="d"> d) Spanish alliance</label>
+          <label><input type="radio" name="q12" value="e"> e) Led to Treaty of Paris</label>
         </div>
       </section>
 
@@ -203,21 +236,21 @@
         <h3>Q13. The Treaty of Paris (1783) did which of the following?</h3>
         <div class="options">
           <label><input type="radio" name="q13" value="a"> a) Restored French rule in Canada</label>
-          <label><input type="radio" name="q13" value="b"> b) Granted independence to Britain’s Caribbean colonies</label>
-          <label><input type="radio" name="q13" value="c" data-correct> c) Recognized U.S. independence and boundaries to the Mississippi River</label>
-          <label><input type="radio" name="q13" value="d"> d) Abolished slavery in the United States</label>
+          <label><input type="radio" name="q13" value="b"> b) Granted independence to Caribbean colonies</label>
+          <label><input type="radio" name="q13" value="c" data-correct> c) Recognized U.S. independence & Mississippi boundary</label>
+          <label><input type="radio" name="q13" value="d"> d) Abolished slavery in the U.S.</label>
           <label><input type="radio" name="q13" value="e"> e) Created the Articles of Confederation</label>
         </div>
       </section>
 
       <!-- WRITING (2) -->
       <section class="card" data-difficulty="writing">
-        <h3>Q14. Short response (2–3 sentences): How did Enlightenment ideas shape the colonists’ arguments for independence?</h3>
+        <h3>Q14. Short response (2–3 sentences): How did Enlightenment ideas shape the arguments for independence?</h3>
         <textarea name="q14" class="writing" placeholder="Write your answer here..."></textarea>
       </section>
 
       <section class="card" data-difficulty="writing">
-        <h3>Q15. Short response (2–3 sentences): Why was the Battle of Saratoga considered a turning point?</h3>
+        <h3>Q15. Short response (2–3 sentences): Why was Saratoga a turning point?</h3>
         <textarea name="q15" class="writing" placeholder="Write your answer here..."></textarea>
       </section>
 
@@ -225,19 +258,31 @@
 
     <div class="card">
       <h3>Results & Admin</h3>
-      <p class="muted small">For teacher's use, only!, don't touch it!</p>
+      <p class="muted small">Teacher only.</p>
       <div class="row" style="margin-top:10px">
         <button id="downloadCsvBtn" disabled>Download CSV</button>
-        <button id="resetBtn">Reset</button>
+        <button id="resetBtn" class="icon-btn">Reset</button>
       </div>
     </div>
 
     <footer>
-      <div>Designed by MF Bruno, your MF Teacher! What's up Bro!?</div>
+      <div class="small">Designed by MF Bruno – minimal UI.</div>
     </footer>
   </main>
 
   <script>
+  // ===== Theme toggle (persist) =====
+  (function(){
+    const root = document.documentElement;
+    const saved = localStorage.getItem('theme') || 'light';
+    root.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+  })();
+
   // ===== Config =====
   const DEFAULT_MINUTES = 30; // quiz length
   const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
@@ -289,7 +334,6 @@
     const name = nameInput.value.trim();
     if(!name){ alert('Please enter your full name before starting.'); return; }
     started = true; startTime = new Date();
-    // Não limpe o valor do input; apenas desabilite
     nameInput.disabled = true; testIdInput.disabled = true;
     startBtn.disabled = true; submitBtn.disabled = false;
     [...form.elements].forEach(el=>el.disabled = false);
@@ -329,7 +373,6 @@
   function collectPayload(reason='manual'){
     const g = grade();
     const now = new Date();
-    // Garante que sempre haja um nome no payload
     const studentNameSafe = (nameInput.value || '').trim() || '(no name)';
     return {
       testId: (testIdInput.value.trim() || 'Module3-Revolution-Quiz-v1'),
@@ -364,7 +407,7 @@
     try{
       const res = await fetch(ENDPOINT, {
         method:'POST',
-        headers:{ 'Content-Type':'text/plain' }, // CORS-friendly
+        headers:{ 'Content-Type':'text/plain' },
         body: JSON.stringify(payload)
       });
       return { posted: res.ok, status: res.status };
@@ -385,7 +428,7 @@
   function lockTest(){
     [...form.elements].forEach(el=>el.disabled = true);
     submitBtn.disabled = true; downloadCsvBtn.disabled = false;
-    document.getElementById('notes').innerHTML = '<strong>Locked:</strong> Time is up or test submitted. Your answers were recorded.';
+    document.getElementById('notes').textContent = 'Locked. Answers recorded.';
     document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
   }
 
@@ -394,10 +437,10 @@
     const payload = collectPayload(reason);
     const csv = toCSV(payload);
     const postRes = await sendResults(payload);
-    downloadCSV(payload.studentName || 'anonymous', csv); // free fallback
+    downloadCSV(payload.studentName || 'anonymous', csv);
     lockTest();
     console.log('Result payload:', payload, 'POST:', postRes);
-    alert('Submission saved. Results were sent to the server and a CSV was downloaded.');
+    alert('Submission saved.');
   }
 
   function autoSubmit(reason){ finalize(reason); }
@@ -411,55 +454,42 @@
   });
   resetBtn.addEventListener('click', ()=>{ location.reload(); });
 
-  // ===== Anti-cheat robusto =====
-  // 1) Conta troca de aba quando o doc fica hidden
+  // Anti-cheat
   document.addEventListener('visibilitychange', ()=>{
     if(!started || ended) return;
     if(document.visibilityState === 'hidden'){
-      tabSwitches++; tabCountEl.textContent = `Tab switches: ${tabSwitches}`;
-      focusFlag.textContent = 'Focus LOST'; focusFlag.className = 'badge';
+      tabSwitches++; tabCountEl.textContent = `Tab: ${tabSwitches}`;
+      focusFlag.textContent = 'Focus LOST';
       isBlurred = true; blurStart = Date.now();
     } else {
-      focusFlag.textContent = 'Focus OK'; focusFlag.className = 'badge';
+      focusFlag.textContent = 'Focus OK';
       if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
     }
   });
-
-  // 2) Alguns navegadores só disparam blur (não hidden). Contabilize como tab switch também.
   window.addEventListener('blur', ()=>{
     if(!started || ended) return;
     blurCount++;
-    // Se o doc NÃO ficou hidden, consideramos também tab switch (alt+tab / outra janela)
     if (document.visibilityState !== 'hidden') {
-      tabSwitches++; tabCountEl.textContent = `Tab switches: ${tabSwitches}`;
+      tabSwitches++; tabCountEl.textContent = `Tab: ${tabSwitches}`;
     }
     focusFlag.textContent='Focus LOST'; isBlurred=true; blurStart=Date.now();
   });
-
   window.addEventListener('focus', ()=>{
     if(!started || ended) return;
     focusFlag.textContent='Focus OK';
     if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
   });
-
-  // 3) Fallback em navegação/fechamento da página
   window.addEventListener('pagehide', ()=>{
     if(!started || ended) return;
-    tabSwitches++; tabCountEl.textContent = `Tab switches: ${tabSwitches}`;
+    tabSwitches++; tabCountEl.textContent = `Tab: ${tabSwitches}`;
     if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
   });
-
-  // Copy/paste/find tracking
   document.addEventListener('copy', ()=>{ copyCount++; });
   document.addEventListener('paste', ()=>{ pasteCount++; });
   document.addEventListener('keydown', (e)=>{
     if((e.ctrlKey||e.metaKey) && (e.key==='f' || e.key==='F')){ findCount++; }
   });
   document.addEventListener('contextmenu', (e)=> e.preventDefault());
-</script>
-
+  </script>
 </body>
 </html>
-
-
-
