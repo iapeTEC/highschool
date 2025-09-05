@@ -1,496 +1,224 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Module 3 – The American Revolution | Quiz</title>
-  <style>
-    /* ========== THEME ========== */
-    :root{
-      --bg:#ffffff; --card:#ffffff; --text:#0b1220; --muted:#6b7280;
-      --accent:#1f6feb; --ok:#16a34a; --ok-weak:#dcfce7; --warn:#b45309; --bad:#dc2626;
-      --border:rgba(0,0,0,.12); --shadow:rgba(0,0,0,.08);
-    }
-    html[data-theme="dark"]{
-      --bg:#000000; --card:#0b0b0f; --text:#f5f7ff; --muted:#a3a7b7;
-      --accent:#7c9bff; --ok:#22c55e; --ok-weak:#062b14; --warn:#ffb02e; --bad:#ff6b6b;
-      --border:rgba(255,255,255,.14); --shadow:rgba(0,0,0,.55);
-    }
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    a{color:var(--accent);text-decoration:none}
-    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.75);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border)}
-    html[data-theme="dark"] header{background:rgba(0,0,0,.7)}
-    .wrap{max-width:1000px;margin:0 auto;padding:16px}
-    h1{margin:0 0 6px;font-size:clamp(22px,2.6vw,32px)}
-    .sub{color:var(--muted)}
-    .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:10px}
-    input[type=text]{background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;min-width:220px;outline:none}
-    input[type=text]::placeholder{color:var(--muted)}
-    button{background:var(--accent);border:none;color:#ffffff;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px var(--shadow)}
-    button[disabled]{opacity:.5;cursor:not-allowed}
-    .icon-btn{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
-    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);padding:8px 12px;border-radius:999px}
-    .grid{display:grid;gap:16px;grid-template-columns:1fr}
-    @media(min-width:880px){.grid{grid-template-columns:1fr 1fr}}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:0 8px 30px var(--shadow)}
-    .card h3{margin:0 0 6px;font-size:18px}
-    .muted{color:var(--muted)}
-    .options{display:grid;gap:8px;margin-top:8px}
-    .options label{
-      display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;
-      padding:10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;background:transparent;
-      transition:transform .08s ease, box-shadow .08s ease, background .12s ease, border-color .12s ease, color .12s ease;
-      box-shadow:0 2px 0 var(--shadow);
-    }
-    /* “Afunda” e fica verde quando selecionada */
-    .options label:has(input[type=radio]:checked){
-      background:var(--ok-weak); border-color:var(--ok); transform:translateY(1px);
-      box-shadow:inset 0 2px 0 rgba(0,0,0,.06);
-      color:#064e3b;
-    }
-    .options input[type=radio]{margin-top:3px}
-    .writing{min-height:100px;width:100%;resize:vertical;background:transparent;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:12px}
-    footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:var(--muted)}
-    .notice{border:1px dashed var(--border);padding:10px;border-radius:10px;color:var(--muted)}
-    .hidden{display:none!important}
-    .strike{opacity:.5;filter:grayscale(.3)}
-    .small{font-size:12px}
-    .timer{font-weight:800;letter-spacing:.5px}
+  <!-- PWA / ícones -->
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Chamada PG">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16x16.png">
+  <link rel="icon" href="./icons/favicon.ico">
+  <link rel="manifest" href="./site.webmanifest">
+  <meta name="theme-color" content="#1a1a1a">
+
+  <title>Dashboard — PG6</title>
+  <link rel="stylesheet" href="styleApontamento.css">
+
+  <style>
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+    .menu a { color:#9b59b6; text-decoration:none; font-weight:700; padding:8px 10px; border:1px solid #9b59b6; border-radius:6px; }
+    .menu a:hover { background:#9b59b6; color:#fff; }
+
+    .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+    .botao { background:#9b59b6; border:none; border-radius:6px; padding:10px 14px; cursor:pointer; font-weight:bold; }
+    .tiny { font-size:.9em; opacity:.8 }
+
+    .list { display:flex; flex-direction:column; gap:10px; }
+    .item { display:grid; grid-template-columns:64px 1fr; gap:12px; align-items:center; background:#2c2c2c; border-radius:12px; padding:12px; }
+    .avatar { width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid #9b59b6; background:#1a1a1a; }
+
+    .name { font-weight:700; }
+    .stats { display:flex; gap:12px; flex-wrap:wrap; font-size:.95em; opacity:.85; }
+
+    .track { position:relative; height:14px; background:#3d3d3d; border-radius:999px; overflow:hidden; border:1px solid #444; }
+    .fill  { position:absolute; inset:0; width:0%; background:#2ecc71; }
+    .runner{ position:absolute; top:50%; translate:-50% -50%; width:24px; height:24px; border-radius:50%; border:2px solid #2c2c2c; box-shadow:0 0 0 3px rgba(155,89,182,.25); overflow:hidden }
+    .runner img{ width:100%; height:100%; object-fit:cover; border-radius:50% }
+
+    .barRow{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px; margin-top:6px }
+    .barNote{ font:600 12px/1 system-ui; opacity:.8 }
   </style>
+
+  <!-- libs para PDF -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <div>
-          <h1>Module 3 – The American Revolution (Quiz)</h1>
-          <div class="sub">Stirrings of Rebellion · Ideas · Winning the War</div>
-        </div>
-        <button id="themeToggle" class="icon-btn">🌓 Theme</button>
-      </div>
-
-      <div class="bar">
-        <div class="row">
-          <input id="studentName" type="text" placeholder="Full name" autocomplete="name" />
-          <span class="pill"><strong>Time:</strong> <span id="timer" class="timer">30:00</span></span>
-          <span id="focusFlag" class="badge">Focus OK</span>
-          <span id="tabCount" class="badge">Tab: 0</span>
-        </div>
-        <div class="row">
-          <input id="testId" type="text" placeholder="Module3-Revolution-Quiz-v1" />
-          <button id="startBtn">Start</button>
-          <button id="submitBtn" disabled>Submit</button>
-        </div>
-      </div>
-
-      <div class="notice small" id="notes">
-        Don’t leave this tab. Timer auto-submits at 30:00.
-      </div>
-    </div>
-  </header>
-
-  <main class="wrap">
-    <form id="quizForm" class="grid" autocomplete="off">
-
-      <!-- EASY (4) -->
-      <section class="card" data-difficulty="easy">
-        <h3>Q1. Which phrase summed up the colonists’ objection to British taxes?</h3>
-        <div class="muted">(Choose one)</div>
-        <div class="options">
-          <label><input type="radio" name="q1" value="a"> a) Liberty and Union, Now and Forever</label>
-          <label><input type="radio" name="q1" value="b" data-correct> b) No taxation without representation</label>
-          <label><input type="radio" name="q1" value="c"> c) E Pluribus Unum</label>
-          <label><input type="radio" name="q1" value="d"> d) Give me liberty or give me death</label>
-          <label><input type="radio" name="q1" value="e"> e) Manifest Destiny</label>
-        </div>
-      </section>
-
-      <section class="card" data-difficulty="easy">
-        <h3>Q2. <em>Common Sense</em> (1776) argued for independence. Who wrote it?</h3>
-        <div class="options">
-          <label><input type="radio" name="q2" value="a" data-correct> a) Thomas Paine</label>
-          <label><input type="radio" name="q2" value="b"> b) John Locke</label>
-          <label><input type="radio" name="q2" value="c"> c) Benjamin Franklin</label>
-          <label><input type="radio" name="q2" value="d"> d) Samuel Adams</label>
-          <label><input type="radio" name="q2" value="e"> e) Thomas Jefferson</label>
-        </div>
-      </section>
-
-      <section class="card" data-difficulty="easy">
-        <h3>Q3. Which document declared the colonies free and independent states in 1776?</h3>
-        <div class="options">
-          <label><input type="radio" name="q3" value="a"> a) Mayflower Compact</label>
-          <label><input type="radio" name="q3" value="b"> b) Articles of Confederation</label>
-          <label><input type="radio" name="q3" value="c" data-correct> c) Declaration of Independence</label>
-          <label><input type="radio" name="q3" value="d"> d) Bill of Rights</label>
-          <label><input type="radio" name="q3" value="e"> e) Treaty of Paris</label>
-        </div>
-      </section>
-
-      <section class="card" data-difficulty="easy">
-        <h3>Q4. Who served as Commander-in-Chief of the Continental Army?</h3>
-        <div class="options">
-          <label><input type="radio" name="q4" value="a"> a) John Adams</label>
-          <label><input type="radio" name="q4" value="b"> b) Alexander Hamilton</label>
-          <label><input type="radio" name="q4" value="c" data-correct> c) George Washington</label>
-          <label><input type="radio" name="q4" value="d"> d) Benedict Arnold</label>
-          <label><input type="radio" name="q4" value="e"> e) John Hancock</label>
-        </div>
-      </section>
-
-      <!-- MEDIUM (5) -->
-      <section class="card" data-difficulty="medium">
-        <h3>Q5. Which battle is widely seen as the turning point that led to a French alliance?</h3>
-        <div class="options">
-          <label><input type="radio" name="q5" value="a"> a) Bunker Hill</label>
-          <label><input type="radio" name="q5" value="b"> b) Trenton</label>
-          <label><input type="radio" name="q5" value="c" data-correct> c) Saratoga</label>
-          <label><input type="radio" name="q5" value="d"> d) Yorktown</label>
-          <label><input type="radio" name="q5" value="e"> e) Lexington and Concord</label>
-        </div>
-      </section>
-
-      <section class="card" data-difficulty="medium">
-        <h3>Q6. The Coercive/Intolerable Acts were passed in response to which event?</h3>
-        <div class="options">
-          <label><input type="radio" name="q6" value="a"> a) Boston Massacre</label>
-          <label><input type="radio" name="q6" value="b" data-correct> b) Boston Tea Party</label>
-          <label><input type="radio" name="q6" value="c"> c) Stamp Act Congress</label>
-          <label><input type="radio" name="q6" value="d"> d) Olive Branch Petition</label>
-          <label><input type="radio" name="q6" value="e"> e) First Continental Congress</label>
-        </div>
-      </section>
-
-      <section class="card" data-difficulty="medium">
-        <h3>Q7. What did the Proclamation of 1763 do?</h3>
-        <div class="options">
-          <label><input type="radio" name="q7" value="a"> a) Ended the French and Indian War</label>
-          <label><input type="radio" name="q7" value="b" data-correct> b) Limited settlement west of the Appalachians</label>
-          <label><input type="radio" name="q7" value="c"> c) Raised taxes on tea</label>
-          <label><input type="radio" name="q7" value="d"> d) Created the Continental Army</label>
-          <label><input type="radio" name="q7" value="e"> e) Declared independence</label>
-        </div>
-      </section>
-
-      <section class="card" data-difficulty="medium">
-        <h3>Q8. Which Enlightenment thinker most directly influenced the Declaration’s natural rights?</h3>
-        <div class="options">
-          <label><input type="radio" name="q8" value="a" data-correct> a) John Locke</label>
-          <label><input type="radio" name="q8" value="b"> b) Voltaire</label>
-          <label><input type="radio" name="q8" value="c"> c) Rousseau</label>
-          <label><input type="radio" name="q8" value="d"> d) Montesquieu</label>
-          <label><input type="radio" name="q8" value="e"> e) Hobbes</label>
-        </div>
-      </section>
-
-      <section class="card" data-difficulty="medium">
-        <h3>Q9. What was the main effect of the Tea Act of 1773?</h3>
-        <div class="options">
-          <label><input type="radio" name="q9" value="a"> a) Raised the price of tea</label>
-          <label><input type="radio" name="q9" value="b" data-correct> b) Monopoly to the British East India Company</label>
-          <label><input type="radio" name="q9" value="c"> c) Banned tea imports</label>
-          <label><input type="radio" name="q9" value="d"> d) Created new assemblies</label>
-          <label><input type="radio" name="q9" value="e"> e) Repealed Townshend duties</label>
-        </div>
-      </section>
-
-      <!-- HARD (4) -->
-      <section class="card" data-difficulty="hard">
-        <h3>Q10. Which statement best describes “salutary neglect” and its impact?</h3>
-        <div class="options">
-          <label><input type="radio" name="q10" value="a"> a) Strict tax enforcement that unified colonies</label>
-          <label><input type="radio" name="q10" value="b" data-correct> b) Lax enforcement that fostered self-government</label>
-          <label><input type="radio" name="q10" value="c"> c) French policy toward British traders</label>
-          <label><input type="radio" name="q10" value="d"> d) Colonial boycott of tea</label>
-          <label><input type="radio" name="q10" value="e"> e) British occupation of Philadelphia</label>
-        </div>
-      </section>
-
-      <section class="card" data-difficulty="hard">
-        <h3>Q11. Which battle occurred first?</h3>
-        <div class="options">
-          <label><input type="radio" name="q11" value="a" data-correct> a) Lexington and Concord</label>
-          <label><input type="radio" name="q11" value="b"> b) Bunker Hill</label>
-          <label><input type="radio" name="q11" value="c"> c) Trenton</label>
-          <label><input type="radio" name="q11" value="d"> d) Yorktown</label>
-          <label><input type="radio" name="q11" value="e"> e) Saratoga</label>
-        </div>
-      </section>
-
-      <section class="card" data-difficulty="hard">
-        <h3>Q12. Why is Valley Forge (1777–1778) significant?</h3>
-        <div class="options">
-          <label><input type="radio" name="q12" value="a"> a) Final British surrender</label>
-          <label><input type="radio" name="q12" value="b"> b) First shots of the war</label>
-          <label><input type="radio" name="q12" value="c" data-correct> c) Harsh winter; discipline improved</label>
-          <label><input type="radio" name="q12" value="d"> d) Spanish alliance</label>
-          <label><input type="radio" name="q12" value="e"> e) Led to Treaty of Paris</label>
-        </div>
-      </section>
-
-      <section class="card" data-difficulty="hard">
-        <h3>Q13. The Treaty of Paris (1783) did which of the following?</h3>
-        <div class="options">
-          <label><input type="radio" name="q13" value="a"> a) Restored French rule in Canada</label>
-          <label><input type="radio" name="q13" value="b"> b) Granted independence to Caribbean colonies</label>
-          <label><input type="radio" name="q13" value="c" data-correct> c) Recognized U.S. independence & Mississippi boundary</label>
-          <label><input type="radio" name="q13" value="d"> d) Abolished slavery in the U.S.</label>
-          <label><input type="radio" name="q13" value="e"> e) Created the Articles of Confederation</label>
-        </div>
-      </section>
-
-      <!-- WRITING (2) -->
-      <section class="card" data-difficulty="writing">
-        <h3>Q14. Short response (2–3 sentences): How did Enlightenment ideas shape the arguments for independence?</h3>
-        <textarea name="q14" class="writing" placeholder="Write your answer here..."></textarea>
-      </section>
-
-      <section class="card" data-difficulty="writing">
-        <h3>Q15. Short response (2–3 sentences): Why was Saratoga a turning point?</h3>
-        <textarea name="q15" class="writing" placeholder="Write your answer here..."></textarea>
-      </section>
-
-    </form>
-
-    <div class="card">
-      <h3>Results & Admin</h3>
-      <p class="muted small">Teacher only.</p>
-      <div class="row" style="margin-top:10px">
-        <button id="downloadCsvBtn" disabled>Download CSV</button>
-        <button id="resetBtn" class="icon-btn">Reset</button>
-      </div>
+  <div class="container">
+    <div class="topbar">
+      <h1>Dashboard — PG6 (corrida: quem tem <u>menos</u> falta)</h1>
+      <nav class="menu">
+        <a href="./rollcall.html">Ir para a Chamada</a>
+      </nav>
     </div>
 
-    <footer>
-      <div class="small">Designed by MF Bruno, your MF teacher! Hey yo...</div>
-    </footer>
-  </main>
+    <div class="controls">
+      <button class="botao" id="btnRefresh">Atualizar dados</button>
+      <button class="botao" id="btnPdf">Relatório (PDF)</button>
+      <span class="tiny" id="lastRefresh"></span>
+    </div>
+
+    <div class="list" id="lista"></div>
+  </div>
 
   <script>
-  // ===== Theme toggle (persist) =====
-  (function(){
-    const root = document.documentElement;
-    const saved = localStorage.getItem('theme') || 'light';
-    root.setAttribute('data-theme', saved);
-    document.getElementById('themeToggle').addEventListener('click', ()=>{
-      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      root.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    });
-  })();
+    // ===== CONFIG =====
+    const GROUP = 'PG6';
+    const API_KEY = 'AIzaSyBuxhNxlYcLM88G6BggpNO8XG8w2BY9vSE';
+    const SHEET_ID = '13hwIbPNJmHuLUxXfi-FJq4l-Gwl_mzIhkfPpl1N3A8c'; // mesma planilha
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyxix26KM2C5Q74SkdtYUjdjyf9Iv2ouG4iUOqDT-jORl8z4kExl-2tTv5LDQp9APgr/exec'; // (não usado aqui)
 
-  // ===== Config =====
-  const DEFAULT_MINUTES = 30; // quiz length
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
+    const CLASS_HOURS = 3;           // cada aula
+    const ABSENCE_LIMIT_HOURS = 18;  // pode faltar até 18h
+    const CLASS_DURATION_MIN = CLASS_HOURS * 60;
 
-  // ===== State =====
-  let started = false, ended = false;
-  let startTime = null, endTime = null, timerInterval = null;
-  let secondsLeft = DEFAULT_MINUTES * 60;
+    // ===== STATE =====
+    let roster = [];        // [{nome, photo}]
+    let attendance = [];    // Attendance (A..H)
 
-  // Focus/anti-cheat tracking
-  let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
-  let copyCount = 0, pasteCount = 0, findCount = 0;
-
-  // DOM
-  const startBtn = document.getElementById('startBtn');
-  const submitBtn = document.getElementById('submitBtn');
-  const timerEl = document.getElementById('timer');
-  const form = document.getElementById('quizForm');
-  const nameInput = document.getElementById('studentName');
-  const testIdInput = document.getElementById('testId');
-  const focusFlag = document.getElementById('focusFlag');
-  const tabCountEl = document.getElementById('tabCount');
-  const downloadCsvBtn = document.getElementById('downloadCsvBtn');
-  const resetBtn = document.getElementById('resetBtn');
-
-  // Lock form until start
-  [...form.elements].forEach(el=>el.disabled = true);
-
-  function fmt(secs){
-    const m = Math.floor(secs/60).toString().padStart(2,'0');
-    const s = (secs%60).toString().padStart(2,'0');
-    return `${m}:${s}`;
-  }
-
-  function tick(){
-    secondsLeft--; if(secondsLeft < 0){ secondsLeft = 0; }
-    timerEl.textContent = fmt(secondsLeft);
-    if(secondsLeft === 0){
-      autoSubmit('time');
+    // ===== HELPERS =====
+    function nowISO_TZ(tz='America/Recife'){
+      const now = new Date();
+      const y = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year:'numeric'}).format(now);
+      const m = new Intl.DateTimeFormat('en-CA', { timeZone: tz, month:'2-digit'}).format(now);
+      const d = new Intl.DateTimeFormat('en-CA', { timeZone: tz, day:'2-digit'}).format(now);
+      const hh= new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour:'2-digit'}).format(now);
+      const mm= new Intl.DateTimeFormat('en-GB', { timeZone: tz, minute:'2-digit'}).format(now);
+      const ss= new Intl.DateTimeFormat('en-GB', { timeZone: tz, second:'2-digit'}).format(now);
+      return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
     }
-  }
 
-  function startTimer(){
-    clearInterval(timerInterval);
-    timerInterval = setInterval(tick, 1000);
-  }
+    async function fetchRoster(){
+      // nomes em B2:B, fotos opcionais em C2:C (mesma ordem)
+      const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
+      const [namesRes, photosRes] = await Promise.all([
+        fetch(`${base}/${encodeURIComponent(GROUP+'!B2:B')}?key=${API_KEY}`),
+        fetch(`${base}/${encodeURIComponent(GROUP+'!C2:C')}?key=${API_KEY}`)
+      ]);
+      let names = [], photos = [];
+      if (namesRes.ok) names = ((await namesRes.json()).values||[]).flat();
+      if (photosRes.ok) photos = ((await photosRes.json()).values||[]).flat();
+      roster = names.map((n,i)=> ({ nome:n, photo: photos[i]||'' }))
+                    .filter(x=>x.nome).sort((a,b)=> a.nome.localeCompare(b.nome,'pt-BR'));
+      if (!roster.length) throw new Error('Roster vazio');
+    }
 
-  function startTest(){
-    const name = nameInput.value.trim();
-    if(!name){ alert('Please enter your full name before starting.'); return; }
-    started = true; startTime = new Date();
-    nameInput.disabled = true; testIdInput.disabled = true;
-    startBtn.disabled = true; submitBtn.disabled = false;
-    [...form.elements].forEach(el=>el.disabled = false);
-    startTimer();
-    localStorage.setItem('m3_session', JSON.stringify({ts: Date.now(), name}));
-  }
+    async function fetchAttendance(){
+      const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
+      const r = await fetch(`${base}/${encodeURIComponent('Attendance!A2:H')}?key=${API_KEY}`);
+      if (!r.ok) { attendance = []; return; }
+      const j = await r.json();
+      attendance = (j.values||[]).map(a=>({
+        ts: a[0]||'',            // Timestamp
+        date: a[1]||'',          // yyyy-mm-dd
+        group: a[2]||'',
+        resp: a[3]||'',
+        aluno: a[4]||'',
+        pres: Number(a[5]||0),   // 0/1
+        arrival: a[6]||'',       // 'yyyy-mm-dd HH:MM:SS' Recife
+        absentMin: Number(a[7]|| (a[5]==='0'? CLASS_DURATION_MIN: 0)) // compat se faltar coluna
+      }));
+    }
 
-  function grade(){
-    const answers = {}; let totalCorrect = 0, totalPossible = 0;
-    const byDiff = {easy:0, medium:0, hard:0};
-    const possibleByDiff = {easy:0, medium:0, hard:0};
-    const nodes = form.querySelectorAll('section.card');
-    nodes.forEach((sec, idx)=>{
-      const diff = sec.dataset.difficulty;
-      if(diff === 'writing') return; // skip autograde
-      const name = `q${idx+1}`; // relies on order
-      const checked = sec.querySelector('input[type=radio]:checked');
-      const correct = sec.querySelector('input[data-correct]');
-      const isCorrect = !!(checked && checked === correct);
-      answers[name] = checked ? checked.value : null;
-      if(diff in possibleByDiff){ possibleByDiff[diff]++; }
-      if(isCorrect){ totalCorrect++; if(diff in byDiff) byDiff[diff]++; }
-      totalPossible++;
-    });
-
-    const writing = {
-      q14: form.querySelector('[name=q14]').value.trim(),
-      q15: form.querySelector('[name=q15]').value.trim()
-    };
-
-    return {
-      answers, writing,
-      score: { totalCorrect, totalPossible, byDifficulty: byDiff, possibleByDifficulty: possibleByDiff }
-    };
-  }
-
-  function collectPayload(reason='manual'){
-    const g = grade();
-    const now = new Date();
-    const studentNameSafe = (nameInput.value || '').trim() || '(no name)';
-    return {
-      testId: (testIdInput.value.trim() || 'Module3-Revolution-Quiz-v1'),
-      studentName: studentNameSafe,
-      startISO: startTime?.toISOString() || null,
-      endISO: now.toISOString(),
-      durationSec: startTime ? Math.round((now - startTime)/1000) : null,
-      reason,
-      score: g.score,
-      answers: g.answers,
-      writing: g.writing,
-      focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount }
-    };
-  }
-
-  function toCSV(obj){
-    const s = obj;
-    const row = [
-      new Date().toISOString(), s.testId, JSON.stringify(s.studentName), s.startISO, s.endISO, s.durationSec,
-      s.score.totalCorrect, s.score.totalPossible,
-      s.score.byDifficulty.easy, s.score.byDifficulty.medium, s.score.byDifficulty.hard,
-      s.focus.tabSwitches, s.focus.blurCount, s.focus.totalBlurMs, s.focus.copyCount, s.focus.pasteCount, s.focus.findCount,
-      JSON.stringify(s.answers), JSON.stringify(s.writing)
-    ];
-    const header = [
-      'timestamp','testId','studentName','startISO','endISO','durationSec','correct','possible','easyCorrect','mediumCorrect','hardCorrect','tabSwitches','blurCount','totalBlurMs','copyCount','pasteCount','findCount','answers','writing'
-    ];
-    return header.join(',') + '\n' + row.join(',');
-  }
-
-  async function sendResults(payload){
-    try{
-      const res = await fetch(ENDPOINT, {
-        method:'POST',
-        headers:{ 'Content-Type':'text/plain' },
-        body: JSON.stringify(payload)
+    function computeTotals(){
+      // soma faltas (min) por aluno em todas as linhas
+      const by = new Map(); // nome => absMin
+      attendance.forEach(r=>{
+        if (r.group !== GROUP) return;
+        const name = r.aluno;
+        if (!name) return;
+        const min = (r.pres===1) ? (r.absentMin||0) : CLASS_DURATION_MIN;
+        by.set(name, (by.get(name)||0) + min);
       });
-      return { posted: res.ok, status: res.status };
-    }catch(err){
-      console.warn('POST failed', err);
-      return { posted:false, error: String(err) };
+      roster.forEach(s=>{ if(!by.has(s.nome)) by.set(s.nome, 0); });
+      const list = roster.map(s=>{
+        const absMin = by.get(s.nome)||0;
+        const absH = +(absMin/60).toFixed(2);
+        const canH = Math.max(0, ABSENCE_LIMIT_HOURS - absH);
+        const progress = Math.max(0, Math.min(1, canH / ABSENCE_LIMIT_HOURS)); // “corrida”: mais verde = menos falta
+        return { nome:s.nome, photo:s.photo, faltaH:absH, podeH:+canH.toFixed(2), progress };
+      }).sort((a,b)=> (b.podeH - a.podeH) || a.nome.localeCompare(b.nome,'pt-BR'));
+      return list;
     }
-  }
 
-  function downloadCSV(name, csv){
-    const blob = new Blob([csv], {type:'text/csv'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_Module3_Quiz.csv`;
-    document.body.appendChild(a); a.click(); a.remove();
-  }
+    function render(){
+      const lista = document.getElementById('lista');
+      const data = computeTotals();
+      lista.innerHTML = '';
+      data.forEach(st=>{
+        const item = document.createElement('div'); item.className='item';
+        const img = document.createElement('img'); img.className='avatar'; img.src = st.photo || 'https://i.imgur.com/0Z8FQ0g.png'; img.alt=st.nome;
 
-  function lockTest(){
-    [...form.elements].forEach(el=>el.disabled = true);
-    submitBtn.disabled = true; downloadCsvBtn.disabled = false;
-    document.getElementById('notes').textContent = 'Locked. Answers recorded.';
-    document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
-  }
+        const main = document.createElement('div');
+        const name = document.createElement('div'); name.className='name'; name.textContent = st.nome;
+        const stats = document.createElement('div'); stats.className='stats';
+        stats.innerHTML = `Faltas: <b>${st.faltaH}h</b> • Pode faltar: <b>${st.podeH}h</b> (limite ${ABSENCE_LIMIT_HOURS}h)`;
 
-  async function finalize(reason){
-    if(ended) return; ended = true; endTime = new Date(); clearInterval(timerInterval);
-    const payload = collectPayload(reason);
-    const csv = toCSV(payload);
-    const postRes = await sendResults(payload);
-    downloadCSV(payload.studentName || 'anonymous', csv);
-    lockTest();
-    console.log('Result payload:', payload, 'POST:', postRes);
-    alert('Submission saved.');
-  }
+        const track = document.createElement('div'); track.className='track';
+        const fill  = document.createElement('div'); fill.className='fill';
+        const pct = Math.round(st.progress*100);
+        fill.style.width = pct + '%'; track.appendChild(fill);
+        const runner = document.createElement('div'); runner.className='runner'; runner.style.left = pct + '%';
+        const rimg = document.createElement('img'); rimg.src = img.src; runner.appendChild(rimg); track.appendChild(runner);
 
-  function autoSubmit(reason){ finalize(reason); }
+        const barRow = document.createElement('div'); barRow.className='barRow';
+        const note = document.createElement('div'); note.className='barNote'; note.textContent = `${st.podeH}h restantes`;
+        barRow.appendChild(track); barRow.appendChild(note);
 
-  // Events
-  startBtn.addEventListener('click', startTest);
-  submitBtn.addEventListener('click', ()=> finalize('manual'));
-  downloadCsvBtn.addEventListener('click', ()=>{
-    const csv = toCSV(collectPayload('download-only'));
-    downloadCSV((nameInput.value || '').trim() || 'anonymous', csv);
-  });
-  resetBtn.addEventListener('click', ()=>{ location.reload(); });
+        main.appendChild(name); main.appendChild(stats); main.appendChild(barRow);
 
-  // Anti-cheat
-  document.addEventListener('visibilitychange', ()=>{
-    if(!started || ended) return;
-    if(document.visibilityState === 'hidden'){
-      tabSwitches++; tabCountEl.textContent = `Tab: ${tabSwitches}`;
-      focusFlag.textContent = 'Focus LOST';
-      isBlurred = true; blurStart = Date.now();
-    } else {
-      focusFlag.textContent = 'Focus OK';
-      if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+        item.appendChild(img); item.appendChild(main);
+        lista.appendChild(item);
+      });
+      document.getElementById('lastRefresh').textContent = 'Atualizado em ' + nowISO_TZ('America/Recife');
     }
-  });
-  window.addEventListener('blur', ()=>{
-    if(!started || ended) return;
-    blurCount++;
-    if (document.visibilityState !== 'hidden') {
-      tabSwitches++; tabCountEl.textContent = `Tab: ${tabSwitches}`;
+
+    function generatePdf(){
+      const { jsPDF } = window.jspdf;
+      const data = computeTotals().sort((a,b)=> a.nome.localeCompare(b.nome,'pt-BR'));
+      const doc = new jsPDF({orientation:'portrait', unit:'pt', format:'a4'});
+      doc.setFont('helvetica','bold'); doc.setFontSize(14);
+      doc.text('Relatório de Faltas (horas) — PG6', 40, 40);
+      doc.setFont('helvetica','normal'); doc.setFontSize(10);
+      doc.text('Regra: 1 aula = 3h • Limite: 18h • Tolerância atraso: 5 min', 40, 58);
+      const body = data.map(st=> [st.nome, `${st.faltaH} h`, `${st.podeH} h`]);
+      doc.autoTable({
+        startY:78,
+        head: [['Aluno','Faltas (h)','Ainda pode faltar (h)']],
+        body,
+        styles:{fontSize:10, cellPadding:6},
+        headStyles:{ fillColor:[30,30,36], textColor:255 },
+        alternateRowStyles:{ fillColor:[245,245,248] },
+        margin:{ left:40, right:40 }
+      });
+      doc.save('report_RollCall_HS.pdf');
     }
-    focusFlag.textContent='Focus LOST'; isBlurred=true; blurStart=Date.now();
-  });
-  window.addEventListener('focus', ()=>{
-    if(!started || ended) return;
-    focusFlag.textContent='Focus OK';
-    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
-  });
-  window.addEventListener('pagehide', ()=>{
-    if(!started || ended) return;
-    tabSwitches++; tabCountEl.textContent = `Tab: ${tabSwitches}`;
-    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
-  });
-  document.addEventListener('copy', ()=>{ copyCount++; });
-  document.addEventListener('paste', ()=>{ pasteCount++; });
-  document.addEventListener('keydown', (e)=>{
-    if((e.ctrlKey||e.metaKey) && (e.key==='f' || e.key==='F')){ findCount++; }
-  });
-  document.addEventListener('contextmenu', (e)=> e.preventDefault());
+
+    async function refreshAll(){
+      const btn = document.getElementById('btnRefresh');
+      try {
+        if (btn) { btn.disabled = true; btn.textContent = 'Atualizando...'; }
+        await fetchRoster();
+        await fetchAttendance();
+        render();
+      } catch (e) {
+        console.error(e);
+        document.getElementById('lista').innerHTML = '<div class="resultado erro">Erro ao carregar dados (verifique permissões de leitura da planilha).</div>';
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Atualizar dados'; }
+      }
+    }
+
+    // ===== INIT =====
+    (async function(){
+      document.getElementById('btnRefresh').onclick = refreshAll;
+      document.getElementById('btnPdf').onclick = generatePdf;
+      await refreshAll();
+    })();
   </script>
 </body>
 </html>
-
