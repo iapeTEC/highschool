@@ -92,19 +92,33 @@
       return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
     }
 
+    // === ROSTER: lê A..C por linha (B = nome; C = foto preferencial; A = foto alternativa); mantém ordem alfabética SEMPRE
     async function fetchRoster(){
-      // nomes em B2:B, fotos opcionais em C2:C (mesma ordem)
-      const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
-      const [namesRes, photosRes] = await Promise.all([
-        fetch(`${base}/${encodeURIComponent(GROUP+'!B2:B')}?key=${API_KEY}`),
-        fetch(`${base}/${encodeURIComponent(GROUP+'!C2:C')}?key=${API_KEY}`)
-      ]);
-      let names = [], photos = [];
-      if (namesRes.ok) names = ((await namesRes.json()).values||[]).flat();
-      if (photosRes.ok) photos = ((await photosRes.json()).values||[]).flat();
-      roster = names.map((n,i)=> ({ nome:n, photo: photos[i]||'' }))
-                    .filter(x=>x.nome).sort((a,b)=> a.nome.localeCompare(b.nome,'pt-BR'));
-      if (!roster.length) throw new Error('Roster vazio');
+      const base  = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
+      const range = `${GROUP}!A2:C`;
+      const res   = await fetch(`${base}/${encodeURIComponent(range)}?key=${API_KEY}`);
+
+      if (!res.ok) {
+        const errText = await res.text().catch(()=> '');
+        console.warn('Sheets API (roster) falhou:', res.status, errText);
+        roster = []; // sem fallback aqui para evitar desencontro de nomes/fotos
+        return;
+      }
+
+      const { values = [] } = await res.json();
+      const pickUrl = s => (s && /^https?:\/\//i.test(s.trim())) ? s.trim() : '';
+
+      roster = values
+        .map(r => {
+          const a = (r[0] || '').trim(); // foto alternativa (antes do nome)
+          const b = (r[1] || '').trim(); // NOME (obrigatório)
+          const c = (r[2] || '').trim(); // foto preferida (ao lado do nome)
+          if (!b) return null;
+          const photo = pickUrl(c) || pickUrl(a) || '';
+          return { nome: b, photo };
+        })
+        .filter(Boolean)
+        .sort((x,y) => x.nome.localeCompare(y.nome, 'pt-BR')); // <-- SEMPRE alfabético
     }
 
     async function fetchAttendance(){
@@ -117,31 +131,37 @@
         date: a[1]||'',          // yyyy-mm-dd
         group: a[2]||'',
         resp: a[3]||'',
-        aluno: a[4]||'',
+        aluno: (a[4]||'').trim(),
         pres: Number(a[5]||0),   // 0/1
-        arrival: a[6]||'',       // 'yyyy-mm-dd HH:MM:SS' Recife
-        absentMin: Number(a[7]|| (a[5]==='0'? CLASS_DURATION_MIN: 0)) // compat se faltar coluna
+        arrival: a[6]||'',
+        absentMin: Number(a[7]|| (a[5]==='0'? CLASS_DURATION_MIN: 0))
       }));
     }
 
+    // === Totais: calcula faltas mas devolve lista em ORDEM ALFABÉTICA
     function computeTotals(){
-      // soma faltas (min) por aluno em todas as linhas
-      const by = new Map(); // nome => absMin
+      const by = new Map(); // nome => minutos de falta acumulados
+
       attendance.forEach(r=>{
         if (r.group !== GROUP) return;
-        const name = r.aluno;
-        if (!name) return;
+        if (!r.aluno) return;
         const min = (r.pres===1) ? (r.absentMin||0) : CLASS_DURATION_MIN;
-        by.set(name, (by.get(name)||0) + min);
+        by.set(r.aluno, (by.get(r.aluno)||0) + min);
       });
-      roster.forEach(s=>{ if(!by.has(s.nome)) by.set(s.nome, 0); });
+
+      // garante todos do roster
+      roster.forEach(s => { if (!by.has(s.nome)) by.set(s.nome, 0); });
+
       const list = roster.map(s=>{
-        const absMin = by.get(s.nome)||0;
-        const absH = +(absMin/60).toFixed(2);
-        const canH = Math.max(0, ABSENCE_LIMIT_HOURS - absH);
-        const progress = Math.max(0, Math.min(1, canH / ABSENCE_LIMIT_HOURS)); // “corrida”: mais verde = menos falta
+        const absMin = by.get(s.nome) || 0;
+        const absH   = +(absMin / 60).toFixed(2);
+        const canH   = Math.max(0, ABSENCE_LIMIT_HOURS - absH);
+        const progress = Math.max(0, Math.min(1, canH / ABSENCE_LIMIT_HOURS));
         return { nome:s.nome, photo:s.photo, faltaH:absH, podeH:+canH.toFixed(2), progress };
-      }).sort((a,b)=> (b.podeH - a.podeH) || a.nome.localeCompare(b.nome,'pt-BR'));
+      });
+
+      // ORDEM FINAL: alfabética, sempre
+      list.sort((a,b)=> a.nome.localeCompare(b.nome,'pt-BR'));
       return list;
     }
 
@@ -149,6 +169,7 @@
       const lista = document.getElementById('lista');
       const data = computeTotals();
       lista.innerHTML = '';
+
       data.forEach(st=>{
         const item = document.createElement('div'); item.className='item';
         const img = document.createElement('img'); img.className='avatar'; img.src = st.photo || 'https://i.imgur.com/0Z8FQ0g.png'; img.alt=st.nome;
@@ -179,7 +200,7 @@
 
     function generatePdf(){
       const { jsPDF } = window.jspdf;
-      const data = computeTotals().sort((a,b)=> a.nome.localeCompare(b.nome,'pt-BR'));
+      const data = computeTotals(); // já vem alfabético
       const doc = new jsPDF({orientation:'portrait', unit:'pt', format:'a4'});
       doc.setFont('helvetica','bold'); doc.setFontSize(14);
       doc.text('Relatório de Faltas (horas) — PG6', 40, 40);
@@ -195,7 +216,7 @@
         alternateRowStyles:{ fillColor:[245,245,248] },
         margin:{ left:40, right:40 }
       });
-      doc.save('report_RollCall_HS.pdf');
+      doc.save('faltas_PG6.pdf');
     }
 
     async function refreshAll(){
@@ -207,7 +228,7 @@
         render();
       } catch (e) {
         console.error(e);
-        document.getElementById('lista').innerHTML = '<div class="resultado erro">Erro ao carregar dados (verifique permissões de leitura da planilha).</div>';
+        document.getElementById('lista').innerHTML = '<div class="resultado erro">Erro ao carregar dados (verifique permissões e a aba PG6).</div>';
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Atualizar dados'; }
       }
