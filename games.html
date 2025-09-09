@@ -1,0 +1,237 @@
+
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pontuação de Grupos</title>
+  <style>
+    :root { --gap: 14px; --radius: 14px; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #0f172a; color: white; }
+    .wrap { max-width: 950px; margin: 24px auto; padding: 20px; }
+    .card { background: #111827; border: 1px solid #1f2937; border-radius: var(--radius); padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    h1 { font-size: 22px; margin: 0 0 10px; }
+    h2 { font-size: 16px; margin: 18px 0 8px; opacity: .9; }
+    label { display:block; font-size: 14px; opacity:.9; margin-bottom: 6px; }
+    input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #334155; background: #0b1220; color: #e5e7eb; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+    .grid4 { display:grid; grid-template-columns: repeat(4,1fr); gap: var(--gap); }
+    .students { display:grid; grid-template-columns: 1fr 120px; gap: 8px 12px; align-items:center; }
+    .pill { background:#0b1220; padding:8px 12px; border-radius:999px; border:1px solid #334155; display:inline-flex; gap:8px; align-items:center; }
+    .btn { background:#22c55e; color:#06220f; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700; }
+    .btn:hover { filter: brightness(1.05); }
+    .muted { opacity:.8; font-size:12px; }
+    .totals { display:flex; gap:12px; flex-wrap:wrap; }
+    .badge { background:#0b1220; border:1px solid #334155; padding:8px 10px; border-radius:10px; font-variant-numeric: tabular-nums; }
+    .ok { color:#22c55e; }
+    .err { color:#ef4444; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>🏁 Pontuação de Grupos</h1>
+      <div class="row">
+        <div>
+          <label>Selecione o grupo</label>
+          <select id="group"></select>
+        </div>
+        <div>
+          <label>Seu nome (opcional)</label>
+          <input id="teacher" placeholder="Ex.: Prof. Bruno"/>
+        </div>
+      </div>
+
+      <h2>Quatro categorias</h2>
+      <div class="grid4">
+        <div><label>Categoria 1</label><input type="number" id="c1" min="0" step="0.1" /></div>
+        <div><label>Categoria 2</label><input type="number" id="c2" min="0" step="0.1" /></div>
+        <div><label>Categoria 3</label><input type="number" id="c3" min="0" step="0.1" /></div>
+        <div><label>Categoria 4</label><input type="number" id="c4" min="0" step="0.1" /></div>
+      </div>
+
+      <h2>Apresentação por aluno</h2>
+      <div id="students" class="students"></div>
+
+      <h2>Resumo</h2>
+      <div class="totals">
+        <div class="badge">Média 4 categorias: <b id="avgCats">0</b></div>
+        <div class="badge">Média apresentação: <b id="avgPres">0</b></div>
+        <div class="badge">Pontuação da rodada: <b id="finalRound">0</b></div>
+      </div>
+
+      <div style="margin-top:16px; display:flex; gap:12px; align-items:center;">
+        <button class="btn" id="submit">Salvar pontuação</button>
+        <span class="muted">A média de apresentação considera apenas quem tiver nota informada.</span>
+      </div>
+      <div id="msg" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+<script>
+const API_BASE = 'https://script.google.com/macros/s/AKfycbz9nsxYU7i7zkvljEfa-n3jAEsWTRt357D13guROXtn5NADUYmW785X0g-7aIsMzWs/exec'; // ex.: https://script.google.com/macros/s/AKfycb.../exec
+let GROUPS = [];
+
+function el(id){ return document.getElementById(id); }
+function n(v){ const x = parseFloat(v); return isNaN(x) ? 0 : x; }
+function round2(x){ return Math.round(x*100)/100; }
+
+async function fetchJSON(url, opts={}){
+  const res = await fetch(url, { ...opts, headers: { 'Content-Type':'application/json' } });
+  if (!res.ok) throw new Error('Erro de rede');
+  return await res.json();
+}
+
+function compute(){
+  const avgCats = (n(el('c1').value)+n(el('c2').value)+n(el('c3').value)+n(el('c4').value))/4;
+  const presInputs = document.querySelectorAll('[data-pres]');
+  const presVals = Array.from(presInputs).map(i=>n(i.value)).filter(v=>!Number.isNaN(v) && v!==0);
+  const avgPres = presVals.length ? presVals.reduce((a,b)=>a+b,0)/presVals.length : 0;
+  el('avgCats').textContent = round2(avgCats);
+  el('avgPres').textContent = round2(avgPres);
+  el('finalRound').textContent = round2(avgCats + avgPres);
+}
+
+function renderStudents(group){
+  const box = el('students');
+  box.innerHTML = '';
+  (group.members||[]).forEach(name => {
+    const rowName = document.createElement('div');
+    rowName.textContent = name;
+    const rowInput = document.createElement('input');
+    rowInput.type = 'number'; rowInput.step = '0.1'; rowInput.min='0'; rowInput.dataset.pres='1'; rowInput.placeholder='Apresentação';
+    rowInput.addEventListener('input', compute);
+    box.appendChild(rowName); box.appendChild(rowInput);
+  });
+}
+
+async function load(){
+  try{
+    const data = await fetchJSON(`${API_BASE}?route=groups`);
+    GROUPS = data.groups||[];
+    const sel = el('group'); sel.innerHTML='';
+    GROUPS.forEach(g=>{
+      const o = document.createElement('option'); o.value=g.id; o.textContent=g.name; sel.appendChild(o);
+    });
+    sel.addEventListener('change', ()=>{
+      const g = GROUPS.find(x=>x.id===sel.value); renderStudents(g); compute();
+    });
+    if (GROUPS[0]){ sel.value = GROUPS[0].id; renderStudents(GROUPS[0]); }
+    ['c1','c2','c3','c4'].forEach(id=> el(id).addEventListener('input', compute));
+    const savedName = localStorage.getItem('teacherName'); if (savedName) el('teacher').value = savedName;
+    el('teacher').addEventListener('change', ()=> localStorage.setItem('teacherName', el('teacher').value));
+    compute();
+  }catch(err){ el('msg').innerHTML = `<span class="err">${err.message}</span>`; }
+}
+
+async function submit(){
+  const sel = el('group');
+  const groupId = sel.value;
+  const categories = ['c1','c2','c3','c4'].map(id => n(el(id).value));
+  const presentations = Array.from(document.querySelectorAll('#students input'))
+    .map((inp, idx) => ({ student: el('students').children[idx*2].textContent, score: n(inp.value) }))
+    .filter(p => p.score>0);
+  const payload = { action:'submitScore', groupId, categories, presentations, submittedBy: el('teacher').value||'' };
+  try{
+    const data = await fetchJSON(API_BASE, { method:'POST', body: JSON.stringify(payload) });
+    el('msg').innerHTML = `<span class="ok">Salvo! Rodada = ${data.finalRound.toFixed(2)} (4 cat: ${data.avgCategories.toFixed(2)} / apr: ${data.presentationAvg.toFixed(2)})</span>`;
+    // limpa inputs de apresentação para próxima rodada
+    document.querySelectorAll('#students input').forEach(i=> i.value='');
+    compute();
+  }catch(err){ el('msg').innerHTML = `<span class="err">Falha ao salvar: ${err.message}</span>`; }
+}
+
+el('submit').addEventListener('click', submit);
+load();
+</script>
+</body>
+</html>
+```
+
+---
+
+## 3) Página do Dashboard — `dashboard.html`
+
+Esta página mostra a corrida dos grupos, com barra de progresso e o **círculo-avatar** “correndo” à frente da barra. A largura da barra é a proporção do grupo em relação ao líder.
+
+```html
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard de Grupos</title>
+  <style>
+    :root { --radius: 16px; }
+    *{ box-sizing: border-box; }
+    body{ margin:0; font-family: Inter, system-ui, Arial; background:#0b1220; color:#e5e7eb; }
+    .wrap{ max-width: 1100px; margin: 26px auto; padding: 18px; }
+    h1{ margin:0 0 12px; font-size: 22px; }
+    .grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:16px; }
+    .card{ background:#0f172a; border:1px solid #1f2937; border-radius: var(--radius); padding:14px; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+    .head{ display:flex; align-items:center; gap:10px; }
+    .rank{ width:28px; height:28px; border-radius:50%; background:#22c55e; color:#06220f; font-weight:800; display:grid; place-items:center; }
+    .name{ font-weight:700; }
+    .total{ margin-left:auto; opacity:.9; font-variant-numeric: tabular-nums; }
+
+    .bar{ position:relative; height:18px; background:#111827; border:1px solid #1f2937; border-radius: 999px; overflow:hidden; margin-top:10px; }
+    .fill{ position:absolute; inset:0 auto 0 0; width:0; background: linear-gradient(90deg, #22c55e, #86efac); }
+    .runner{ position:absolute; top:50%; transform: translateY(-50%); width:34px; height:34px; border-radius:50%; border:3px solid #22c55e; background:#0b1220; display:grid; place-items:center; box-shadow: 0 6px 16px rgba(34,197,94,.35); }
+    .runner img{ width:28px; height:28px; border-radius:50%; object-fit: cover; }
+    .members{ margin-top:10px; font-size:12px; opacity:.85; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🏆 Dashboard — Corrida dos Grupos</h1>
+    <div id="grid" class="grid"></div>
+  </div>
+
+<script>
+const API_BASE = 'COLE_AQUI_A_URL_DO_SEU_WEB_APP';
+
+async function fetchJSON(url){
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Erro de rede');
+  return await res.json();
+}
+
+function pct(x){ return Math.max(0, Math.min(100, Math.round(x))); }
+
+function card(g, idx){
+  const p = pct(g.progress);
+  const img = g.image || 'https://i.imgur.com/8Km9tLL.png'; // placeholder
+  const el = document.createElement('div'); el.className='card';
+  el.innerHTML = `
+    <div class="head">
+      <div class="rank">${idx+1}</div>
+      <div class="name">${g.name}</div>
+      <div class="total">${g.total.toFixed(2)} pts</div>
+    </div>
+    <div class="bar">
+      <div class="fill" style="width:${p}%"></div>
+      <div class="runner" style="left: calc(${p}% - 17px)">
+        <img src="${img}" alt="${g.name}"/>
+      </div>
+    </div>
+    <div class="members">${(g.members||[]).join(', ')}</div>
+  `;
+  return el;
+}
+
+async function load(){
+  try{
+    const data = await fetchJSON(`${API_BASE}?route=standings`);
+    const grid = document.getElementById('grid'); grid.innerHTML='';
+    (data.standings||[]).forEach((g, i) => grid.appendChild(card(g, i)));
+  }catch(err){
+    document.getElementById('grid').textContent = 'Erro ao carregar: '+err.message;
+  }
+}
+
+load();
+setInterval(load, 15000); // atualiza a cada 15s
+</script>
+</body>
+</html>
