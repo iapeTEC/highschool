@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -70,15 +69,26 @@
   </div>
 
 <script>
-const API_BASE = 'https://script.google.com/macros/s/AKfycbz9nsxYU7i7zkvljEfa-n3jAEsWTRt357D13guROXtn5NADUYmW785X0g-7aIsMzWs/exec'; // ex.: https://script.google.com/macros/s/AKfycb.../exec
+const API_BASE = 'https://script.google.com/macros/s/AKfycbykkhQ-RAQJKRimrXwlJNEx4CgM3o3XkugdxC-_ydS7ys4c2hfjkTLdGhEtaXZNdE9Z/exec'; // ex.: https://script.google.com/macros/s/AKfycb.../exec
 let GROUPS = [];
 
 function el(id){ return document.getElementById(id); }
 function n(v){ const x = parseFloat(v); return isNaN(x) ? 0 : x; }
 function round2(x){ return Math.round(x*100)/100; }
 
-async function fetchJSON(url, opts={}){
-  const res = await fetch(url, { ...opts, headers: { 'Content-Type':'application/json' } });
+async function getJSON(url){
+  // GET simples sem headers personalizados → evita preflight
+  const res = await fetch(url, { method: 'GET' });
+  if (!res.ok) throw new Error('Erro de rede');
+  return await res.json();
+}
+async function postFormJSON(url, payload){
+  // POST simples (sem preflight): x-www-form-urlencoded
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ payload: JSON.stringify(payload) }).toString()
+  });
   if (!res.ok) throw new Error('Erro de rede');
   return await res.json();
 }
@@ -108,7 +118,7 @@ function renderStudents(group){
 
 async function load(){
   try{
-    const data = await fetchJSON(`${API_BASE}?route=groups`);
+    const data = await getJSON(`${API_BASE}?route=groups`);
     GROUPS = data.groups||[];
     const sel = el('group'); sel.innerHTML='';
     GROUPS.forEach(g=>{
@@ -134,7 +144,7 @@ async function submit(){
     .filter(p => p.score>0);
   const payload = { action:'submitScore', groupId, categories, presentations, submittedBy: el('teacher').value||'' };
   try{
-    const data = await fetchJSON(API_BASE, { method:'POST', body: JSON.stringify(payload) });
+    const data = await postFormJSON(API_BASE, payload);
     el('msg').innerHTML = `<span class="ok">Salvo! Rodada = ${data.finalRound.toFixed(2)} (4 cat: ${data.avgCategories.toFixed(2)} / apr: ${data.presentationAvg.toFixed(2)})</span>`;
     // limpa inputs de apresentação para próxima rodada
     document.querySelectorAll('#students input').forEach(i=> i.value='');
