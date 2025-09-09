@@ -68,93 +68,8 @@
     </div>
   </div>
 
-<script>
-const API_BASE = 'https://script.google.com/macros/s/AKfycbwkG8V6QO3cWhHHjrLUUn7SVlawbAjylR5tVLyyOQ_ezD3IGF4WobfXU06G9nK9r82r/exec'; // ex.: https://script.google.com/macros/s/AKfycb.../exec
-let GROUPS = [];
 
-function el(id){ return document.getElementById(id); }
-function n(v){ const x = parseFloat(v); return isNaN(x) ? 0 : x; }
-function round2(x){ return Math.round(x*100)/100; }
 
-async function getJSON(url){
-  // GET simples sem headers personalizados → evita preflight
-  const res = await fetch(url, { method: 'GET' });
-  if (!res.ok) throw new Error('Erro de rede');
-  return await res.json();
-}
-async function postFormJSON(url, payload){
-  // POST simples (sem preflight): x-www-form-urlencoded
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ payload: JSON.stringify(payload) }).toString()
-  });
-  if (!res.ok) throw new Error('Erro de rede');
-  return await res.json();
-}
-
-function compute(){
-  const avgCats = (n(el('c1').value)+n(el('c2').value)+n(el('c3').value)+n(el('c4').value))/4;
-  const presInputs = document.querySelectorAll('[data-pres]');
-  const presVals = Array.from(presInputs).map(i=>n(i.value)).filter(v=>!Number.isNaN(v) && v!==0);
-  const avgPres = presVals.length ? presVals.reduce((a,b)=>a+b,0)/presVals.length : 0;
-  el('avgCats').textContent = round2(avgCats);
-  el('avgPres').textContent = round2(avgPres);
-  el('finalRound').textContent = round2(avgCats + avgPres);
-}
-
-function renderStudents(group){
-  const box = el('students');
-  box.innerHTML = '';
-  (group.members||[]).forEach(name => {
-    const rowName = document.createElement('div');
-    rowName.textContent = name;
-    const rowInput = document.createElement('input');
-    rowInput.type = 'number'; rowInput.step = '0.1'; rowInput.min='0'; rowInput.dataset.pres='1'; rowInput.placeholder='Apresentação';
-    rowInput.addEventListener('input', compute);
-    box.appendChild(rowName); box.appendChild(rowInput);
-  });
-}
-
-async function load(){
-  try{
-    const data = await getJSON(`${API_BASE}?route=groups`);
-    GROUPS = data.groups||[];
-    const sel = el('group'); sel.innerHTML='';
-    GROUPS.forEach(g=>{
-      const o = document.createElement('option'); o.value=g.id; o.textContent=g.name; sel.appendChild(o);
-    });
-    sel.addEventListener('change', ()=>{
-      const g = GROUPS.find(x=>x.id===sel.value); renderStudents(g); compute();
-    });
-    if (GROUPS[0]){ sel.value = GROUPS[0].id; renderStudents(GROUPS[0]); }
-    ['c1','c2','c3','c4'].forEach(id=> el(id).addEventListener('input', compute));
-    const savedName = localStorage.getItem('teacherName'); if (savedName) el('teacher').value = savedName;
-    el('teacher').addEventListener('change', ()=> localStorage.setItem('teacherName', el('teacher').value));
-    compute();
-  }catch(err){ el('msg').innerHTML = `<span class="err">${err.message}</span>`; }
-}
-
-async function submit(){
-  const sel = el('group');
-  const groupId = sel.value;
-  const categories = ['c1','c2','c3','c4'].map(id => n(el(id).value));
-  const presentations = Array.from(document.querySelectorAll('#students input'))
-    .map((inp, idx) => ({ student: el('students').children[idx*2].textContent, score: n(inp.value) }))
-    .filter(p => p.score>0);
-  const payload = { action:'submitScore', groupId, categories, presentations, submittedBy: el('teacher').value||'' };
-  try{
-    const data = await postFormJSON(API_BASE, payload);
-    el('msg').innerHTML = `<span class="ok">Salvo! Rodada = ${data.finalRound.toFixed(2)} (4 cat: ${data.avgCategories.toFixed(2)} / apr: ${data.presentationAvg.toFixed(2)})</span>`;
-    // limpa inputs de apresentação para próxima rodada
-    document.querySelectorAll('#students input').forEach(i=> i.value='');
-    compute();
-  }catch(err){ el('msg').innerHTML = `<span class="err">Falha ao salvar: ${err.message}</span>`; }
-}
-
-el('submit').addEventListener('click', submit);
-load();
-<script>
 <script>
 const API_BASE = 'https://script.google.com/macros/s/AKfycbykkhQ-RAQJKRimrXwlJNEx4CgM3o3XkugdxC-_ydS7ys4c2hfjkTLdGhEtaXZNdE9Z/exec';
 let GROUPS = [];
@@ -241,10 +156,6 @@ async function submit(){
 
 el('submit').addEventListener('click', submit);
 load();
-</script>
-
-</script>
-
 </script>
 </body>
 </html>
