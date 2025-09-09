@@ -154,6 +154,19 @@ async function submit(){
 
 el('submit').addEventListener('click', submit);
 load();
+<script>
+function jsonp(url){
+  return new Promise((resolve, reject)=>{
+    const cb = 'cb_' + Math.random().toString(36).slice(2);
+    const s = document.createElement('script');
+    window[cb] = (data) => { resolve(data); delete window[cb]; s.remove(); };
+    s.onerror = () => { delete window[cb]; reject(new Error('Falha JSONP')); };
+    s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+    document.body.appendChild(s);
+  });
+}
+</script>
+
 </script>
 </body>
 </html>
