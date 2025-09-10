@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Civil War · Word Wall Cards (Module 9 · 5–7)</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-YkG7s3b2aqQ6r6Ptqj2o6vY6c0rVb1Qn5o7X3Y9p8m3JYF3o0zYk8nR3f8m6o3cXy6Q2G1oK2n7Qn3lO6wKOhA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+  :root{
+    /* cores */
+    --bordo:#7a1b2c; --bordo-press:#641525;
+    --ok:#10b981; --err:#ef4444; --link:#9ec2ff;
+
+    /* DARK (chumbo) */
+    --bg:#1f232a; --surf:#262b33; --ink:#e9edf6; --muted:#a6b0c2; --line:#333a47; --chip:#2e3440;
+    /* LIGHT */
+    --bg-light:#f7f8fb; --surf-light:#ffffff; --ink-light:#0f1320; --muted-light:#5f6878; --line-light:#e7e9ef; --chip-light:#f1f3f7;
+  }
+  [data-theme="dark"]{ --bg:var(--bg); --surf:var(--surf); --ink:var(--ink); --muted:var(--muted); --line:var(--line); --chip:var(--chip) }
+  [data-theme="light"]{ --bg:var(--bg-light); --surf:var(--surf-light); --ink:var(--ink-light); --muted:var(--muted-light); --line:var(--line-light); --chip:var(--chip-light) }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  header,main,.footer{width:100%; max-width:1220px; padding:16px}
+  header{padding-top:22px}
+  .title{font-weight:800; font-size:clamp(20px,2.2vw,28px); letter-spacing:.2px}
+  .subtitle{color:var(--muted); margin-top:6px; font-size:clamp(12px,1.6vw,14px)}
+  .topbar{
+    margin-top:14px; display:grid; gap:10px; align-items:center;
+    grid-template-columns:1fr auto auto auto auto auto;
+  }
+  .namebox{
+    background:var(--surf); border:1px solid var(--line); border-radius:12px; padding:8px 12px; display:flex; gap:10px; align-items:center;
+  }
+  .namebox input{ all:unset; color:var(--ink); width:100%; font-size:14px }
+
+  .chip{background:var(--chip); border:1px solid var(--line); padding:8px 12px; border-radius:999px; font-weight:800; font-size:14px}
+  .chip.ok{border-color:rgba(16,185,129,.35)}
+  .chip.err{border-color:rgba(239,68,68,.35)}
+  .chip.time{border-color:rgba(122,27,44,.35)}
+
+  .btn{
+    appearance:none; border:none; background:var(--bordo); color:#fff; font-weight:800;
+    padding:10px 14px; border-radius:10px; cursor:pointer;
+    transition:transform .06s ease, filter .15s ease, background .15s ease;
+  }
+  .btn:hover{filter:brightness(1.05)}
+  .btn:active{background:var(--bordo-press); transform:translateY(1px)}
+  .btn:disabled{opacity:.55; cursor:not-allowed}
+
+  .toggle{display:flex; align-items:center; gap:8px; color:var(--muted); font-weight:700; font-size:14px}
+  .switch{position:relative; width:50px; height:28px; background:var(--surf); border:1px solid var(--line); border-radius:999px; cursor:pointer}
+  .knob{position:absolute; top:2px; left:2px; width:24px; height:24px; background:var(--chip); border:1px solid var(--line); border-radius:50%; transition:left .2s}
+  [data-theme="light"] .knob{left:24px}
+
+  .legend{color:var(--muted); margin-top:8px; font-size:13px}
+
+  /* layout das colunas */
+  .wrap{display:grid; gap:16px; grid-template-columns:1fr 1fr; margin-top:14px}
+  @media (max-width:980px){ .wrap{grid-template-columns:1fr} }
+
+  .col{
+    background:var(--surf); border:1px solid var(--line); border-radius:14px; padding:14px; min-height:420px;
+  }
+  .col h3{margin:6px 6px 12px; font-size:12px; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
+
+  .grid{
+    display:grid; gap:12px; grid-template-columns:repeat(2, 1fr);
+  }
+  @media (max-width:680px){ .grid{grid-template-columns:1fr} }
+
+  /* CARDS */
+  .targetCard, .dragCard{
+    background:var(--chip); border:1px solid var(--line); border-radius:14px; padding:12px 14px; min-height:74px;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    box-shadow:0 6px 18px rgba(0,0,0,.16);
+    transition:transform .08s ease, box-shadow .18s ease, border-color .12s ease, background .12s ease;
+    font-weight:700; line-height:1.25;
+  }
+  .dragCard{cursor:grab; user-select:none}
+  .dragCard:active{cursor:grabbing; transform:scale(1.01)}
+  .targetCard.dropzone{outline:1px dashed transparent}
+  .targetCard.hover{outline-color:#9ec2ff55; box-shadow:0 10px 24px rgba(0,0,0,.22)}
+  .targetCard.matched{border-color:rgba(16,185,129,.45); background:#0f1a31aa}
+  .wrong{animation:shake .24s}
+  @keyframes shake{0%{transform:translateX(0)} 25%{transform:translateX(-4px)} 50%{transform:translateX(4px)} 75%{transform:translateX(-3px)} 100%{transform:translateX(0)}}
+
+  .footer{
+    color:var(--muted); display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; padding-bottom:28px;
+  }
+  .emailbox{background:var(--surf); border:1px solid var(--line); padding:10px 12px; border-radius:12px}
+  .emailbox a{color:var(--link); text-decoration:none; font-weight:800}
+
+  .toast{
+    position:fixed; bottom:18px; right:18px; background:var(--surf); border:1px solid var(--line);
+    color:var(--ink); padding:10px 14px; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.3); display:none;
+  }
+  .toast.show{display:block; animation:fade 3.2s ease both}
+  @keyframes fade{0%{opacity:0; transform:translateY(8px)} 10%{opacity:1; transform:none} 80%{opacity:1} 100%{opacity:0}}
+</style>
+</head>
+<body>
+<header>
+  <div class="title">Civil War — Word Wall Cards</div>
+  <div class="subtitle">Module 9 · <strong>The Politics of War</strong> · <strong>The North Takes Charge</strong> · <strong>Effects of the War</strong></div>
+
+  <div class="topbar">
+    <div class="namebox">
+      <span style="color:var(--muted);font-weight:700;">Nome:</span>
+      <input id="playerName" type="text" placeholder="Digite seu nome completo" autocomplete="name" />
+    </div>
+    <div id="hits" class="chip ok">Acertos: 0</div>
+    <div id="misses" class="chip err">Erros: 0</div>
+    <div id="timer" class="chip time">Tempo: 00:00</div>
+    <div class="toggle" title="Alternar tema">
+      <span>Dark</span>
+      <div id="themeSwitch" class="switch" role="button" tabindex="0" aria-label="Alternar tema"><div class="knob"></div></div>
+      <span>Light</span>
+    </div>
+    <button id="startBtn" class="btn">Iniciar</button>
+  </div>
+  <div class="legend">Arraste os <b>cards</b> da coluna da direita e solte no <b>par correto</b> à esquerda. Conclua os <b>20 pares</b> — o PDF baixa automaticamente. Vence quem terminar <b>mais rápido</b> e com <b>menos erros</b>.</div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="col">
+      <h3>Alvos (solte aqui o par correto)</h3>
+      <div id="leftGrid" class="grid" aria-live="polite"></div>
+    </section>
+    <section class="col">
+      <h3>Cards para arrastar</h3>
+      <div id="rightGrid" class="grid" aria-live="polite"></div>
+    </section>
+  </div>
+</main>
+
+<div class="footer">
+  <div class="emailbox">
+    Ao finalizar, envie o PDF para: <strong><a id="mailto" href="mailto:bruno@advir.org?subject=Civil%20War%20WordWall%20-%20Aluno&body=Professor,%20segue%20em%20anexo%20meu%20PDF.">bruno@advir.org</a></strong>
+  </div>
+  <div>
+    <button id="resetBtn" class="btn" style="background:var(--surf); color:var(--ink); border:1px solid var(--line); font-weight:700;">Reiniciar</button>
+  </div>
+</div>
+
+<div id="toast" class="toast">PDF gerado e baixado. Envie para <strong>bruno@advir.org</strong>.</div>
+
+<script>
+/* ===================== DATASET: 20 pares (Politics of War · North Takes Charge · Effects) ===================== */
+const PAIRS = [
+  { left:"Emancipation Proclamation", right:"January 1, 1863" },
+  { left:"Suspension of habeas corpus (Union)", right:"Abraham Lincoln" },
+  { left:"New York City Draft Riots", right:"July 1863" },
+  { left:"Copperhead leader", right:"Clement Vallandigham" },
+  { left:"U.S. Sanitary Commission", right:"Elizabeth Blackwell" },
+  { left:"Legal Tender Act", right:"1862 (greenbacks)" },
+  { left:"Battle of Gettysburg", right:"July 1–3, 1863" },
+  { left:"Pickett’s Charge", right:"George Pickett" },
+  { left:"Fall of Vicksburg", right:"July 4, 1863" },
+  { left:"Gettysburg Address", right:"November 19, 1863" },
+  { left:"Grant promoted to Lt. General", right:"March 1864" },
+  { left:"Sherman’s March to the Sea", right:"Atlanta → Savannah (Nov–Dec 1864)" },
+  { left:"Siege of Petersburg", right:"1864–1865 (trench warfare)" },
+  { left:"Lee surrenders at Appomattox", right:"April 9, 1865" },
+  { left:"Thirteenth Amendment ratified", right:"December 1865" },
+  { left:"Lincoln assassinated", right:"John Wilkes Booth (Apr 14, 1865)" },
+  { left:"National Bank Act", right:"1863 (federal banking system)" },
+  { left:"American Red Cross founded", right:"Clara Barton (1881)" },
+  { left:"Andersonville Prison", right:"Georgia (Confederate POW camp)" },
+  { left:"Morrill Land-Grant Act", right:"1862 (land-grant colleges)" }
+];
+const TOTAL = PAIRS.length;
+
+/* ===================== STATE & DOM ===================== */
+let startTime=null, timerInterval=null, hits=0, misses=0, matched=0;
+const leftGrid = document.getElementById('leftGrid');
+const rightGrid = document.getElementById('rightGrid');
+const startBtn = document.getElementById('startBtn');
+const resetBtn = document.getElementById('resetBtn');
+const nameInput = document.getElementById('playerName');
+const hitsEl = document.getElementById('hits');
+const missesEl = document.getElementById('misses');
+const timerEl = document.getElementById('timer');
+const themeSwitch = document.getElementById('themeSwitch');
+const toastEl = document.getElementById('toast');
+const mailto = document.getElementById('mailto');
+
+/* ===================== UTILS ===================== */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function fmtTime(sec){ const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(sec%60).padStart(2,'0'); return `${m}:${s}`; }
+function nowSec(){ return Math.floor((Date.now()-startTime)/1000); }
+function showToast(){ toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'), 3200); }
+
+/* ===================== TIMER ===================== */
+function startTimer(){ startTime=Date.now(); timerInterval=setInterval(()=> timerEl.textContent=`Tempo: ${fmtTime(nowSec())}`, 250); }
+function stopTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } }
+
+/* ===================== RENDER ===================== */
+function buildBoard(){
+  const L = PAIRS.map((p,i)=> ({...p, pid:`P${i}`}));
+  const R = PAIRS.map((p,i)=> ({...p, pid:`P${i}`}));
+  shuffle(L); shuffle(R);
+
+  leftGrid.innerHTML=''; rightGrid.innerHTML='';
+
+  L.forEach(item=>{
+    const dz = document.createElement('div');
+    dz.className = 'targetCard dropzone';
+    dz.setAttribute('data-id', item.pid);
+    dz.textContent = item.left;
+    dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('hover'); });
+    dz.addEventListener('dragleave', ()=> dz.classList.remove('hover'));
+    dz.addEventListener('drop', e=> onDrop(e, dz));
+    leftGrid.appendChild(dz);
+  });
+
+  R.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'dragCard';
+    card.setAttribute('draggable','true');
+    card.setAttribute('data-id', item.pid);
+    card.textContent = item.right;
+    card.addEventListener('dragstart', e=>{
+      card.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', JSON.stringify({pid:item.pid}));
+    });
+    card.addEventListener('dragend', ()=> card.classList.remove('dragging'));
+    rightGrid.appendChild(card);
+  });
+}
+
+/* ===================== MATCH LOGIC ===================== */
+function onDrop(e, target){
+  e.preventDefault();
+  target.classList.remove('hover');
+  const data = e.dataTransfer.getData('text/plain');
+  if(!data) return;
+  const { pid } = JSON.parse(data);
+  if (target.classList.contains('matched')) return;
+
+  if (pid === target.getAttribute('data-id')){
+    // correto
+    hits++; matched++;
+    hitsEl.textContent = `Acertos: ${hits}`;
+    target.classList.add('matched');
+
+    const dragged = document.querySelector(`.dragCard.dragging`) || [...rightGrid.querySelectorAll('.dragCard')].find(x=>x.getAttribute('data-id')===pid);
+    if (dragged){
+      dragged.setAttribute('draggable','false');
+      dragged.style.cursor='default';
+      dragged.style.borderColor='rgba(16,185,129,.45)';
+      dragged.style.background='#0f1a31aa';
+      target.appendChild(dragged);
+    }
+
+    if (matched === TOTAL){
+      stopTimer();
+      onComplete();
+    }
+  } else {
+    // errado
+    misses++;
+    missesEl.textContent = `Erros: ${misses}`;
+    target.classList.add('wrong');
+    setTimeout(()=> target.classList.remove('wrong'), 250);
+  }
+}
+
+/* ===================== FLOW ===================== */
+function startGame(){
+  const name = nameInput.value.trim();
+  if(!name){ alert('Digite seu nome antes de iniciar.'); nameInput.focus(); return; }
+  // atualiza mailto com nome
+  mailto.href = `mailto:bruno@advir.org?subject=Civil%20War%20WordWall%20-%20${encodeURIComponent(name)}&body=Professor,%20segue%20em%20anexo%20meu%20PDF.`;
+
+  hits=0; misses=0; matched=0;
+  hitsEl.textContent='Acertos: 0'; missesEl.textContent='Erros: 0'; timerEl.textContent='Tempo: 00:00';
+  buildBoard();
+  startBtn.disabled = true; nameInput.disabled = true;
+  stopTimer(); startTimer();
+}
+function resetGame(){
+  stopTimer();
+  hits=misses=matched=0;
+  hitsEl.textContent='Acertos: 0'; missesEl.textContent='Erros: 0'; timerEl.textContent='Tempo: 00:00';
+  leftGrid.innerHTML=''; rightGrid.innerHTML='';
+  startBtn.disabled=false; nameInput.disabled=false;
+}
+
+/* ===================== SCORING & PDF ===================== */
+const BASE = { TARGET_TIME:900, TARGET_ERRORS:20, W_TIME:.7, W_ERR:.3 };
+function computeScore(seconds, errors){
+  const t = Math.min(seconds, BASE.TARGET_TIME);
+  const e = Math.min(errors, BASE.TARGET_ERRORS);
+  const composite = BASE.W_TIME*(1 - t/BASE.TARGET_TIME) + BASE.W_ERR*(1 - e/BASE.TARGET_ERRORS);
+  return Math.round(Math.max(0, Math.min(10, composite*10))*10)/10;
+}
+function onComplete(){
+  const secs = Math.floor((Date.now()-startTime)/1000);
+  const name = nameInput.value.trim();
+  const score = computeScore(secs, misses);
+  const when = new Date().toLocaleString();
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  const margin = 48; let y = margin;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text('Civil War — Word Wall Cards (Module 9 · 5–7)', margin, y); y+=18;
+  doc.setFont('helvetica','normal'); doc.setFontSize(11);
+  doc.text(`Aluno: ${name}`, margin, y); y+=14;
+  doc.text(`Data/Hora: ${when}`, margin, y); y+=14;
+  doc.text(`Tempo: ${fmtTime(secs)}   |   Acertos: ${hits}/${TOTAL}   |   Erros: ${misses}`, margin, y); y+=14;
+  doc.setFont('helvetica','bold'); doc.text(`Pontuação (0–10): ${score}`, margin, y); y+=18;
+
+  doc.setFont('helvetica','bold'); doc.text('Pares corretos:', margin, y); y+=14;
+  doc.setFont('helvetica','normal');
+  const lines = PAIRS.map((p,i)=> `${String(i+1).padStart(2,'0')}. ${p.left}  ↔  ${p.right}`);
+  const wrapW = doc.internal.pageSize.getWidth() - margin*2;
+  const pageH = doc.internal.pageSize.getHeight() - margin;
+  const lh = 14;
+  lines.forEach(line=>{
+    const wrapped = doc.splitTextToSize(line, wrapW);
+    wrapped.forEach(w=>{
+      if (y > pageH){ doc.addPage(); y = margin; }
+      doc.text(w, margin, y); y+=lh;
+    });
+  });
+  y+=10;
+  if (y > pageH){ doc.addPage(); y = margin; }
+  doc.setFont('helvetica','italic'); doc.setFontSize(9);
+  doc.text('Nota = 10 × [0.7×(1−t/900) + 0.3×(1−e/20)], limitada a 0–10. Tempo em 15 min zera a parte de tempo; 20+ erros zeram a parte de erros.', margin, y);
+
+  const fileName = `CivilWar_WordWall_${name.replace(/\s+/g,'_')}.pdf`;
+  doc.save(fileName);
+  showToast();
+}
+
+/* ===================== THEME ===================== */
+function toggleTheme(){
+  const root = document.documentElement;
+  const cur = root.getAttribute('data-theme') || 'dark';
+  root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+}
+themeSwitch.addEventListener('click', toggleTheme);
+themeSwitch.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggleTheme(); }});
+
+/* ===================== BINDINGS ===================== */
+startBtn.addEventListener('click', startGame);
+resetBtn.addEventListener('click', resetGame);
+nameInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ startGame(); }});
+</script>
+</body>
+</html>
