@@ -9,7 +9,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-YkG7s3b2aqQ6r6Ptqj2o6vY6c0rVb1Qn5o7X3Y9p8m3JYF3o0zYk8nR3f8m6o3cXy6Q2G1oK2n7Qn3lO6wKOhA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
   :root{
-    /* cores */
     --bordo:#7a1b2c; --bordo-press:#641525;
     --ok:#10b981; --err:#ef4444; --link:#9ec2ff;
 
@@ -23,8 +22,7 @@
 
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
+  body{ margin:0; background:var(--bg); color:var(--ink);
     font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     display:flex; flex-direction:column; align-items:center;
   }
@@ -34,7 +32,7 @@
   .subtitle{color:var(--muted); margin-top:6px; font-size:clamp(12px,1.6vw,14px)}
   .topbar{
     margin-top:14px; display:grid; gap:10px; align-items:center;
-    grid-template-columns:1fr auto auto auto auto auto;
+    grid-template-columns:1fr auto auto auto auto auto auto;
   }
   .namebox{
     background:var(--surf); border:1px solid var(--line); border-radius:12px; padding:8px 12px; display:flex; gap:10px; align-items:center;
@@ -55,6 +53,10 @@
   .btn:active{background:var(--bordo-press); transform:translateY(1px)}
   .btn:disabled{opacity:.55; cursor:not-allowed}
 
+  .btn-outline{
+    background:var(--surf); color:var(--ink); border:1px solid var(--line); font-weight:800;
+  }
+
   .toggle{display:flex; align-items:center; gap:8px; color:var(--muted); font-weight:700; font-size:14px}
   .switch{position:relative; width:50px; height:28px; background:var(--surf); border:1px solid var(--line); border-radius:999px; cursor:pointer}
   .knob{position:absolute; top:2px; left:2px; width:24px; height:24px; background:var(--chip); border:1px solid var(--line); border-radius:50%; transition:left .2s}
@@ -62,26 +64,18 @@
 
   .legend{color:var(--muted); margin-top:8px; font-size:13px}
 
-  /* layout das colunas */
   .wrap{display:grid; gap:16px; grid-template-columns:1fr 1fr; margin-top:14px}
   @media (max-width:980px){ .wrap{grid-template-columns:1fr} }
-
-  .col{
-    background:var(--surf); border:1px solid var(--line); border-radius:14px; padding:14px; min-height:420px;
-  }
+  .col{ background:var(--surf); border:1px solid var(--line); border-radius:14px; padding:14px; min-height:420px; }
   .col h3{margin:6px 6px 12px; font-size:12px; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
-
-  .grid{
-    display:grid; gap:12px; grid-template-columns:repeat(2, 1fr);
-  }
+  .grid{ display:grid; gap:12px; grid-template-columns:repeat(2, 1fr); }
   @media (max-width:680px){ .grid{grid-template-columns:1fr} }
 
-  /* CARDS */
   .targetCard, .dragCard{
     background:var(--chip); border:1px solid var(--line); border-radius:14px; padding:12px 14px; min-height:74px;
     display:flex; align-items:center; justify-content:center; text-align:center;
     box-shadow:0 6px 18px rgba(0,0,0,.16);
-    transition:transform .08s ease, box-shadow .18s ease, border-color .12s ease, background .12s ease;
+    transition:transform .08s, box-shadow .18s, border-color .12s, background .12s;
     font-weight:700; line-height:1.25;
   }
   .dragCard{cursor:grab; user-select:none}
@@ -92,11 +86,9 @@
   .wrong{animation:shake .24s}
   @keyframes shake{0%{transform:translateX(0)} 25%{transform:translateX(-4px)} 50%{transform:translateX(4px)} 75%{transform:translateX(-3px)} 100%{transform:translateX(0)}}
 
-  .footer{
-    color:var(--muted); display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; padding-bottom:28px;
-  }
-  .emailbox{background:var(--surf); border:1px solid var(--line); padding:10px 12px; border-radius:12px}
-  .emailbox a{color:var(--link); text-decoration:none; font-weight:800}
+  .footer{ color:var(--muted); display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; padding-bottom:28px; }
+  .emailbox{ background:var(--surf); border:1px solid var(--line); padding:10px 12px; border-radius:12px }
+  .emailbox a{ color:var(--link); text-decoration:none; font-weight:800 }
 
   .toast{
     position:fixed; bottom:18px; right:18px; background:var(--surf); border:1px solid var(--line);
@@ -104,6 +96,7 @@
   }
   .toast.show{display:block; animation:fade 3.2s ease both}
   @keyframes fade{0%{opacity:0; transform:translateY(8px)} 10%{opacity:1; transform:none} 80%{opacity:1} 100%{opacity:0}}
+  .hidden{display:none}
 </style>
 </head>
 <body>
@@ -125,8 +118,9 @@
       <span>Light</span>
     </div>
     <button id="startBtn" class="btn">Iniciar</button>
+    <button id="downloadBtn" class="btn btn-outline hidden" title="Se o navegador bloquear o download automático, clique aqui.">Baixar PDF</button>
   </div>
-  <div class="legend">Arraste os <b>cards</b> da coluna da direita e solte no <b>par correto</b> à esquerda. Conclua os <b>20 pares</b> — o PDF baixa automaticamente. Vence quem terminar <b>mais rápido</b> e com <b>menos erros</b>.</div>
+  <div class="legend">Arraste os <b>cards</b> da coluna da direita e solte no <b>par correto</b> à esquerda. Conclua os <b>20 pares</b> — tentaremos baixar o PDF automaticamente; se não baixar, use o botão <b>Baixar PDF</b>. Vence quem terminar <b>mais rápido</b> e com <b>menos erros</b>.</div>
 </header>
 
 <main>
@@ -147,14 +141,14 @@
     Ao finalizar, envie o PDF para: <strong><a id="mailto" href="mailto:bruno@advir.org?subject=Civil%20War%20WordWall%20-%20Aluno&body=Professor,%20segue%20em%20anexo%20meu%20PDF.">bruno@advir.org</a></strong>
   </div>
   <div>
-    <button id="resetBtn" class="btn" style="background:var(--surf); color:var(--ink); border:1px solid var(--line); font-weight:700;">Reiniciar</button>
+    <button id="resetBtn" class="btn btn-outline">Reiniciar</button>
   </div>
 </div>
 
-<div id="toast" class="toast">PDF gerado e baixado. Envie para <strong>bruno@advir.org</strong>.</div>
+<div id="toast" class="toast">PDF pronto! Se não baixou automaticamente, clique em <b>Baixar PDF</b> e envie para <strong>bruno@advir.org</strong>.</div>
 
 <script>
-/* ===================== DATASET: 20 pares (Politics of War · North Takes Charge · Effects) ===================== */
+/* --------- DATA: 20 pares --------- */
 const PAIRS = [
   { left:"Emancipation Proclamation", right:"January 1, 1863" },
   { left:"Suspension of habeas corpus (Union)", right:"Abraham Lincoln" },
@@ -179,12 +173,14 @@ const PAIRS = [
 ];
 const TOTAL = PAIRS.length;
 
-/* ===================== STATE & DOM ===================== */
+/* --------- STATE & DOM --------- */
 let startTime=null, timerInterval=null, hits=0, misses=0, matched=0;
+let lastReport=null; // guarda dados do PDF para re-gerar via botão
 const leftGrid = document.getElementById('leftGrid');
 const rightGrid = document.getElementById('rightGrid');
 const startBtn = document.getElementById('startBtn');
 const resetBtn = document.getElementById('resetBtn');
+const downloadBtn = document.getElementById('downloadBtn');
 const nameInput = document.getElementById('playerName');
 const hitsEl = document.getElementById('hits');
 const missesEl = document.getElementById('misses');
@@ -193,17 +189,18 @@ const themeSwitch = document.getElementById('themeSwitch');
 const toastEl = document.getElementById('toast');
 const mailto = document.getElementById('mailto');
 
-/* ===================== UTILS ===================== */
+/* --------- UTILS --------- */
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function fmtTime(sec){ const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(sec%60).padStart(2,'0'); return `${m}:${s}`; }
 function nowSec(){ return Math.floor((Date.now()-startTime)/1000); }
 function showToast(){ toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'), 3200); }
+function showDownloadBtn(show=true){ downloadBtn.classList.toggle('hidden', !show); }
 
-/* ===================== TIMER ===================== */
+/* --------- TIMER --------- */
 function startTimer(){ startTime=Date.now(); timerInterval=setInterval(()=> timerEl.textContent=`Tempo: ${fmtTime(nowSec())}`, 250); }
 function stopTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } }
 
-/* ===================== RENDER ===================== */
+/* --------- RENDER --------- */
 function buildBoard(){
   const L = PAIRS.map((p,i)=> ({...p, pid:`P${i}`}));
   const R = PAIRS.map((p,i)=> ({...p, pid:`P${i}`}));
@@ -237,7 +234,7 @@ function buildBoard(){
   });
 }
 
-/* ===================== MATCH LOGIC ===================== */
+/* --------- MATCH LOGIC --------- */
 function onDrop(e, target){
   e.preventDefault();
   target.classList.remove('hover');
@@ -247,7 +244,6 @@ function onDrop(e, target){
   if (target.classList.contains('matched')) return;
 
   if (pid === target.getAttribute('data-id')){
-    // correto
     hits++; matched++;
     hitsEl.textContent = `Acertos: ${hits}`;
     target.classList.add('matched');
@@ -266,7 +262,6 @@ function onDrop(e, target){
       onComplete();
     }
   } else {
-    // errado
     misses++;
     missesEl.textContent = `Erros: ${misses}`;
     target.classList.add('wrong');
@@ -274,28 +269,29 @@ function onDrop(e, target){
   }
 }
 
-/* ===================== FLOW ===================== */
+/* --------- FLOW --------- */
 function startGame(){
   const name = nameInput.value.trim();
   if(!name){ alert('Digite seu nome antes de iniciar.'); nameInput.focus(); return; }
-  // atualiza mailto com nome
-  mailto.href = `mailto:bruno@advir.org?subject=Civil%20War%20WordWall%20-%20${encodeURIComponent(name)}&body=Professor,%20segue%20em%20anexo%20meu%20PDF.`;
+  mailto.href = `mailto:bruno@advir.org?subject=Civil%20War%20WordWall%20-%20${encodeURIComponent(name)}&body=Professor,%20segue%20meu%20PDF%20anexo.`;
 
   hits=0; misses=0; matched=0;
   hitsEl.textContent='Acertos: 0'; missesEl.textContent='Erros: 0'; timerEl.textContent='Tempo: 00:00';
   buildBoard();
   startBtn.disabled = true; nameInput.disabled = true;
+  showDownloadBtn(false);
   stopTimer(); startTimer();
 }
 function resetGame(){
   stopTimer();
-  hits=misses=matched=0;
+  hits=misses=matched=0; lastReport=null;
   hitsEl.textContent='Acertos: 0'; missesEl.textContent='Erros: 0'; timerEl.textContent='Tempo: 00:00';
   leftGrid.innerHTML=''; rightGrid.innerHTML='';
   startBtn.disabled=false; nameInput.disabled=false;
+  showDownloadBtn(false);
 }
 
-/* ===================== SCORING & PDF ===================== */
+/* --------- SCORE & PDF --------- */
 const BASE = { TARGET_TIME:900, TARGET_ERRORS:20, W_TIME:.7, W_ERR:.3 };
 function computeScore(seconds, errors){
   const t = Math.min(seconds, BASE.TARGET_TIME);
@@ -303,13 +299,11 @@ function computeScore(seconds, errors){
   const composite = BASE.W_TIME*(1 - t/BASE.TARGET_TIME) + BASE.W_ERR*(1 - e/BASE.TARGET_ERRORS);
   return Math.round(Math.max(0, Math.min(10, composite*10))*10)/10;
 }
-function onComplete(){
-  const secs = Math.floor((Date.now()-startTime)/1000);
-  const name = nameInput.value.trim();
+
+function buildPDFBlob({name, secs, hits, misses, lines}){
+  const { jsPDF } = window.jspdf;
   const score = computeScore(secs, misses);
   const when = new Date().toLocaleString();
-
-  const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit:'pt', format:'a4' });
   const margin = 48; let y = margin;
 
@@ -323,7 +317,6 @@ function onComplete(){
 
   doc.setFont('helvetica','bold'); doc.text('Pares corretos:', margin, y); y+=14;
   doc.setFont('helvetica','normal');
-  const lines = PAIRS.map((p,i)=> `${String(i+1).padStart(2,'0')}. ${p.left}  ↔  ${p.right}`);
   const wrapW = doc.internal.pageSize.getWidth() - margin*2;
   const pageH = doc.internal.pageSize.getHeight() - margin;
   const lh = 14;
@@ -337,14 +330,45 @@ function onComplete(){
   y+=10;
   if (y > pageH){ doc.addPage(); y = margin; }
   doc.setFont('helvetica','italic'); doc.setFontSize(9);
-  doc.text('Nota = 10 × [0.7×(1−t/900) + 0.3×(1−e/20)], limitada a 0–10. Tempo em 15 min zera a parte de tempo; 20+ erros zeram a parte de erros.', margin, y);
+  doc.text('Nota = 10 × [0.7×(1−t/900) + 0.3×(1−e/20)], limitada a 0–10.', margin, y);
 
+  // gera Blob para maior compatibilidade (fallback Safari/iOS)
+  const blob = doc.output('blob');
   const fileName = `CivilWar_WordWall_${name.replace(/\s+/g,'_')}.pdf`;
-  doc.save(fileName);
-  showToast();
+  return {blob, fileName};
 }
 
-/* ===================== THEME ===================== */
+function tryAutoDownload({blob, fileName}){
+  try{
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fileName;
+    // inserir no DOM garante compatibilidade com alguns navegadores
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1500);
+    return true;
+  }catch(e){
+    console.warn('Auto-download falhou:', e);
+    return false;
+  }
+}
+
+function onComplete(){
+  const secs = nowSec();
+  const name = nameInput.value.trim();
+  const lines = PAIRS.map((p,i)=> `${String(i+1).padStart(2,'0')}. ${p.left}  ↔  ${p.right}`);
+  lastReport = { name, secs, hits, misses, lines };
+
+  const pkg = buildPDFBlob(lastReport);
+  const ok = tryAutoDownload(pkg);
+  showToast();
+  showDownloadBtn(true);
+
+  // Se o download automático não acontecer, o botão manual fica visível
+}
+
+/* --------- THEME --------- */
 function toggleTheme(){
   const root = document.documentElement;
   const cur = root.getAttribute('data-theme') || 'dark';
@@ -353,10 +377,15 @@ function toggleTheme(){
 themeSwitch.addEventListener('click', toggleTheme);
 themeSwitch.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggleTheme(); }});
 
-/* ===================== BINDINGS ===================== */
+/* --------- BINDINGS --------- */
 startBtn.addEventListener('click', startGame);
 resetBtn.addEventListener('click', resetGame);
 nameInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ startGame(); }});
+downloadBtn.addEventListener('click', ()=>{
+  if(!lastReport){ return; }
+  const pkg = buildPDFBlob(lastReport);
+  tryAutoDownload(pkg);
+});
 </script>
 </body>
 </html>
