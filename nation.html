@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Prova</title>
   <style>
+    /* ========== THEME ========== */
     :root{
       --bg:#ffffff; --card:#ffffff; --text:#0b1220; --muted:#6b7280;
       --accent:#1f6feb; --ok:#16a34a; --ok-weak:#dcfce7; --warn:#b45309; --bad:#dc2626;
@@ -59,7 +60,7 @@
     .small{font-size:12px}
     .timer{font-weight:800;letter-spacing:.5px}
 
-    /* Modal de Consentimento */
+    /* ===== Modal de Consentimento ===== */
     .modal-backdrop{
       position:fixed; inset:0; background:rgba(0,0,0,.85);
       display:flex; align-items:center; justify-content:center; z-index:9999;
@@ -74,8 +75,10 @@
     .modal .rules{ background:rgba(0,0,0,.03); border:1px dashed var(--border); padding:12px; border-radius:12px; }
     .modal footer{ display:flex; gap:10px; justify-content:flex-end; border:0; padding:0; margin-top:14px;}
     .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); box-shadow:none;}
+    .warn{ color:var(--warn); font-weight:700; }
+    .bad{ color:var(--bad); font-weight:700; }
 
-    /* Toast leve */
+    /* Toast */
     .toast{
       position:fixed; left:50%; transform:translateX(-50%);
       bottom:16px; background:#111827; color:#fff; padding:10px 14px;
@@ -86,27 +89,27 @@
   </style>
 </head>
 <body>
-  <!-- Modal de consentimento (único popup) -->
+  <!-- Modal de consentimento -->
   <div id="consentBackdrop" class="modal-backdrop" aria-modal="true" role="dialog">
     <div class="modal">
       <h2>Termos da Prova</h2>
-      <div class="muted">Ao aceitar, a prova inicia e o cronômetro começa.</div>
+      <div class="muted">Leia com atenção antes de começar.</div>
       <div class="rules">
         <ul>
-          <li>Tentaremos ativar <b>tela cheia</b> (se o navegador permitir).</li>
-          <li>Trocas de aba/janela são <b>registradas</b>.</li>
-          <li><b>Copiar/colar/recortar</b> e <b>Ctrl/Cmd+F</b> são bloqueados.</li>
-          <li>Não minimize ou feche a aba até enviar a prova.</li>
+          <li>Ao clicar em <b>Aceitar e começar</b>, a prova iniciará e tentará ficar em <b>tela cheia</b>. O <b>cronômetro</b> começará.</li>
+          <li>Você <span class="bad">não poderá</span> <b>minimizar</b>, <b>fechar</b> a aba, <b>navegar</b> para outras abas ou alternar janelas sem registro.</li>
+          <li><b>Copiar</b>, <b>colar</b>, <b>recortar</b> e <b>localizar (Ctrl/Cmd+F)</b> são <span class="bad">bloqueados</span> durante a prova.</li>
+          <li>Qualquer perda de foco é <span class="warn">rastreadas</span> (troca de aba, janela, etc.).</li>
         </ul>
       </div>
       <footer>
         <button id="declineBtn" class="btn-ghost">Sair</button>
-        <button id="acceptBtn">Aceitar e começar</button>
+        <button id="acceptBtn" disabled>Aceitar e começar</button>
       </footer>
     </div>
   </div>
 
-  <div id="toast" class="toast" aria-live="polite">Ação registrada.</div>
+  <div id="toast" class="toast" aria-live="polite">⚠️ Volte para a prova — sua ação foi registrada.</div>
 
   <header>
     <div class="wrap">
@@ -120,9 +123,8 @@
 
       <div class="bar">
         <div class="row">
-          <!-- nome agora é OPCIONAL, não exige nada -->
-          <input id="studentName" type="text" placeholder="Nome (opcional)" autocomplete="name" />
-          <span class="pill"><strong>Tempo:</strong> <span id="timer" class="timer">30:00</span></span>
+          <input id="studentName" type="text" placeholder="Nome completo" autocomplete="name" />
+          <span class="pill"><strong>Time:</strong> <span id="timer" class="timer">30:00</span></span>
           <span id="focusFlag" class="badge">Foco OK</span>
           <span id="tabCount" class="badge">Contador de Aba: 0</span>
         </div>
@@ -134,7 +136,7 @@
       </div>
 
       <div class="notice small" id="notes">
-        A prova será enviada automaticamente em 30 minutos.
+        Não saia dessa aba! A prova será enviada automaticamente depois de 30 minutos!
       </div>
     </div>
   </header>
@@ -155,7 +157,7 @@
       </section>
 
       <section class="card" data-difficulty="easy">
-        <h3>Q2. Em CSS, o que vai entre <code>{ }</code>?</h3>
+        <h3>Q2. Em CSS, o que normalmente aparece entre <code>{ }</code>?</h3>
         <div class="options">
           <label><input type="radio" name="q2" value="a"> a) Tags de HTML</label>
           <label><input type="radio" name="q2" value="b"> b) A estrutura do documento</label>
@@ -166,7 +168,7 @@
       </section>
 
       <section class="card" data-difficulty="easy">
-        <h3>Q3. Qual é a hierarquia correta de títulos?</h3>
+        <h3>Q3. Sobre <b>hierarquia</b> de títulos no HTML, qual é a ordem correta do maior nível para o menor?</h3>
         <div class="options">
           <label><input type="radio" name="q3" value="a"> a) h3 &gt; h2 &gt; h1</label>
           <label><input type="radio" name="q3" value="b"> b) h2 &gt; h3 &gt; h1</label>
@@ -177,19 +179,19 @@
       </section>
 
       <section class="card" data-difficulty="easy">
-        <h3>Q4. O que é responsividade?</h3>
+        <h3>Q4. O que é <b>responsividade</b> em páginas web?</h3>
         <div class="options">
-          <label><input type="radio" name="q4" value="a"> a) Responder e-mails automaticamente</label>
-          <label><input type="radio" name="q4" value="b" data-correct> b) Adaptação do layout a diferentes telas/dispositivos</label>
-          <label><input type="radio" name="q4" value="c"> c) Carregar mais rápido somente no Wi-Fi</label>
-          <label><input type="radio" name="q4" value="d"> d) Layout fixo em qualquer tela</label>
-          <label><input type="radio" name="q4" value="e"> e) Somente rotação de tela</label>
+          <label><input type="radio" name="q4" value="a"> a) A página responde apenas a cliques do mouse</label>
+          <label><input type="radio" name="q4" value="b" data-correct> b) A página se adapta a diferentes tamanhos de tela/dispositivos</label>
+          <label><input type="radio" name="q4" value="c"> c) A página carrega mais rápido no Wi-Fi</label>
+          <label><input type="radio" name="q4" value="d"> d) O site responde e-mails automaticamente</label>
+          <label><input type="radio" name="q4" value="e"> e) O layout fica sempre fixo</label>
         </div>
       </section>
 
       <!-- MEDIUM (2) -->
       <section class="card" data-difficulty="medium">
-        <h3>Q5. Como fechar corretamente <code>&lt;p&gt;</code> no HTML?</h3>
+        <h3>Q5. No HTML, qual opção <b>fecha</b> corretamente um parágrafo aberto com <code>&lt;p&gt;</code>?</h3>
         <div class="options">
           <label><input type="radio" name="q5" value="a"> a) <code>&lt;p/&gt;</code></label>
           <label><input type="radio" name="q5" value="b" data-correct> b) <code>&lt;/p&gt;</code></label>
@@ -200,30 +202,30 @@
       </section>
 
       <section class="card" data-difficulty="medium">
-        <h3>Q6. A tag <code>&lt;link rel="stylesheet" href="style.css"&gt;</code> serve para…</h3>
+        <h3>Q6. Qual é a função de <code>&lt;link rel="stylesheet" href="style.css"&gt;</code> no <code>&lt;head&gt;</code>?</h3>
         <div class="options">
           <label><input type="radio" name="q6" value="a"> a) Inserir um script</label>
-          <label><input type="radio" name="q6" value="b"> b) Definir idioma</label>
-          <label><input type="radio" name="q6" value="c"> c) Exibir imagem</label>
-          <label><input type="radio" name="q6" value="d" data-correct> d) Importar CSS externo</label>
-          <label><input type="radio" name="q6" value="e"> e) Criar link clicável no corpo</label>
+          <label><input type="radio" name="q6" value="b"> b) Definir o idioma da página</label>
+          <label><input type="radio" name="q6" value="c"> c) Mostrar uma imagem</label>
+          <label><input type="radio" name="q6" value="d" data-correct> d) Importar um arquivo CSS externo</label>
+          <label><input type="radio" name="q6" value="e"> e) Criar um link clicável no corpo do site</label>
         </div>
       </section>
 
       <!-- HARD (2) -->
       <section class="card" data-difficulty="hard">
-        <h3>Q7. O seletor CSS <code>p strong</code> seleciona…</h3>
+        <h3>Q7. No CSS, o seletor <code>p strong</code> (descendente) faz o quê?</h3>
         <div class="options">
-          <label><input type="radio" name="q7" value="a"> a) Apenas <code>&lt;p&gt;</code></label>
-          <label><input type="radio" name="q7" value="b"> b) Todo <code>&lt;strong&gt;</code> do documento</label>
-          <label><input type="radio" name="q7" value="c" data-correct> c) <code>&lt;strong&gt;</code> dentro de <code>&lt;p&gt;</code></label>
-          <label><input type="radio" name="q7" value="d"> d) <code>&lt;p&gt;</code> dentro de <code>&lt;strong&gt;</code></label>
-          <label><input type="radio" name="q7" value="e"> e) Nada</label>
+          <label><input type="radio" name="q7" value="a"> a) Seleciona apenas <code>&lt;p&gt;</code></label>
+          <label><input type="radio" name="q7" value="b"> b) Seleciona todo <code>&lt;strong&gt;</code> do documento</label>
+          <label><input type="radio" name="q7" value="c" data-correct> c) Seleciona <code>&lt;strong&gt;</code> que está <b>dentro de</b> um <code>&lt;p&gt;</code></label>
+          <label><input type="radio" name="q7" value="d"> d) Seleciona <code>&lt;p&gt;</code> que está <b>dentro de</b> um <code>&lt;strong&gt;</code></label>
+          <label><input type="radio" name="q7" value="e"> e) Não seleciona nada</label>
         </div>
       </section>
 
       <section class="card" data-difficulty="hard">
-        <h3>Q8. No box model, o <b>espaço externo</b> é definido por…</h3>
+        <h3>Q8. No modelo de caixa, qual propriedade define o <b>espaço externo</b> entre um elemento e seus vizinhos?</h3>
         <div class="options">
           <label><input type="radio" name="q8" value="a"> a) <code>padding</code></label>
           <label><input type="radio" name="q8" value="b"> b) <code>border</code></label>
@@ -235,12 +237,12 @@
 
       <!-- WRITING (2) -->
       <section class="card" data-difficulty="writing">
-        <h3>Q9. Escreva um <b>comando em CSS</b> (seletor + { declarações }).</h3>
+        <h3>Q9. Resposta curta: Escreva um <b>comando em CSS</b> (qualquer seletor com pelo menos uma declaração dentro de <code>{ }</code>).</h3>
         <textarea name="q14" class="writing" placeholder="Ex.: p { color: red; }"></textarea>
       </section>
 
       <section class="card" data-difficulty="writing">
-        <h3>Q10. Escreva a <b>estrutura HTML</b> mínima (<!DOCTYPE>, html(lang), head(meta+title), body).</h3>
+        <h3>Q10. Resposta curta: Escreva a <b>estrutura HTML</b> mínima (inclua <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html lang=""&gt;</code>, <code>&lt;head&gt;</code> com <code>&lt;meta charset=&quot;utf-8&quot;&gt;</code> e <code>&lt;title&gt;</code>, e <code>&lt;body&gt;</code>).</h3>
         <textarea name="q15" class="writing" placeholder="Ex.: <!DOCTYPE html> ..."></textarea>
       </section>
     </form>
@@ -260,7 +262,7 @@
   </main>
 
   <script>
-  // ===== Tema =====
+  // ===== Theme toggle (persist) =====
   (function(){
     const root = document.documentElement;
     const saved = localStorage.getItem('theme') || 'light';
@@ -273,7 +275,7 @@
   })();
 
   // ===== Config =====
-  const DEFAULT_MINUTES = 30;
+  const DEFAULT_MINUTES = 30; // quiz length
   const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
 
   // ===== State =====
@@ -281,11 +283,11 @@
   let startTime = null, endTime = null, timerInterval = null;
   let secondsLeft = DEFAULT_MINUTES * 60;
 
-  // Anti-cheat
+  // Focus/anti-cheat tracking
   let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
   let copyCount = 0, pasteCount = 0, findCount = 0;
 
-  // desconto de 1 logo após aceitar (popup do sistema)
+  // Grace para descontar 1 do contador se popup do sistema aparecer após aceitar
   let acceptTs = null;
   const GRACE_MS = 2500;
   let systemPopupOffsetApplied = false;
@@ -301,41 +303,60 @@
   const tabCountEl = document.getElementById('tabCount');
   const downloadCsvBtn = document.getElementById('downloadCsvBtn');
   const resetBtn = document.getElementById('resetBtn');
+
+  const consentBackdrop = document.getElementById('consentBackdrop');
+  const acceptBtn = document.getElementById('acceptBtn');
+  const declineBtn = document.getElementById('declineBtn');
   const toast = document.getElementById('toast');
 
-  // Modal
-  const consentBackdrop = document.getElementById('consentBackdrop');
-  document.body.style.overflow = 'hidden'; // trava scroll enquanto modal existe
+  // Travar scroll enquanto modal visível (só se ele existe)
+  if (document.getElementById('consentBackdrop')) {
+    document.body.style.overflow = 'hidden';
+  }
 
-  // trava o form até iniciar
+  // Lock form until start
   [...form.elements].forEach(el=>el.disabled = true);
+
+  // Enable "Aceitar e começar" button only when name is filled
+  function toggleAcceptButton() {
+    acceptBtn.disabled = !nameInput.value.trim();
+  }
+  nameInput.addEventListener('input', toggleAcceptButton);
+  toggleAcceptButton(); // Initial check
 
   function fmt(secs){
     const m = Math.floor(secs/60).toString().padStart(2,'0');
     const s = (secs%60).toString().padStart(2,'0');
     return `${m}:${s}`;
   }
+
   function tick(){
     secondsLeft--; if(secondsLeft < 0){ secondsLeft = 0; }
     timerEl.textContent = fmt(secondsLeft);
-    if(secondsLeft === 0){ autoSubmit('time'); }
+    if(secondsLeft === 0){
+      autoSubmit('time');
+    }
   }
+
   function startTimer(){
     clearInterval(timerInterval);
     timerInterval = setInterval(tick, 1000);
   }
+
   async function goFullscreen(){
     try{
       if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
         await document.documentElement.requestFullscreen();
       }
-    }catch(e){}
+    }catch(e){ /* ignore */ }
   }
+
   function showToast(msg){
-    toast.textContent = msg || 'Ação registrada.';
+    toast.textContent = msg || '⚠️ Volte para a prova — sua ação foi registrada.';
     toast.classList.add('show');
-    setTimeout(()=> toast.classList.remove('show'), 1500);
+    setTimeout(()=> toast.classList.remove('show'), 2000);
   }
+
   function maybeApplySystemPopupOffset(){
     if (started && !systemPopupOffsetApplied && acceptTs && (Date.now() - acceptTs) <= GRACE_MS){
       tabSwitches = Math.max(0, tabSwitches - 1);
@@ -345,19 +366,27 @@
   }
 
   function startTest(){
-    // sem validação de nome — é opcional
+    const name = nameInput.value.trim();
+    if(!name){ 
+      showToast('Por favor, informe seu nome completo antes de começar.');
+      return; 
+    }
+
     started = true; startTime = new Date();
     nameInput.disabled = true; testIdInput.disabled = true;
     startBtn.disabled = true; startBtn.classList.add('hidden');
     submitBtn.disabled = false;
 
-    // habilita formulário
+    // habilita todos os campos do form
     [...form.elements].forEach(el=>el.disabled = false);
+
+    // fallback para navegadores que "perdem" o enable após popups
     setTimeout(()=>{ [...form.elements].forEach(el=>el.disabled=false); }, 0);
 
     startTimer();
+    localStorage.setItem('m3_session', JSON.stringify({ts: Date.now(), name}));
 
-    // bloqueios
+    // bloquear copiar/colar/atalhos
     document.addEventListener('copy', (e)=>{ copyCount++; e.preventDefault(); showToast('Cópia bloqueada.'); });
     document.addEventListener('cut', (e)=>{ e.preventDefault(); showToast('Recorte bloqueado.'); });
     document.addEventListener('paste', (e)=>{ pasteCount++; e.preventDefault(); showToast('Colagem bloqueada.'); });
@@ -365,15 +394,21 @@
     document.addEventListener('keydown', (e)=>{
       const k = e.key.toLowerCase();
       const ctrl = e.ctrlKey || e.metaKey;
-      if (ctrl && (k==='c' || k==='v' || k==='x' || k==='s' || k==='p' || k==='f')) { e.preventDefault(); showToast('Atalho bloqueado.'); }
-      if (k==='f11'){ e.preventDefault(); showToast('F11 bloqueado.'); }
+      if (ctrl && (k==='c' || k==='v' || k==='x')) { e.preventDefault(); showToast('Copiar/Colar/Recortar bloqueado.'); }
+      if (ctrl && (k==='s')) { e.preventDefault(); showToast('Salvar bloqueado durante a prova.'); }
+      if (ctrl && (k==='p')) { e.preventDefault(); showToast('Impressão bloqueada durante a prova.'); }
+      if (ctrl && (k==='f')) { e.preventDefault(); findCount++; showToast('Localizar (Ctrl/Cmd+F) bloqueado.'); }
+      if (k==='f11'){ e.preventDefault(); showToast('Alterar tela cheia está bloqueado.'); }
     }, {capture:true});
 
+    // bloquear menu de contexto
     document.addEventListener('contextmenu', (e)=> e.preventDefault());
 
+    // manter tela cheia
     document.addEventListener('fullscreenchange', ()=>{
       if (started && !ended && !document.fullscreenElement){
-        // silencioso: não forçar novamente pra evitar novo popup
+        showToast('Você saiu da tela cheia. Retornando...');
+        goFullscreen();
       }
     });
   }
@@ -487,9 +522,10 @@
     console.log('Result payload:', payload, 'POST:', postRes);
     try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
   }
+
   function autoSubmit(reason){ finalize(reason); }
 
-  // Eventos básicos
+  // ===== Eventos do header (o start real vem do modal) =====
   startBtn.addEventListener('click', startTest);
   submitBtn.addEventListener('click', ()=> finalize('manual'));
   downloadCsvBtn.addEventListener('click', ()=>{
@@ -498,7 +534,7 @@
   });
   resetBtn.addEventListener('click', ()=>{ location.reload(); });
 
-  // Anti-cheat + offset popup
+  // ===== Anti-cheat base + ajuste do popup de sistema =====
   document.addEventListener('visibilitychange', ()=>{
     if(!started || ended) return;
     if(document.visibilityState === 'hidden'){
@@ -506,12 +542,13 @@
       focusFlag.textContent = 'Focus LOST';
       isBlurred = true; blurStart = Date.now();
       maybeApplySystemPopupOffset();
-      showToast('Troca de aba registrada.');
+      showToast('Aba/janela em segundo plano registrada.');
     } else {
       focusFlag.textContent = 'Foco OK';
       if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
     }
   });
+
   window.addEventListener('blur', ()=>{
     if(!started || ended) return;
     blurCount++;
@@ -520,12 +557,15 @@
       maybeApplySystemPopupOffset();
     }
     focusFlag.textContent='Focus LOST'; isBlurred=true; blurStart=Date.now();
+    showToast('Perda de foco registrada.');
   });
+
   window.addEventListener('focus', ()=>{
     if(!started || ended) return;
     focusFlag.textContent='Foco OK';
     if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
   });
+
   window.addEventListener('pagehide', ()=>{
     if(!started || ended) return;
     tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
@@ -533,24 +573,34 @@
     if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
   });
 
-  // Aceitar/Sair do modal
-  document.getElementById('acceptBtn').addEventListener('click', async ()=>{
-    // remove overlay de verdade (impede travamento)
+  // ===== Modal actions =====
+  async function acceptAndStart(){
+    const name = nameInput.value.trim();
+    if(!name){ 
+      showToast('Por favor, informe seu nome completo antes de começar.');
+      return; 
+    }
     const backdrop = document.getElementById('consentBackdrop');
     if (backdrop) backdrop.remove();
-    document.body.style.overflow = '';
+    document.body.style.overflow = ''; // libera scroll
+    acceptTs = Date.now(); // janela de graça do offset
 
-    acceptTs = Date.now();
-    startTest();            // inicia já
-    // tentar fullscreen depois (sem alert/prompt nosso)
-    try{ await goFullscreen(); }catch(e){}
-  });
+    // 1) Inicia prova imediatamente
+    startTest();
 
+    // 2) Tenta tela cheia logo depois (sem bloquear)
+    goFullscreen();
+
+    // 3) Toast leve informativo
+    showToast('A prova começou. Boa sorte!');
+  }
+
+  document.getElementById('acceptBtn').addEventListener('click', acceptAndStart);
   document.getElementById('declineBtn').addEventListener('click', ()=>{
     window.location.href = 'about:blank';
   });
 
-  // enquanto o modal existe, bloqueia atalhos que poderiam atrapalhar
+  // Previne atalhos críticos enquanto o modal está aberto
   document.addEventListener('keydown', (e)=>{
     if (document.getElementById('consentBackdrop')){
       const k = e.key.toLowerCase();
@@ -559,7 +609,7 @@
     }
   });
 
-  // bloqueio global do menu de contexto
+  // Reforça bloqueio de clique direito em toda a página
   document.addEventListener('contextmenu', (e)=> e.preventDefault());
   </script>
 </body>
