@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -44,7 +44,6 @@
       transition:transform .08s ease, box-shadow .08s ease, background .12s ease, border-color .12s ease, color .12s ease;
       box-shadow:0 2px 0 var(--shadow);
     }
-    /* “Afunda” e fica verde quando selecionada */
     .options label:has(input[type=radio]:checked){
       background:var(--ok-weak); border-color:var(--ok); transform:translateY(1px);
       box-shadow:inset 0 2px 0 rgba(0,0,0,.06);
@@ -60,9 +59,58 @@
     .strike{opacity:.5;filter:grayscale(.3)}
     .small{font-size:12px}
     .timer{font-weight:800;letter-spacing:.5px}
+
+    /* ===== Modal de Consentimento ===== */
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.85);
+      display:flex; align-items:center; justify-content:center; z-index:9999;
+    }
+    .modal{
+      background:var(--card); color:var(--text);
+      width:min(680px, 92vw); border:1px solid var(--border);
+      border-radius:16px; padding:18px; box-shadow:0 20px 60px var(--shadow);
+    }
+    .modal h2{ margin:0 0 8px; }
+    .modal .muted{ margin-bottom:10px; }
+    .modal .rules{ background:rgba(0,0,0,.03); border:1px dashed var(--border); padding:12px; border-radius:12px; }
+    .modal footer{ display:flex; gap:10px; justify-content:flex-end; border:0; padding:0; margin-top:14px;}
+    .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); box-shadow:none;}
+    .warn{ color:var(--warn); font-weight:700; }
+    .bad{ color:var(--bad); font-weight:700; }
+
+    /* Toast */
+    .toast{
+      position:fixed; left:50%; transform:translateX(-50%);
+      bottom:16px; background:#111827; color:#fff; padding:10px 14px;
+      border-radius:12px; font-size:14px; box-shadow:0 8px 30px rgba(0,0,0,.35);
+      z-index:9998; display:none;
+    }
+    .toast.show{ display:block; }
   </style>
 </head>
 <body>
+  <!-- Modal de consentimento -->
+  <div id="consentBackdrop" class="modal-backdrop" aria-modal="true" role="dialog">
+    <div class="modal">
+      <h2>Termos da Prova</h2>
+      <div class="muted">Leia com atenção antes de começar.</div>
+      <div class="rules">
+        <ul>
+          <li>Ao clicar em <b>Aceitar e começar</b>, a prova iniciará e tentará ficar em <b>tela cheia</b>. O <b>cronômetro</b> começará.</li>
+          <li>Você <span class="bad">não poderá</span> <b>minimizar</b>, <b>fechar</b> a aba, <b>navegar</b> para outras abas ou alternar janelas sem registro.</li>
+          <li><b>Copiar</b>, <b>colar</b>, <b>recortar</b> e <b>localizar (Ctrl/Cmd+F)</b> são <span class="bad">bloqueados</span> durante a prova.</li>
+          <li>Qualquer perda de foco é <span class="warn">rastreadas</span> (troca de aba, janela, etc.).</li>
+        </ul>
+      </div>
+      <footer>
+        <button id="declineBtn" class="btn-ghost">Sair</button>
+        <button id="acceptBtn">Aceitar e começar</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite">⚠️ Volte para a prova — sua ação foi registrada.</div>
+
   <header>
     <div class="wrap">
       <div class="row" style="justify-content:space-between;align-items:center">
@@ -75,136 +123,129 @@
 
       <div class="bar">
         <div class="row">
-          <input id="studentName" type="text" placeholder="Full name" autocomplete="name" />
+          <input id="studentName" type="text" placeholder="Nome completo" autocomplete="name" />
           <span class="pill"><strong>Time:</strong> <span id="timer" class="timer">30:00</span></span>
           <span id="focusFlag" class="badge">Foco OK</span>
           <span id="tabCount" class="badge">Contador de Aba: 0</span>
         </div>
         <div class="row">
           <input id="testId" type="text" placeholder="Prova-Web-Designer1" />
-          <button id="startBtn">Iniciar</button>
+          <button id="startBtn" class="hidden">Iniciar</button>
           <button id="submitBtn" disabled>Enviar</button>
         </div>
       </div>
 
       <div class="notice small" id="notes">
-        Nao saia dessa aba! A prova vai ser enviada automaticamente depois de 30 minutos!
+        Não saia dessa aba! A prova será enviada automaticamente depois de 30 minutos!
       </div>
     </div>
   </header>
 
   <main class="wrap">
     <form id="quizForm" class="grid" autocomplete="off">
-<!-- EASY (4) -->
-<section class="card" data-difficulty="easy">
-  <h3>Q1. Em HTML, o que é o elemento <code>&lt;head&gt;</code>?</h3>
-  <div class="muted">(Escolha uma)</div>
-  <div class="options">
-    <label><input type="radio" name="q1" value="a" data-correct> a) A seção com metadados (título, links de CSS, meta tags) que não aparece no corpo da página</label>
-    <label><input type="radio" name="q1" value="b"> b) A área visível do site onde ficam textos e imagens</label>
-    <label><input type="radio" name="q1" value="c"> c) Um contêiner obrigatório para tabelas</label>
-    <label><input type="radio" name="q1" value="d"> d) Um rodapé com informações de contato</label>
-    <label><input type="radio" name="q1" value="e"> e) Um script para carregar JavaScript</label>
-  </div>
-</section>
+      <!-- EASY (4) -->
+      <section class="card" data-difficulty="easy">
+        <h3>Q1. Em HTML, o que significam as “tags” com <code>&lt;&gt;</code>?</h3>
+        <div class="muted">(Escolha uma)</div>
+        <div class="options">
+          <label><input type="radio" name="q1" value="a"> a) Comentários de CSS</label>
+          <label><input type="radio" name="q1" value="b" data-correct> b) Elementos/estruturas do HTML (ex.: <code>&lt;h1&gt;</code>, <code>&lt;p&gt;</code>)</label>
+          <label><input type="radio" name="q1" value="c"> c) Objetos do JavaScript</label>
+          <label><input type="radio" name="q1" value="d"> d) Seletores do CSS</label>
+          <label><input type="radio" name="q1" value="e"> e) Variáveis do CSS</label>
+        </div>
+      </section>
 
-<section class="card" data-difficulty="easy">
-  <h3>Q2. Para que serve <code>&lt;!DOCTYPE html&gt;</code> em um documento?</h3>
-  <div class="options">
-    <label><input type="radio" name="q2" value="a" data-correct> a) Informar ao navegador que o documento usa o padrão HTML5</label>
-    <label><input type="radio" name="q2" value="b"> b) Importar o arquivo de estilos CSS</label>
-    <label><input type="radio" name="q2" value="c"> c) Inserir um arquivo JavaScript externo</label>
-    <label><input type="radio" name="q2" value="d"> d) Definir o idioma da página</label>
-    <label><input type="radio" name="q2" value="e"> e) Definir a codificação de caracteres</label>
-  </div>
-</section>
+      <section class="card" data-difficulty="easy">
+        <h3>Q2. Em CSS, o que normalmente aparece entre <code>{ }</code>?</h3>
+        <div class="options">
+          <label><input type="radio" name="q2" value="a"> a) Tags de HTML</label>
+          <label><input type="radio" name="q2" value="b"> b) A estrutura do documento</label>
+          <label><input type="radio" name="q2" value="c" data-correct> c) Declarações de estilo (propriedade: valor;)</label>
+          <label><input type="radio" name="q2" value="d"> d) Comentários do navegador</label>
+          <label><input type="radio" name="q2" value="e"> e) Links externos</label>
+        </div>
+      </section>
 
-<section class="card" data-difficulty="easy">
-  <h3>Q3. Qual é a finalidade do atributo <code>alt</code> na tag <code>&lt;img&gt;</code>?</h3>
-  <div class="options">
-    <label><input type="radio" name="q3" value="a" data-correct> a) Fornecer texto alternativo para acessibilidade e quando a imagem não carrega</label>
-    <label><input type="radio" name="q3" value="b"> b) Definir o tamanho (largura e altura) da imagem</label>
-    <label><input type="radio" name="q3" value="c"> c) Transformar a imagem em um link</label>
-    <label><input type="radio" name="q3" value="d"> d) Ativar animação CSS automaticamente</label>
-    <label><input type="radio" name="q3" value="e"> e) Mudar a cor de fundo da imagem</label>
-  </div>
-</section>
+      <section class="card" data-difficulty="easy">
+        <h3>Q3. Sobre <b>hierarquia</b> de títulos no HTML, qual é a ordem correta do maior nível para o menor?</h3>
+        <div class="options">
+          <label><input type="radio" name="q3" value="a"> a) h3 &gt; h2 &gt; h1</label>
+          <label><input type="radio" name="q3" value="b"> b) h2 &gt; h3 &gt; h1</label>
+          <label><input type="radio" name="q3" value="c"> c) h1 &gt; h3 &gt; h2</label>
+          <label><input type="radio" name="q3" value="d" data-correct> d) h1 &gt; h2 &gt; h3</label>
+          <label><input type="radio" name="q3" value="e"> e) h2 &gt; h1 &gt; h3</label>
+        </div>
+      </section>
 
-<section class="card" data-difficulty="easy">
-  <h3>Q4. Para abrir um link em uma nova aba/janela, qual valor de <code>target</code> usar em <code>&lt;a&gt;</code>?</h3>
-  <div class="options">
-    <label><input type="radio" name="q4" value="a" data-correct> a) <code>_blank</code></label>
-    <label><input type="radio" name="q4" value="b"> b) <code>_self</code></label>
-    <label><input type="radio" name="q4" value="c"> c) <code>newtab</code></label>
-    <label><input type="radio" name="q4" value="d"> d) <code>open</code></label>
-    <label><input type="radio" name="q4" value="e"> e) <code>external</code></label>
-  </div>
-</section>
+      <section class="card" data-difficulty="easy">
+        <h3>Q4. O que é <b>responsividade</b> em páginas web?</h3>
+        <div class="options">
+          <label><input type="radio" name="q4" value="a"> a) A página responde apenas a cliques do mouse</label>
+          <label><input type="radio" name="q4" value="b" data-correct> b) A página se adapta a diferentes tamanhos de tela/dispositivos</label>
+          <label><input type="radio" name="q4" value="c"> c) A página carrega mais rápido no Wi-Fi</label>
+          <label><input type="radio" name="q4" value="d"> d) O site responde e-mails automaticamente</label>
+          <label><input type="radio" name="q4" value="e"> e) O layout fica sempre fixo</label>
+        </div>
+      </section>
 
-<!-- MEDIUM (5) -->
+      <!-- MEDIUM (2) -->
+      <section class="card" data-difficulty="medium">
+        <h3>Q5. No HTML, qual opção <b>fecha</b> corretamente um parágrafo aberto com <code>&lt;p&gt;</code>?</h3>
+        <div class="options">
+          <label><input type="radio" name="q5" value="a"> a) <code>&lt;p/&gt;</code></label>
+          <label><input type="radio" name="q5" value="b" data-correct> b) <code>&lt;/p&gt;</code></label>
+          <label><input type="radio" name="q5" value="c"> c) <code>&lt;close p&gt;</code></label>
+          <label><input type="radio" name="q5" value="d"> d) <code>&lt;p close&gt;</code></label>
+          <label><input type="radio" name="q5" value="e"> e) <code>&lt;end p&gt;</code></label>
+        </div>
+      </section>
 
+      <section class="card" data-difficulty="medium">
+        <h3>Q6. Qual é a função de <code>&lt;link rel="stylesheet" href="style.css"&gt;</code> no <code>&lt;head&gt;</code>?</h3>
+        <div class="options">
+          <label><input type="radio" name="q6" value="a"> a) Inserir um script</label>
+          <label><input type="radio" name="q6" value="b"> b) Definir o idioma da página</label>
+          <label><input type="radio" name="q6" value="c"> c) Mostrar uma imagem</label>
+          <label><input type="radio" name="q6" value="d" data-correct> d) Importar um arquivo CSS externo</label>
+          <label><input type="radio" name="q6" value="e"> e) Criar um link clicável no corpo do site</label>
+        </div>
+      </section>
 
+      <!-- HARD (2) -->
+      <section class="card" data-difficulty="hard">
+        <h3>Q7. No CSS, o seletor <code>p strong</code> (descendente) faz o quê?</h3>
+        <div class="options">
+          <label><input type="radio" name="q7" value="a"> a) Seleciona apenas <code>&lt;p&gt;</code></label>
+          <label><input type="radio" name="q7" value="b"> b) Seleciona todo <code>&lt;strong&gt;</code> do documento</label>
+          <label><input type="radio" name="q7" value="c" data-correct> c) Seleciona <code>&lt;strong&gt;</code> que está <b>dentro de</b> um <code>&lt;p&gt;</code></label>
+          <label><input type="radio" name="q7" value="d"> d) Seleciona <code>&lt;p&gt;</code> que está <b>dentro de</b> um <code>&lt;strong&gt;</code></label>
+          <label><input type="radio" name="q7" value="e"> e) Não seleciona nada</label>
+        </div>
+      </section>
 
-<section class="card" data-difficulty="medium">
-  <h3>Q5. No modelo de caixa (box model), o que a propriedade <code>padding</code> faz?</h3>
-  <div class="options">
-    <label><input type="radio" name="q8" value="a" data-correct> a) Aumenta o espaço interno entre o conteúdo e a borda do elemento</label>
-    <label><input type="radio" name="q8" value="b"> b) Define o espaço externo entre o elemento e os vizinhos</label>
-    <label><input type="radio" name="q8" value="c"> c) Ajusta a espessura da borda</label>
-    <label><input type="radio" name="q8" value="d"> d) Centraliza o elemento na página</label>
-    <label><input type="radio" name="q8" value="e"> e) Define a largura total do elemento ignorando bordas</label>
-  </div>
-</section>
+      <section class="card" data-difficulty="hard">
+        <h3>Q8. No modelo de caixa, qual propriedade define o <b>espaço externo</b> entre um elemento e seus vizinhos?</h3>
+        <div class="options">
+          <label><input type="radio" name="q8" value="a"> a) <code>padding</code></label>
+          <label><input type="radio" name="q8" value="b"> b) <code>border</code></label>
+          <label><input type="radio" name="q8" value="c"> c) <code>width</code></label>
+          <label><input type="radio" name="q8" value="d"> d) <code>display</code></label>
+          <label><input type="radio" name="q8" value="e" data-correct> e) <code>margin</code></label>
+        </div>
+      </section>
 
+      <!-- WRITING (2) -->
+      <section class="card" data-difficulty="writing">
+        <h3>Q9. Resposta curta: Escreva um <b>comando em CSS</b> (qualquer seletor com pelo menos uma declaração dentro de <code>{ }</code>).</h3>
+        <textarea name="q14" class="writing" placeholder="Ex.: p { color: red; }"></textarea>
+      </section>
 
-
-<section class="card" data-difficulty="hard">
-  <h3>Q6. Qual dessas ações ocorre primeiro ao criar uma página HTML5 correta?</h3>
-  <div class="options">
-    <label><input type="radio" name="q11" value="a" data-correct> a) Declarar <code>&lt;!DOCTYPE html&gt;</code></label>
-    <label><input type="radio" name="q11" value="b"> b) Adicionar o CSS externo</label>
-    <label><input type="radio" name="q11" value="c"> c) Inserir imagens</label>
-    <label><input type="radio" name="q11" value="d"> d) Escrever o conteúdo do <code>&lt;body&gt;</code></label>
-    <label><input type="radio" name="q11" value="e"> e) Criar links para outras páginas</label>
-  </div>
-</section>
-
-<section class="card" data-difficulty="hard">
-  <h3>Q7. Pensando em acessibilidade, qual atributo é ESSENCIAL e deve ser usado corretamente?</h3>
-  <div class="options">
-    <label><input type="radio" name="q12" value="a" data-correct> a) <code>alt</code> em imagens, descrevendo brevemente o conteúdo</label>
-    <label><input type="radio" name="q12" value="b"> b) <code>title</code> em todo elemento</label>
-    <label><input type="radio" name="q12" value="c"> c) <code>id</code> repetido para vários elementos</label>
-    <label><input type="radio" name="q12" value="d"> d) <code>style</code> com cores chamativas</label>
-    <label><input type="radio" name="q12" value="e"> e) <code>hidden</code> para esconder textos importantes</label>
-  </div>
-</section>
-
-<section class="card" data-difficulty="hard">
-  <h3>Q8. Por que é melhor usar <code>&lt;strong&gt;</code> do que <code>&lt;b&gt;</code> em muitos casos?</h3>
-  <div class="options">
-    <label><input type="radio" name="q13" value="a" data-correct> a) <code>&lt;strong&gt;</code> dá ênfase semântica ao conteúdo; <code>&lt;b&gt;</code> é apenas visual</label>
-    <label><input type="radio" name="q13" value="b"> b) <code>&lt;b&gt;</code> é mais acessível que <code>&lt;strong&gt;</code></label>
-    <label><input type="radio" name="q13" value="c"> c) <code>&lt;strong&gt;</code> é obrigatório por padrão</label>
-    <label><input type="radio" name="q13" value="d"> d) <code>&lt;b&gt;</code> remove o texto da árvore de acessibilidade</label>
-    <label><input type="radio" name="q13" value="e"> e) <code>&lt;strong&gt;</code> aumenta o tamanho da fonte automaticamente</label>
-  </div>
-</section>
-
-<!-- WRITING (2) -->
-<section class="card" data-difficulty="writing">
-  <h3>Q9. Resposta curta (4–6 frases): Compare CSS inline, CSS interno (em <code>&lt;style&gt;</code>) e CSS externo (com <code>&lt;link&gt;</code>). Explique vantagens e desvantagens e diga quando você usaria cada um.</h3>
-  <textarea name="q14" class="writing" placeholder="Escreva sua resposta aqui..."></textarea>
-</section>
-
-<section class="card" data-difficulty="writing">
-  <h3>Q10. Resposta curta: Escreva a estrutura mínima de um documento HTML5 (inclua <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html lang=""&gt;</code>, <code>&lt;head&gt;</code> com <code>&lt;meta charset="utf-8"&gt;</code> e <code>&lt;title&gt;</code>, e <code>&lt;body&gt;</code>).</h3>
-  <textarea name="q15" class="writing" placeholder="Escreva sua resposta aqui..."></textarea>
-</section>
-
-  
-</form>
-
+      <section class="card" data-difficulty="writing">
+        <h3>Q10. Resposta curta: Escreva a <b>estrutura HTML</b> mínima (inclua <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html lang=""&gt;</code>, <code>&lt;head&gt;</code> com <code>&lt;meta charset=&quot;utf-8&quot;&gt;</code> e <code>&lt;title&gt;</code>, e <code>&lt;body&gt;</code>).</h3>
+        <textarea name="q15" class="writing" placeholder="Ex.: <!DOCTYPE html> ..."></textarea>
+      </section>
+    </form>
 
     <div class="card">
       <h3>Results & Admin</h3>
@@ -246,6 +287,11 @@
   let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
   let copyCount = 0, pasteCount = 0, findCount = 0;
 
+  // Grace para descontar 1 do contador se popup do sistema aparecer após aceitar
+  let acceptTs = null;
+  const GRACE_MS = 2500;
+  let systemPopupOffsetApplied = false;
+
   // DOM
   const startBtn = document.getElementById('startBtn');
   const submitBtn = document.getElementById('submitBtn');
@@ -257,6 +303,16 @@
   const tabCountEl = document.getElementById('tabCount');
   const downloadCsvBtn = document.getElementById('downloadCsvBtn');
   const resetBtn = document.getElementById('resetBtn');
+
+  const consentBackdrop = document.getElementById('consentBackdrop');
+  const acceptBtn = document.getElementById('acceptBtn');
+  const declineBtn = document.getElementById('declineBtn');
+  const toast = document.getElementById('toast');
+
+  // Travar scroll enquanto modal visível (só se ele existe)
+  if (document.getElementById('consentBackdrop')) {
+    document.body.style.overflow = 'hidden';
+  }
 
   // Lock form until start
   [...form.elements].forEach(el=>el.disabled = true);
@@ -280,38 +336,104 @@
     timerInterval = setInterval(tick, 1000);
   }
 
+  async function goFullscreen(){
+    try{
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      }
+    }catch(e){ /* ignore */ }
+  }
+
+  function showToast(msg){
+    toast.textContent = msg || '⚠️ Volte para a prova — sua ação foi registrada.';
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 2000);
+  }
+
+  function maybeApplySystemPopupOffset(){
+    if (started && !systemPopupOffsetApplied && acceptTs && (Date.now() - acceptTs) <= GRACE_MS){
+      tabSwitches = Math.max(0, tabSwitches - 1);
+      systemPopupOffsetApplied = true;
+      tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    }
+  }
+
   function startTest(){
     const name = nameInput.value.trim();
-    if(!name){ alert('Please enter your full name before starting.'); return; }
+    if(!name){ alert('Por favor, informe seu nome completo antes de começar.'); return; }
+
     started = true; startTime = new Date();
     nameInput.disabled = true; testIdInput.disabled = true;
-    startBtn.disabled = true; submitBtn.disabled = false;
+    startBtn.disabled = true; startBtn.classList.add('hidden');
+    submitBtn.disabled = false;
+
+    // habilita todos os campos do form
     [...form.elements].forEach(el=>el.disabled = false);
+
+    // fallback para navegadores que "perdem" o enable após popups
+    setTimeout(()=>{ [...form.elements].forEach(el=>el.disabled=false); }, 0);
+
     startTimer();
     localStorage.setItem('m3_session', JSON.stringify({ts: Date.now(), name}));
+
+    // bloquear copiar/colar/atalhos
+    document.addEventListener('copy', (e)=>{ copyCount++; e.preventDefault(); showToast('Cópia bloqueada.'); });
+    document.addEventListener('cut', (e)=>{ e.preventDefault(); showToast('Recorte bloqueado.'); });
+    document.addEventListener('paste', (e)=>{ pasteCount++; e.preventDefault(); showToast('Colagem bloqueada.'); });
+
+    document.addEventListener('keydown', (e)=>{
+      const k = e.key.toLowerCase();
+      const ctrl = e.ctrlKey || e.metaKey;
+      if (ctrl && (k==='c' || k==='v' || k==='x')) { e.preventDefault(); showToast('Copiar/Colar/Recortar bloqueado.'); }
+      if (ctrl && (k==='s')) { e.preventDefault(); showToast('Salvar bloqueado durante a prova.'); }
+      if (ctrl && (k==='p')) { e.preventDefault(); showToast('Impressão bloqueada durante a prova.'); }
+      if (ctrl && (k==='f')) { e.preventDefault(); findCount++; showToast('Localizar (Ctrl/Cmd+F) bloqueado.'); }
+      if (k==='f11'){ e.preventDefault(); showToast('Alterar tela cheia está bloqueado.'); }
+    }, {capture:true});
+
+    // bloquear menu de contexto
+    document.addEventListener('contextmenu', (e)=> e.preventDefault());
+
+    // manter tela cheia
+    document.addEventListener('fullscreenchange', ()=>{
+      if (started && !ended && !document.fullscreenElement){
+        showToast('Você saiu da tela cheia. Retornando...');
+        goFullscreen();
+      }
+    });
+
+    // (removido o beforeunload para evitar popup extra)
   }
 
   function grade(){
     const answers = {}; let totalCorrect = 0, totalPossible = 0;
     const byDiff = {easy:0, medium:0, hard:0};
     const possibleByDiff = {easy:0, medium:0, hard:0};
+
     const nodes = form.querySelectorAll('section.card');
-    nodes.forEach((sec, idx)=>{
+    nodes.forEach((sec)=>{
       const diff = sec.dataset.difficulty;
-      if(diff === 'writing') return; // skip autograde
-      const name = `q${idx+1}`; // relies on order
+      if(diff === 'writing') return;
+
+      const radios = sec.querySelectorAll('input[type=radio]');
+      if (!radios.length) return;
+
+      const qname = radios[0].name;
       const checked = sec.querySelector('input[type=radio]:checked');
-      const correct = sec.querySelector('input[data-correct]');
-      const isCorrect = !!(checked && checked === correct);
-      answers[name] = checked ? checked.value : null;
-      if(diff in possibleByDiff){ possibleByDiff[diff]++; }
-      if(isCorrect){ totalCorrect++; if(diff in byDiff) byDiff[diff]++; }
+      const correct = sec.querySelector('input[type=radio][data-correct]');
+
+      const isCorrect = !!(checked && correct && checked === correct);
+      answers[qname] = checked ? checked.value : null;
+
+      if (diff in possibleByDiff) possibleByDiff[diff]++;
+      if (isCorrect){ totalCorrect++; if (diff in byDiff) byDiff[diff]++; }
+
       totalPossible++;
     });
 
     const writing = {
-      q14: form.querySelector('[name=q14]').value.trim(),
-      q15: form.querySelector('[name=q15]').value.trim()
+      q14: form.querySelector('[name=q14]')?.value.trim() || '',
+      q15: form.querySelector('[name=q15]')?.value.trim() || ''
     };
 
     return {
@@ -390,12 +512,12 @@
     downloadCSV(payload.studentName || 'anonymous', csv);
     lockTest();
     console.log('Result payload:', payload, 'POST:', postRes);
-    alert('Submission saved.');
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
   }
 
   function autoSubmit(reason){ finalize(reason); }
 
-  // Events
+  // ===== Eventos do header (o start real vem do modal) =====
   startBtn.addEventListener('click', startTest);
   submitBtn.addEventListener('click', ()=> finalize('manual'));
   downloadCsvBtn.addEventListener('click', ()=>{
@@ -404,47 +526,78 @@
   });
   resetBtn.addEventListener('click', ()=>{ location.reload(); });
 
-  // Anti-cheat
+  // ===== Anti-cheat base + ajuste do popup de sistema =====
   document.addEventListener('visibilitychange', ()=>{
     if(!started || ended) return;
     if(document.visibilityState === 'hidden'){
-      tabSwitches++; tabCountEl.textContent = `Tab: ${tabSwitches}`;
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
       focusFlag.textContent = 'Focus LOST';
       isBlurred = true; blurStart = Date.now();
+      maybeApplySystemPopupOffset();
+      showToast('Aba/janela em segundo plano registrada.');
     } else {
-      focusFlag.textContent = 'Focus OK';
+      focusFlag.textContent = 'Foco OK';
       if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
     }
   });
+
   window.addEventListener('blur', ()=>{
     if(!started || ended) return;
     blurCount++;
     if (document.visibilityState !== 'hidden') {
-      tabSwitches++; tabCountEl.textContent = `Tab: ${tabSwitches}`;
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+      maybeApplySystemPopupOffset();
     }
     focusFlag.textContent='Focus LOST'; isBlurred=true; blurStart=Date.now();
+    showToast('Perda de foco registrada.');
   });
+
   window.addEventListener('focus', ()=>{
     if(!started || ended) return;
-    focusFlag.textContent='Focus OK';
+    focusFlag.textContent='Foco OK';
     if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
   });
+
   window.addEventListener('pagehide', ()=>{
     if(!started || ended) return;
-    tabSwitches++; tabCountEl.textContent = `Tab: ${tabSwitches}`;
+    tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    maybeApplySystemPopupOffset();
     if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
   });
-  document.addEventListener('copy', ()=>{ copyCount++; });
-  document.addEventListener('paste', ()=>{ pasteCount++; });
-  document.addEventListener('keydown', (e)=>{
-    if((e.ctrlKey||e.metaKey) && (e.key==='f' || e.key==='F')){ findCount++; }
+
+  // ===== Modal actions =====
+  async function acceptAndStart(){
+    const backdrop = document.getElementById('consentBackdrop');
+    if (backdrop) backdrop.remove();
+    document.body.style.overflow = ''; // libera scroll
+    acceptTs = Date.now(); // janela de graça do offset
+
+    // 1) Inicia prova imediatamente (sem popup extra)
+    startTest();
+
+    // 2) Tenta tela cheia logo depois (sem bloquear)
+    goFullscreen();
+
+    // 3) Toast leve informativo
+    showToast('A prova começou. Boa sorte!');
+  }
+
+  document.getElementById('acceptBtn').addEventListener('click', acceptAndStart);
+  document.getElementById('declineBtn').addEventListener('click', ()=>{
+    window.location.href = 'about:blank';
   });
+
+  // Previne atalhos críticos enquanto o modal está aberto
+  document.addEventListener('keydown', (e)=>{
+    if (document.getElementById('consentBackdrop')){
+      const k = e.key.toLowerCase();
+      if ((e.ctrlKey||e.metaKey) && (k==='w' || k==='r' || k==='p' || k==='s' || k==='f')) e.preventDefault();
+      if (k==='f11') e.preventDefault();
+    }
+  });
+
+  // Reforça bloqueio de clique direito em toda a página
   document.addEventListener('contextmenu', (e)=> e.preventDefault());
   </script>
 </body>
 </html>
-
-
-
-
-
