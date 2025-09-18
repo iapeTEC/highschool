@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prova</title>
+  <style>
+    /* ========== THEME ========== */
+    :root{
+      --bg:#ffffff; --card:#ffffff; --text:#0b1220; --muted:#6b7280;
+      --accent:#1f6feb; --ok:#16a34a; --ok-weak:#dcfce7; --warn:#b45309; --bad:#dc2626;
+      --border:rgba(0,0,0,.12); --shadow:rgba(0,0,0,.08);
+    }
+    html[data-theme="dark"]{
+      --bg:#000000; --card:#0b0b0f; --text:#f5f7ff; --muted:#a3a7b7;
+      --accent:#7c9bff; --ok:#22c55e; --ok-weak:#062b14; --warn:#ffb02e; --bad:#ff6b6b;
+      --border:rgba(255,255,255,.14); --shadow:rgba(0,0,0,.55);
+    }
+
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    a{color:var(--accent);text-decoration:none}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.75);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border)}
+    html[data-theme="dark"] header{background:rgba(0,0,0,.7)}
+    .wrap{max-width:1000px;margin:0 auto;padding:16px}
+    h1{margin:0 0 6px;font-size:clamp(22px,2.6vw,32px)}
+    .sub{color:var(--muted)}
+    .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:10px}
+    input[type=text]{background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;min-width:220px;outline:none}
+    input[type=text]::placeholder{color:var(--muted)}
+    button{background:var(--accent);border:none;color:#ffffff;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px var(--shadow)}
+    button[disabled]{opacity:.5;cursor:not-allowed}
+    .icon-btn{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);padding:8px 12px;border-radius:999px}
+    .grid{display:grid;gap:16px;grid-template-columns:1fr}
+    @media(min-width:880px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:0 8px 30px var(--shadow)}
+    .card h3{margin:0 0 6px;font-size:18px}
+    .muted{color:var(--muted)}
+    .options{display:grid;gap:8px;margin-top:8px}
+    .options label{
+      display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;
+      padding:10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;background:transparent;
+      transition:transform .08s ease, box-shadow .08s ease, background .12s ease, border-color .12s ease, color .12s ease;
+      box-shadow:0 2px 0 var(--shadow);
+    }
+    .options label:has(input[type=radio]:checked){
+      background:var(--ok-weak); border-color:var(--ok); transform:translateY(1px);
+      box-shadow:inset 0 2px 0 rgba(0,0,0,.06);
+      color:#064e3b;
+    }
+    .options input[type=radio]{margin-top:3px}
+    .writing{min-height:100px;width:100%;resize:vertical;background:transparent;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:12px}
+    footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:var(--muted)}
+    .notice{border:1px dashed var(--border);padding:10px;border-radius:10px;color:var(--muted)}
+    .hidden{display:none!important}
+    .strike{opacity:.5;filter:grayscale(.3)}
+    .small{font-size:12px}
+    .timer{font-weight:800;letter-spacing:.5px}
+
+    /* ===== Modal de Consentimento ===== */
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.55);
+      display:flex; align-items:center; justify-content:center; z-index:9999;
+    }
+    .modal{
+      background:var(--card); color:var(--text);
+      width:min(680px, 92vw); border:1px solid var(--border);
+      border-radius:16px; padding:18px; box-shadow:0 20px 60px var(--shadow);
+    }
+    .modal h2{ margin:0 0 8px; }
+    .modal .muted{ margin-bottom:10px; }
+    .modal .rules{ background:rgba(0,0,0,.03); border:1px dashed var(--border); padding:12px; border-radius:12px; }
+    .modal footer{ display:flex; gap:10px; justify-content:flex-end; border:0; padding:0; margin-top:14px;}
+    .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); box-shadow:none;}
+    .warn{ color:var(--warn); font-weight:700; }
+    .bad{ color:var(--bad); font-weight:700; }
+
+    /* Aviso de perda de foco / saída de tela cheia */
+    .toast{
+      position:fixed; left:50%; transform:translateX(-50%);
+      bottom:16px; background:#111827; color:#fff; padding:10px 14px;
+      border-radius:12px; font-size:14px; box-shadow:0 8px 30px rgba(0,0,0,.35);
+      z-index:9998; display:none;
+    }
+    .toast.show{ display:block; }
+  </style>
+</head>
+<body>
+  <!-- Modal de consentimento -->
+  <div id="consentBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <h2>Termos da Prova</h2>
+      <div class="muted">Leia com atenção antes de começar.</div>
+      <div class="rules">
+        <ul>
+          <li>Ao clicar em <b>Aceitar e começar</b>, a prova entrará em <b>tela cheia</b> e o <b>cronômetro</b> será iniciado.</li>
+          <li>Você <span class="bad">não poderá</span> <b>minimizar</b>, <b>fechar</b> a aba, <b>navegar</b> para outras abas ou <b>alternar janelas</b> sem registro.</li>
+          <li>As ações de <b>copiar</b>, <b>colar</b>, <b>recortar</b> e <b>localizar (Ctrl/Cmd+F)</b> são <span class="bad">bloqueadas</span> durante a prova.</li>
+          <li>Todas as tentativas de sair do foco são <span class="warn">rastreadas</span> (troca de aba, perda de foco, etc.).</li>
+          <li>Ao tentar sair/fechar a página, você verá um aviso e sua sessão pode ser registrada como encerrada.</li>
+        </ul>
+      </div>
+      <footer>
+        <button id="declineBtn" class="btn-ghost">Sair</button>
+        <button id="acceptBtn">Aceitar e começar</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">⚠️ Volte para a prova — sua ação foi registrada.</div>
+
+  <header>
+    <div class="wrap">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <h1>Prova 1 - Web Designer</h1>
+          <div class="sub">HTML e CSS</div>
+        </div>
+        <button id="themeToggle" class="icon-btn">🌓 Tema</button>
+      </div>
+
+      <div class="bar">
+        <div class="row">
+          <input id="studentName" type="text" placeholder="Full name" autocomplete="name" />
+          <span class="pill"><strong>Time:</strong> <span id="timer" class="timer">30:00</span></span>
+          <span id="focusFlag" class="badge">Foco OK</span>
+          <span id="tabCount" class="badge">Contador de Aba: 0</span>
+        </div>
+        <div class="row">
+          <input id="testId" type="text" placeholder="Prova-Web-Designer1" />
+          <!-- Botão iniciar fica escondido; o modal dispara o início -->
+          <button id="startBtn" class="hidden">Iniciar</button>
+          <button id="submitBtn" disabled>Enviar</button>
+        </div>
+      </div>
+
+      <div class="notice small" id="notes">
+        Não saia dessa aba! A prova será enviada automaticamente depois de 30 minutos!
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <form id="quizForm" class="grid" autocomplete="off">
+      <!-- === SUAS PERGUNTAS (mesmo conteúdo que você mandou) === -->
+      <!-- EASY (4) -->
+      <section class="card" data-difficulty="easy">
+        <h3>Q1. Em HTML, o que é o elemento <code>&lt;head&gt;</code>?</h3>
+        <div class="muted">(Escolha uma)</div>
+        <div class="options">
+          <label><input type="radio" name="q1" value="a" data-correct> a) A seção com metadados (título, links de CSS, meta tags) que não aparece no corpo da página</label>
+          <label><input type="radio" name="q1" value="b"> b) A área visível do site onde ficam textos e imagens</label>
+          <label><input type="radio" name="q1" value="c"> c) Um contêiner obrigatório para tabelas</label>
+          <label><input type="radio" name="q1" value="d"> d) Um rodapé com informações de contato</label>
+          <label><input type="radio" name="q1" value="e"> e) Um script para carregar JavaScript</label>
+        </div>
+      </section>
+
+      <section class="card" data-difficulty="easy">
+        <h3>Q2. Para que serve <code>&lt;!DOCTYPE html&gt;</code> em um documento?</h3>
+        <div class="options">
+          <label><input type="radio" name="q2" value="a" data-correct> a) Informar ao navegador que o documento usa o padrão HTML5</label>
+          <label><input type="radio" name="q2" value="b"> b) Importar o arquivo de estilos CSS</label>
+          <label><input type="radio" name="q2" value="c"> c) Inserir um arquivo JavaScript externo</label>
+          <label><input type="radio" name="q2" value="d"> d) Definir o idioma da página</label>
+          <label><input type="radio" name="q2" value="e"> e) Definir a codificação de caracteres</label>
+        </div>
+      </section>
+
+      <section class="card" data-difficulty="easy">
+        <h3>Q3. Qual é a finalidade do atributo <code>alt</code> na tag <code>&lt;img&gt;</code>?</h3>
+        <div class="options">
+          <label><input type="radio" name="q3" value="a" data-correct> a) Fornecer texto alternativo para acessibilidade e quando a imagem não carrega</label>
+          <label><input type="radio" name="q3" value="b"> b) Definir o tamanho (largura e altura) da imagem</label>
+          <label><input type="radio" name="q3" value="c"> c) Transformar a imagem em um link</label>
+          <label><input type="radio" name="q3" value="d"> d) Ativar animação CSS automaticamente</label>
+          <label><input type="radio" name="q3" value="e"> e) Mudar a cor de fundo da imagem</label>
+        </div>
+      </section>
+
+      <section class="card" data-difficulty="easy">
+        <h3>Q4. Para abrir um link em uma nova aba/janela, qual valor de <code>target</code> usar em <code>&lt;a&gt;</code>?</h3>
+        <div class="options">
+          <label><input type="radio" name="q4" value="a" data-correct> a) <code>_blank</code></label>
+          <label><input type="radio" name="q4" value="b"> b) <code>_self</code></label>
+          <label><input type="radio" name="q4" value="c"> c) <code>newtab</code></label>
+          <label><input type="radio" name="q4" value="d"> d) <code>open</code></label>
+          <label><input type="radio" name="q4" value="e"> e) <code>external</code></label>
+        </div>
+      </section>
+
+      <!-- MEDIUM/HARD/Writing iguais ao seu... -->
+      <section class="card" data-difficulty="medium">
+        <h3>Q5. No modelo de caixa (box model), o que a propriedade <code>padding</code> faz?</h3>
+        <div class="options">
+          <label><input type="radio" name="q8" value="a" data-correct> a) Aumenta o espaço interno entre o conteúdo e a borda do elemento</label>
+          <label><input type="radio" name="q8" value="b"> b) Define o espaço externo entre o elemento e os vizinhos</label>
+          <label><input type="radio" name="q8" value="c"> c) Ajusta a espessura da borda</label>
+          <label><input type="radio" name="q8" value="d"> d) Centraliza o elemento na página</label>
+          <label><input type="radio" name="q8" value="e"> e) Define a largura total do elemento ignorando bordas</label>
+        </div>
+      </section>
+
+      <section class="card" data-difficulty="hard">
+        <h3>Q6. Qual dessas ações ocorre primeiro ao criar uma página HTML5 correta?</h3>
+        <div class="options">
+          <label><input type="radio" name="q11" value="a" data-correct> a) Declarar <code>&lt;!DOCTYPE html&gt;</code></label>
+          <label><input type="radio" name="q11" value="b"> b) Adicionar o CSS externo</label>
+          <label><input type="radio" name="q11" value="c"> c) Inserir imagens</label>
+          <label><input type="radio" name="q11" value="d"> d) Escrever o conteúdo do <code>&lt;body&gt;</code></label>
+          <label><input type="radio" name="q11" value="e"> e) Criar links para outras páginas</label>
+        </div>
+      </section>
+
+      <section class="card" data-difficulty="hard">
+        <h3>Q7. Pensando em acessibilidade, qual atributo é ESSENCIAL e deve ser usado corretamente?</h3>
+        <div class="options">
+          <label><input type="radio" name="q12" value="a" data-correct> a) <code>alt</code> em imagens, descrevendo brevemente o conteúdo</label>
+          <label><input type="radio" name="q12" value="b"> b) <code>title</code> em todo elemento</label>
+          <label><input type="radio" name="q12" value="c"> c) <code>id</code> repetido para vários elementos</label>
+          <label><input type="radio" name="q12" value="d"> d) <code>style</code> com cores chamativas</label>
+          <label><input type="radio" name="q12" value="e"> e) <code>hidden</code> para esconder textos importantes</label>
+        </div>
+      </section>
+
+      <section class="card" data-difficulty="hard">
+        <h3>Q8. Por que é melhor usar <code>&lt;strong&gt;</code> do que <code>&lt;b&gt;</code> em muitos casos?</h3>
+        <div class="options">
+          <label><input type="radio" name="q13" value="a" data-correct> a) <code>&lt;strong&gt;</code> dá ênfase semântica ao conteúdo; <code>&lt;b&gt;</code> é apenas visual</label>
+          <label><input type="radio" name="q13" value="b"> b) <code>&lt;b&gt;</code> é mais acessível que <code>&lt;strong&gt;</code></label>
+          <label><input type="radio" name="q13" value="c"> c) <code>&lt;strong&gt;</code> é obrigatório por padrão</label>
+          <label><input type="radio" name="q13" value="d"> d) <code>&lt;b&gt;</code> remove o texto da árvore de acessibilidade</label>
+          <label><input type="radio" name="q13" value="e"> e) <code>&lt;strong&gt;</code> aumenta o tamanho da fonte automaticamente</label>
+        </div>
+      </section>
+
+      <section class="card" data-difficulty="writing">
+        <h3>Q9. Resposta curta (4–6 frases): Compare CSS inline, CSS interno (em <code>&lt;style&gt;</code>) e CSS externo (com <code>&lt;link&gt;</code>). Explique vantagens e desvantagens e diga quando você usaria cada um.</h3>
+        <textarea name="q14" class="writing" placeholder="Escreva sua resposta aqui..."></textarea>
+      </section>
+
+      <section class="card" data-difficulty="writing">
+        <h3>Q10. Resposta curta: Escreva a estrutura mínima de um documento HTML5 (inclua <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html lang=""&gt;</code>, <code>&lt;head&gt;</code> com <code>&lt;meta charset="utf-8"&gt;</code> e <code>&lt;title&gt;</code>, e <code>&lt;body&gt;</code>).</h3>
+        <textarea name="q15" class="writing" placeholder="Escreva sua resposta aqui..."></textarea>
+      </section>
+    </form>
+
+    <div class="card">
+      <h3>Results & Admin</h3>
+      <p class="muted small">Teacher only.</p>
+      <div class="row" style="margin-top:10px">
+        <button id="downloadCsvBtn" disabled>Download CSV</button>
+        <button id="resetBtn" class="icon-btn">Reset</button>
+      </div>
+    </div>
+
+    <footer>
+      <div class="small">Designed by MF Bruno, your MF teacher! Hey yo...</div>
+    </footer>
+  </main>
+
+  <script>
+  // ===== Theme toggle (persist) =====
+  (function(){
+    const root = document.documentElement;
+    const saved = localStorage.getItem('theme') || 'light';
+    root.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+  })();
+
+  // ===== Config =====
+  const DEFAULT_MINUTES = 30; // quiz length
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
+
+  // ===== State =====
+  let started = false, ended = false;
+  let startTime = null, endTime = null, timerInterval = null;
+  let secondsLeft = DEFAULT_MINUTES * 60;
+
+  // Focus/anti-cheat tracking
+  let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
+  let copyCount = 0, pasteCount = 0, findCount = 0, cutCount = 0, printCount = 0, saveCount = 0;
+
+  // DOM
+  const startBtn = document.getElementById('startBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const timerEl = document.getElementById('timer');
+  const form = document.getElementById('quizForm');
+  const nameInput = document.getElementById('studentName');
+  const testIdInput = document.getElementById('testId');
+  const focusFlag = document.getElementById('focusFlag');
+  const tabCountEl = document.getElementById('tabCount');
+  const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  const consentBackdrop = document.getElementById('consentBackdrop');
+  const acceptBtn = document.getElementById('acceptBtn');
+  const declineBtn = document.getElementById('declineBtn');
+  const toast = document.getElementById('toast');
+
+  // Lock form until start
+  [...form.elements].forEach(el=>el.disabled = true);
+
+  function fmt(secs){
+    const m = Math.floor(secs/60).toString().padStart(2,'0');
+    const s = (secs%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  function tick(){
+    secondsLeft--; if(secondsLeft < 0){ secondsLeft = 0; }
+    timerEl.textContent = fmt(secondsLeft);
+    if(secondsLeft === 0){
+      autoSubmit('time');
+    }
+  }
+
+  function startTimer(){
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  async function goFullscreen(){
+    try{
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      }
+    }catch(e){ /* ignore */ }
+  }
+
+  function showToast(msg){
+    toast.textContent = msg || '⚠️ Volte para a prova — sua ação foi registrada.';
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 2000);
+  }
+
+  function startTest(){
+    const name = nameInput.value.trim();
+    if(!name){ alert('Por favor, informe seu nome completo antes de começar.'); return; }
+    started = true; startTime = new Date();
+    nameInput.disabled = true; testIdInput.disabled = true;
+    startBtn.disabled = true; startBtn.classList.add('hidden');
+    submitBtn.disabled = false;
+    [...form.elements].forEach(el=>el.disabled = false);
+    startTimer();
+    localStorage.setItem('m3_session', JSON.stringify({ts: Date.now(), name}));
+
+    // bloquear copiar/colar/atalhos
+    document.addEventListener('copy', (e)=>{ copyCount++; e.preventDefault(); showToast('Cópia bloqueada.'); });
+    document.addEventListener('cut', (e)=>{ cutCount++; e.preventDefault(); showToast('Recorte bloqueado.'); });
+    document.addEventListener('paste', (e)=>{ pasteCount++; e.preventDefault(); showToast('Colagem bloqueada.'); });
+
+    document.addEventListener('keydown', (e)=>{
+      const k = e.key.toLowerCase();
+      const ctrl = e.ctrlKey || e.metaKey;
+      // bloquear combos comuns
+      if (ctrl && (k==='c' || k==='v' || k==='x')) { e.preventDefault(); showToast('Copiar/Colar/Recortar bloqueado.'); }
+      if (ctrl && (k==='s')) { e.preventDefault(); saveCount++; showToast('Salvar bloqueado durante a prova.'); }
+      if (ctrl && (k==='p')) { e.preventDefault(); printCount++; showToast('Impressão bloqueada durante a prova.'); }
+      if (ctrl && (k==='f')) { e.preventDefault(); findCount++; showToast('Localizar (Ctrl/Cmd+F) bloqueado.'); }
+      // F11 (sair da tela cheia)
+      if (k==='f11'){ e.preventDefault(); showToast('Alterar tela cheia está bloqueado.'); }
+    }, {capture:true});
+
+    // bloquear menu de contexto (já existia, reforçando)
+    document.addEventListener('contextmenu', (e)=> e.preventDefault());
+
+    // tentar manter tela cheia
+    document.addEventListener('fullscreenchange', ()=>{
+      if (started && !ended && !document.fullscreenElement){
+        showToast('Você saiu da tela cheia. Retornando...');
+        goFullscreen();
+      }
+    });
+
+    // aviso ao tentar fechar/navegar
+    window.addEventListener('beforeunload', (e)=>{
+      if (started && !ended){
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+
+    // entrar em tela cheia ao começar
+    goFullscreen();
+  }
+
+  function grade(){
+    const answers = {}; let totalCorrect = 0, totalPossible = 0;
+    const byDiff = {easy:0, medium:0, hard:0};
+    const possibleByDiff = {easy:0, medium:0, hard:0};
+    const nodes = form.querySelectorAll('section.card');
+    nodes.forEach((sec, idx)=>{
+      const diff = sec.dataset.difficulty;
+      if(diff === 'writing') return; // skip autograde
+      const name = `q${idx+1}`; // relies on order
+      const checked = sec.querySelector('input[type=radio]:checked');
+      const correct = sec.querySelector('input[data-correct]');
+      const isCorrect = !!(checked && checked === correct);
+      answers[name] = checked ? checked.value : null;
+      if(diff in possibleByDiff){ possibleByDiff[diff]++; }
+      if(isCorrect){ totalCorrect++; if(diff in byDiff) byDiff[diff]++; }
+      totalPossible++;
+    });
+
+    const writing = {
+      q14: form.querySelector('[name=q14]')?.value.trim() || '',
+      q15: form.querySelector('[name=q15]')?.value.trim() || ''
+    };
+
+    return {
+      answers, writing,
+      score: { totalCorrect, totalPossible, byDifficulty: byDiff, possibleByDifficulty: possibleByDiff }
+    };
+  }
+
+  function collectPayload(reason='manual'){
+    const g = grade();
+    const now = new Date();
+    const studentNameSafe = (nameInput.value || '').trim() || '(no name)';
+    return {
+      testId: (testIdInput.value.trim() || 'Module3-Revolution-Quiz-v1'),
+      studentName: studentNameSafe,
+      startISO: startTime?.toISOString() || null,
+      endISO: now.toISOString(),
+      durationSec: startTime ? Math.round((now - startTime)/1000) : null,
+      reason,
+      score: g.score,
+      answers: g.answers,
+      writing: g.writing,
+      focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount }
+    };
+  }
+
+  function toCSV(obj){
+    const s = obj;
+    const row = [
+      new Date().toISOString(), s.testId, JSON.stringify(s.studentName), s.startISO, s.endISO, s.durationSec,
+      s.score.totalCorrect, s.score.totalPossible,
+      s.score.byDifficulty.easy, s.score.byDifficulty.medium, s.score.byDifficulty.hard,
+      s.focus.tabSwitches, s.focus.blurCount, s.focus.totalBlurMs, s.focus.copyCount, s.focus.pasteCount, s.focus.findCount,
+      JSON.stringify(s.answers), JSON.stringify(s.writing)
+    ];
+    const header = [
+      'timestamp','testId','studentName','startISO','endISO','durationSec','correct','possible','easyCorrect','mediumCorrect','hardCorrect','tabSwitches','blurCount','totalBlurMs','copyCount','pasteCount','findCount','answers','writing'
+    ];
+    return header.join(',') + '\n' + row.join(',');
+  }
+
+  async function sendResults(payload){
+    try{
+      const res = await fetch(ENDPOINT, {
+        method:'POST',
+        headers:{ 'Content-Type':'text/plain' },
+        body: JSON.stringify(payload)
+      });
+      return { posted: res.ok, status: res.status };
+    }catch(err){
+      console.warn('POST failed', err);
+      return { posted:false, error: String(err) };
+    }
+  }
+
+  function downloadCSV(name, csv){
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_Module5_Quiz.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  function lockTest(){
+    [...form.elements].forEach(el=>el.disabled = true);
+    submitBtn.disabled = true; downloadCsvBtn.disabled = false;
+    document.getElementById('notes').textContent = 'Locked. Answers recorded.';
+    document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
+  }
+
+  async function finalize(reason){
+    if(ended) return; ended = true; endTime = new Date(); clearInterval(timerInterval);
+    const payload = collectPayload(reason);
+    const csv = toCSV(payload);
+    const postRes = await sendResults(payload);
+    downloadCSV(payload.studentName || 'anonymous', csv);
+    lockTest();
+    console.log('Result payload:', payload, 'POST:', postRes);
+    alert('Submission saved.');
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+  }
+
+  function autoSubmit(reason){ finalize(reason); }
+
+  // ===== Eventos do header (mantém mas o start vem do modal) =====
+  startBtn.addEventListener('click', startTest);
+  submitBtn.addEventListener('click', ()=> finalize('manual'));
+  downloadCsvBtn.addEventListener('click', ()=>{
+    const csv = toCSV(collectPayload('download-only'));
+    downloadCSV((nameInput.value || '').trim() || 'anonymous', csv);
+  });
+  resetBtn.addEventListener('click', ()=>{ location.reload(); });
+
+  // ===== Anti-cheat base (já existia) + aviso visual =====
+  document.addEventListener('visibilitychange', ()=>{
+    if(!started || ended) return;
+    if(document.visibilityState === 'hidden'){
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+      focusFlag.textContent = 'Focus LOST';
+      isBlurred = true; blurStart = Date.now();
+      showToast('Aba/janela em segundo plano registrada.');
+    } else {
+      focusFlag.textContent = 'Foco OK';
+      if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+    }
+  });
+
+  window.addEventListener('blur', ()=>{
+    if(!started || ended) return;
+    blurCount++;
+    if (document.visibilityState !== 'hidden') {
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    }
+    focusFlag.textContent='Focus LOST'; isBlurred=true; blurStart=Date.now();
+    showToast('Perda de foco registrada.');
+  });
+
+  window.addEventListener('focus', ()=>{
+    if(!started || ended) return;
+    focusFlag.textContent='Foco OK';
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  });
+
+  window.addEventListener('pagehide', ()=>{
+    if(!started || ended) return;
+    tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  });
+
+  // ===== Modal actions =====
+  acceptBtn.addEventListener('click', async ()=>{
+    // Esconde modal e inicia prova
+    consentBackdrop.style.display = 'none';
+    await goFullscreen();
+    startTest();
+    alert('A prova começou. O cronômetro está rodando. Boa sorte!');
+  });
+
+  declineBtn.addEventListener('click', ()=>{
+    // se preferir redirecionar pra outra página, troque abaixo
+    window.location.href = 'about:blank';
+  });
+
+  // Previne scroll para fora do foco durante o modal
+  document.addEventListener('keydown', (e)=>{
+    if (consentBackdrop.style.display !== 'none'){
+      // na tela do modal, bloqueia atalhos críticos
+      const k = e.key.toLowerCase();
+      if ((e.ctrlKey||e.metaKey) && (k==='w' || k==='r' || k==='p' || k==='s')) e.preventDefault();
+      if (k==='f11') e.preventDefault();
+    }
+  });
+
+  // Reforça bloqueio de clique direito em toda a página
+  document.addEventListener('contextmenu', (e)=> e.preventDefault());
+  </script>
+</body>
+</html>
