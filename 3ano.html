@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prova</title>
+  <style>
+    :root{
+      --bg:#ffffff; --card:#ffffff; --text:#0b1220; --muted:#6b7280;
+      --accent:#1f6feb; --ok:#16a34a; --ok-weak:#dcfce7; --warn:#b45309; --bad:#dc2626;
+      --border:rgba(0,0,0,.12); --shadow:rgba(0,0,0,.08);
+    }
+    html[data-theme="dark"]{
+      --bg:#000000; --card:#0b0b0f; --text:#f5f7ff; --muted:#a3a7b7;
+      --accent:#7c9bff; --ok:#22c55e; --ok-weak:#062b14; --warn:#ffb02e; --bad:#ff6b6b;
+      --border:rgba(255,255,255,.14); --shadow:rgba(0,0,0,.55);
+    }
+
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    a{color:var(--accent);text-decoration:none}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.75);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border)}
+    html[data-theme="dark"] header{background:rgba(0,0,0,.7)}
+    .wrap{max-width:1000px;margin:0 auto;padding:16px}
+    h1{margin:0 0 6px;font-size:clamp(22px,2.6vw,32px)}
+    .sub{color:var(--muted)}
+    .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:10px}
+    input[type=text]{background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;min-width:220px;outline:none}
+    input[type=text]::placeholder{color:var(--muted)}
+    button{background:var(--accent);border:none;color:#ffffff;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px var(--shadow)}
+    button[disabled]{opacity:.5;cursor:not-allowed}
+    .icon-btn{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);padding:8px 12px;border-radius:999px}
+    .grid{display:grid;gap:16px;grid-template-columns:1fr}
+    @media(min-width:880px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:0 8px 30px var(--shadow)}
+    .card h3{margin:0 0 6px;font-size:18px}
+    .muted{color:var(--muted)}
+    .options{display:grid;gap:8px;margin-top:8px}
+    .options label{
+      display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;
+      padding:10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;background:transparent;
+      transition:transform .08s ease, box-shadow .08s ease, background .12s ease, border-color .12s ease, color .12s ease;
+      box-shadow:0 2px 0 var(--shadow);
+    }
+    .options label:has(input[type=radio]:checked){
+      background:var(--ok-weak); border-color:var(--ok); transform:translateY(1px);
+      box-shadow:inset 0 2px 0 rgba(0,0,0,.06);
+      color:#064e3b;
+    }
+    .options input[type=radio]{margin-top:3px}
+    .writing{min-height:100px;width:100%;resize:vertical;background:transparent;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:12px}
+    footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:var(--muted)}
+    .notice{border:1px dashed var(--border);padding:10px;border-radius:10px;color:var(--muted)}
+    .hidden{display:none!important}
+    .strike{opacity:.5;filter:grayscale(.3)}
+    .small{font-size:12px}
+    .timer{font-weight:800;letter-spacing:.5px}
+
+    /* Modal de Consentimento */
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.85);
+      display:flex; align-items:center; justify-content:center; z-index:9999;
+    }
+    .modal{
+      background:var(--card); color:var(--text);
+      width:min(680px, 92vw); border:1px solid var(--border);
+      border-radius:16px; padding:18px; box-shadow:0 20px 60px var(--shadow);
+    }
+    .modal h2{ margin:0 0 8px; }
+    .modal .muted{ margin-bottom:10px; }
+    .modal .rules{ background:rgba(0,0,0,.03); border:1px dashed var(--border); padding:12px; border-radius:12px; }
+    .modal footer{ display:flex; gap:10px; justify-content:flex-end; border:0; padding:0; margin-top:14px;}
+    .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); box-shadow:none;}
+
+    /* Toast leve */
+    .toast{
+      position:fixed; left:50%; transform:translateX(-50%);
+      bottom:16px; background:#111827; color:#fff; padding:10px 14px;
+      border-radius:12px; font-size:14px; box-shadow:0 8px 30px rgba(0,0,0,.35);
+      z-index:9998; display:none;
+    }
+    .toast.show{ display:block; }
+  </style>
+</head>
+<body>
+  <!-- Modal de consentimento + nome (único popup) -->
+  <div id="consentBackdrop" class="modal-backdrop" aria-modal="true" role="dialog">
+    <div class="modal">
+      <h2>Termos da Prova</h2>
+      <div class="muted">Preencha seu <b>nome completo</b> e clique em “Aceitar e começar”. O cronômetro inicia em seguida.</div>
+
+      <label for="modalName" class="muted" style="display:block;margin:10px 0 6px">Nome completo</label>
+      <input id="modalName" type="text" placeholder="Ex.: Maria Fernanda Silva" autocomplete="name"
+             style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text)" />
+
+      <div class="rules" style="margin-top:12px">
+        <ul>
+          <li>Tentaremos ativar <b>tela cheia</b> (se o navegador permitir).</li>
+          <li>Trocas de aba/janela são <b>registradas</b>.</li>
+          <li><b>Copiar/colar/recortar</b> e <b>Ctrl/Cmd+F</b> são bloqueados.</li>
+          <li>Não minimize ou feche a aba até enviar a prova.</li>
+        </ul>
+      </div>
+      <footer>
+        <button id="declineBtn" class="btn-ghost">Sair</button>
+        <button id="acceptBtn" disabled>Aceitar e começar</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite">Ação registrada.</div>
+
+  <header>
+    <div class="wrap">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <h1>Prova 1 - Web Designer</h1>
+          <div class="sub">HTML e CSS</div>
+        </div>
+        <button id="themeToggle" class="icon-btn">🌓 Tema</button>
+      </div>
+
+      <div class="bar">
+        <div class="row">
+          <input id="studentName" type="text" placeholder="Nome (será preenchido ao aceitar)" autocomplete="name" />
+          <span class="pill"><strong>Tempo:</strong> <span id="timer" class="timer">30:00</span></span>
+          <span id="focusFlag" class="badge">Foco OK</span>
+          <span id="tabCount" class="badge">Contador de Aba: 0</span>
+        </div>
+        <div class="row">
+          <input id="testId" type="text" placeholder="Prova-Web-Designer1" />
+          <button id="startBtn" class="hidden">Iniciar</button>
+          <button id="submitBtn" disabled>Enviar</button>
+        </div>
+      </div>
+
+      <div class="notice small" id="notes">
+        A prova será enviada automaticamente em 30 minutos.
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <form id="quizForm" class="grid" autocomplete="off">
+    <section class="card" data-difficulty="easy">
+  <h3>Q1. Where does <b>Education</b> usually happen?</h3>
+  <div class="muted">(Choose one)</div>
+  <div class="options">
+    <label><input type="radio" name="q1" value="a"> a) On vacation</label>
+    <label><input type="radio" name="q1" value="b" data-correct> b) At school or university</label>
+    <label><input type="radio" name="q1" value="c"> c) At the supermarket</label>
+    <label><input type="radio" name="q1" value="d"> d) On the bus</label>
+    <label><input type="radio" name="q1" value="e"> e) At the park</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="easy">
+  <h3>Q2. Which word means <b>learning by yourself</b>?</h3>
+  <div class="options">
+    <label><input type="radio" name="q2" value="a"> a) Teaching</label>
+    <label><input type="radio" name="q2" value="b" data-correct> b) Learning</label>
+    <label><input type="radio" name="q2" value="c"> c) Shopping</label>
+    <label><input type="radio" name="q2" value="d"> d) Sleeping</label>
+    <label><input type="radio" name="q2" value="e"> e) Cooking</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="easy">
+  <h3>Q3. <b>Education</b> is often connected with…</h3>
+  <div class="options">
+    <label><input type="radio" name="q3" value="a" data-correct> a) Formal institutions</label>
+    <label><input type="radio" name="q3" value="b"> b) Football matches</label>
+    <label><input type="radio" name="q3" value="c"> c) Holidays</label>
+    <label><input type="radio" name="q3" value="d"> d) Shopping centers</label>
+    <label><input type="radio" name="q3" value="e"> e) Restaurants</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="easy">
+  <h3>Q4. Which is a good example of <b>informal learning</b>?</h3>
+  <div class="options">
+    <label><input type="radio" name="q4" value="a"> a) Passing a final exam</label>
+    <label><input type="radio" name="q4" value="b"> b) Getting a diploma</label>
+    <label><input type="radio" name="q4" value="c" data-correct> c) Learning to cook with your grandmother</label>
+    <label><input type="radio" name="q4" value="d"> d) Attending a graduation ceremony</label>
+    <label><input type="radio" name="q4" value="e"> e) Taking an official test</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="easy">
+  <h3>Q5. What is the main <b>goal</b> of Education?</h3>
+  <div class="options">
+    <label><input type="radio" name="q5" value="a"> a) Entertainment only</label>
+    <label><input type="radio" name="q5" value="b"> b) Eating lunch</label>
+    <label><input type="radio" name="q5" value="c" data-correct> c) Developing knowledge and skills</label>
+    <label><input type="radio" name="q5" value="d"> d) Playing video games</label>
+    <label><input type="radio" name="q5" value="e"> e) Traveling</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="easy">
+  <h3>Q6. Which word best describes <b>Learning</b>?</h3>
+  <div class="options">
+    <label><input type="radio" name="q6" value="a"> a) Limited</label>
+    <label><input type="radio" name="q6" value="b"> b) Finished</label>
+    <label><input type="radio" name="q6" value="c" data-correct> c) Continuous</label>
+    <label><input type="radio" name="q6" value="d"> d) Always formal</label>
+    <label><input type="radio" name="q6" value="e"> e) Only for school</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="easy">
+  <h3>Q7. Which is an <b>advantage</b> of Learning?</h3>
+  <div class="options">
+    <label><input type="radio" name="q7" value="a"> a) It is always free</label>
+    <label><input type="radio" name="q7" value="b" data-correct> b) It can happen anywhere</label>
+    <label><input type="radio" name="q7" value="c"> c) It never changes</label>
+    <label><input type="radio" name="q7" value="d"> d) It always gives a diploma</label>
+    <label><input type="radio" name="q7" value="e"> e) It only happens at night</label>
+  </div>
+</section>
+
+<!-- MEDIUM -->
+<section class="card" data-difficulty="medium">
+  <h3>Q8. Which is a <b>similarity</b> between Education and Learning?</h3>
+  <div class="options">
+    <label><input type="radio" name="q8" value="a"> a) Both give money directly</label>
+    <label><input type="radio" name="q8" value="b" data-correct> b) Both improve skills</label>
+    <label><input type="radio" name="q8" value="c"> c) Both happen only at school</label>
+    <label><input type="radio" name="q8" value="d"> d) Both are always informal</label>
+    <label><input type="radio" name="q8" value="e"> e) Both require exams</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="medium">
+  <h3>Q9. Which is a common <b>difference</b> between them?</h3>
+  <div class="options">
+    <label><input type="radio" name="q9" value="a" data-correct> a) Education is formal, Learning can be informal</label>
+    <label><input type="radio" name="q9" value="b"> b) Both are only formal</label>
+    <label><input type="radio" name="q9" value="c"> c) Learning always needs exams</label>
+    <label><input type="radio" name="q9" value="d"> d) Education never uses teachers</label>
+    <label><input type="radio" name="q9" value="e"> e) Learning happens only at school</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="medium">
+  <h3>Q10. Which is an example of <b>Education and Learning together</b>?</h3>
+  <div class="options">
+    <label><input type="radio" name="q10" value="a"> a) Playing a video game</label>
+    <label><input type="radio" name="q10" value="b"> b) Talking with friends</label>
+    <label><input type="radio" name="q10" value="c" data-correct> c) Studying math in school and practicing at home</label>
+    <label><input type="radio" name="q10" value="d"> d) Cooking dinner only</label>
+    <label><input type="radio" name="q10" value="e"> e) Sleeping at night</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="medium">
+  <h3>Q11. Which is a <b>benefit</b> of Education?</h3>
+  <div class="options">
+    <label><input type="radio" name="q11" value="a"> a) No teachers</label>
+    <label><input type="radio" name="q11" value="b"> b) It always happens online</label>
+    <label><input type="radio" name="q11" value="c" data-correct> c) It gives structure and diplomas</label>
+    <label><input type="radio" name="q11" value="d"> d) It is only free</label>
+    <label><input type="radio" name="q11" value="e"> e) It never uses books</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="medium">
+  <h3>Q12. Which situation shows <b>informal learning</b>?</h3>
+  <div class="options">
+    <label><input type="radio" name="q12" value="a"> a) Passing a university test</label>
+    <label><input type="radio" name="q12" value="b" data-correct> b) Watching a YouTube tutorial</label>
+    <label><input type="radio" name="q12" value="c"> c) Getting a diploma</label>
+    <label><input type="radio" name="q12" value="d"> d) Attending graduation</label>
+    <label><input type="radio" name="q12" value="e"> e) Enrolling in college</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="medium">
+  <h3>Q13. Which sentence shows a <b>pro</b> of Learning?</h3>
+  <div class="options">
+    <label><input type="radio" name="q13" value="a"> a) Learning always needs exams</label>
+    <label><input type="radio" name="q13" value="b"> b) Learning is limited</label>
+    <label><input type="radio" name="q13" value="c"> c) Learning gives diplomas only</label>
+    <label><input type="radio" name="q13" value="d" data-correct> d) Learning happens anywhere and anytime</label>
+    <label><input type="radio" name="q13" value="e"> e) Learning never helps</label>
+  </div>
+</section>
+
+<!-- HARD -->
+<section class="card" data-difficulty="hard">
+  <h3>Q14. Which is the best <b>summary</b>?</h3>
+  <div class="options">
+    <label><input type="radio" name="q14" value="a" data-correct> a) Education is structured, Learning never ends</label>
+    <label><input type="radio" name="q14" value="b"> b) Education never helps</label>
+    <label><input type="radio" name="q14" value="c"> c) Learning only happens in school</label>
+    <label><input type="radio" name="q14" value="d"> d) Education and Learning are identical</label>
+    <label><input type="radio" name="q14" value="e"> e) Learning is useless</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="hard">
+  <h3>Q15. Which is a <b>critical opinion</b> about Education?</h3>
+  <div class="options">
+    <label><input type="radio" name="q15" value="a"> a) Education always gives jobs</label>
+    <label><input type="radio" name="q15" value="b" data-correct> b) Education is sometimes disconnected from real life</label>
+    <label><input type="radio" name="q15" value="c"> c) Education is identical to Learning</label>
+    <label><input type="radio" name="q15" value="d"> d) Education is only for kids</label>
+    <label><input type="radio" name="q15" value="e"> e) Education never uses teachers</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="hard">
+  <h3>Q16. Which sentence is <b>incorrect</b>?</h3>
+  <div class="options">
+    <label><input type="radio" name="q16" value="a"> a) Education is structured</label>
+    <label><input type="radio" name="q16" value="b"> b) Learning is continuous</label>
+    <label><input type="radio" name="q16" value="c" data-correct> c) Learning only happens with a teacher</label>
+    <label><input type="radio" name="q16" value="d"> d) Education gives diplomas</label>
+    <label><input type="radio" name="q16" value="e"> e) Both help people</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="hard">
+  <h3>Q17. Which is the most <b>inclusive</b> sentence?</h3>
+  <div class="options">
+    <label><input type="radio" name="q17" value="a" data-correct> a) Everyone can learn, everywhere and always</label>
+    <label><input type="radio" name="q17" value="b"> b) Only schools teach</label>
+    <label><input type="radio" name="q17" value="c"> c) Only books help</label>
+    <label><input type="radio" name="q17" value="d"> d) Learning is for adults only</label>
+    <label><input type="radio" name="q17" value="e"> e) Education is useless</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="hard">
+  <h3>Q18. Which is the best <b>example</b> of both?</h3>
+  <div class="options">
+    <label><input type="radio" name="q18" value="a" data-correct> a) A student learns at school and practices at home</label>
+    <label><input type="radio" name="q18" value="b"> b) Sleeping at home</label>
+    <label><input type="radio" name="q18" value="c"> c) Watching cartoons</label>
+    <label><input type="radio" name="q18" value="d"> d) Going on vacation</label>
+    <label><input type="radio" name="q18" value="e"> e) Playing a video game only</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="hard">
+  <h3>Q19. Which is a <b>con</b> of Education?</h3>
+  <div class="options">
+    <label><input type="radio" name="q19" value="a"> a) It is always free</label>
+    <label><input type="radio" name="q19" value="b" data-correct> b) It can be expensive and rigid</label>
+    <label><input type="radio" name="q19" value="c"> c) It never uses exams</label>
+    <label><input type="radio" name="q19" value="d"> d) It gives diplomas</label>
+    <label><input type="radio" name="q19" value="e"> e) It always happens outdoors</label>
+  </div>
+</section>
+
+<section class="card" data-difficulty="hard">
+  <h3>Q20. Which is a <b>con</b> of Learning?</h3>
+  <div class="options">
+    <label><input type="radio" name="q20" value="a" data-correct> a) It may not give official certification</label>
+    <label><input type="radio" name="q20" value="b"> b) It always requires exams</label>
+    <label><input type="radio" name="q20" value="c"> c) It only happens at school</label>
+    <label><input type="radio" name="q20" value="d"> d) It always costs money</label>
+    <label><input type="radio" name="q20" value="e"> e) It is never useful</label>
+  </div>
+</section>
+
+    </form>
+
+    <div class="card">
+      <h3>Results & Admin</h3>
+      <p class="muted small">Teacher only.</p>
+      <div class="row" style="margin-top:10px">
+        <button id="downloadCsvBtn" disabled>Download CSV</button>
+        <button id="resetBtn" class="icon-btn">Reset</button>
+      </div>
+    </div>
+
+    <footer>
+      <div class="small">Designed by MF Bruno, your MF teacher! Hey yo...</div>
+    </footer>
+  </main>
+
+  <script>
+  // ===== Tema =====
+  (function(){
+    const root = document.documentElement;
+    const saved = localStorage.getItem('theme') || 'light';
+    root.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+  })();
+
+  // ===== Config =====
+  const DEFAULT_MINUTES = 30;
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
+
+  // ===== State =====
+  let started = false, ended = false;
+  let startTime = null, endTime = null, timerInterval = null;
+  let secondsLeft = DEFAULT_MINUTES * 60;
+
+  // Anti-cheat
+  let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
+  let copyCount = 0, pasteCount = 0, findCount = 0;
+
+  // desconto de 1 logo após aceitar (popup do sistema)
+  let acceptTs = null;
+  const GRACE_MS = 2500;
+  let systemPopupOffsetApplied = false;
+
+  // DOM
+  const startBtn = document.getElementById('startBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const timerEl = document.getElementById('timer');
+  const form = document.getElementById('quizForm');
+  const nameInput = document.getElementById('studentName');
+  const testIdInput = document.getElementById('testId');
+  const focusFlag = document.getElementById('focusFlag');
+  const tabCountEl = document.getElementById('tabCount');
+  const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const toast = document.getElementById('toast');
+
+  // Modal
+  const consentBackdrop = document.getElementById('consentBackdrop');
+  const modalName = document.getElementById('modalName');
+  const acceptBtnEl = document.getElementById('acceptBtn');
+  document.body.style.overflow = 'hidden'; // trava scroll enquanto modal existe
+
+  // trava o form até iniciar
+  [...form.elements].forEach(el=>el.disabled = true);
+
+  function fmt(secs){
+    const m = Math.floor(secs/60).toString().padStart(2,'0');
+    const s = (secs%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+  function tick(){
+    secondsLeft--; if(secondsLeft < 0){ secondsLeft = 0; }
+    timerEl.textContent = fmt(secondsLeft);
+    if(secondsLeft === 0){ autoSubmit('time'); }
+  }
+  function startTimer(){
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 1000);
+  }
+  async function goFullscreen(){
+    try{
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      }
+    }catch(e){}
+  }
+  function showToast(msg){
+    toast.textContent = msg || 'Ação registrada.';
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 1500);
+  }
+  function maybeApplySystemPopupOffset(){
+    if (started && !systemPopupOffsetApplied && acceptTs && (Date.now() - acceptTs) <= GRACE_MS){
+      tabSwitches = Math.max(0, tabSwitches - 1);
+      systemPopupOffsetApplied = true;
+      tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    }
+  }
+
+  function isValidFullName(n){
+    const t = (n||'').trim().replace(/\s+/g,' ');
+    const parts = t.split(' ').filter(p => p.length >= 2);
+    return parts.length >= 2;
+  }
+
+  // habilita o botão quando o nome é válido
+  modalName.addEventListener('input', ()=>{
+    acceptBtnEl.disabled = !isValidFullName(modalName.value);
+  });
+
+  function startTest(){
+    started = true; startTime = new Date();
+    nameInput.disabled = true; // fica somente leitura após iniciar
+    testIdInput.disabled = true;
+    startBtn.disabled = true; startBtn.classList.add('hidden');
+    submitBtn.disabled = false;
+
+    // habilita formulário
+    [...form.elements].forEach(el=>el.disabled = false);
+    setTimeout(()=>{ [...form.elements].forEach(el=>el.disabled=false); }, 0);
+
+    startTimer();
+
+    // bloqueios (apenas após iniciar)
+    document.addEventListener('copy', (e)=>{ copyCount++; e.preventDefault(); showToast('Cópia bloqueada.'); });
+    document.addEventListener('cut', (e)=>{ e.preventDefault(); showToast('Recorte bloqueado.'); });
+    document.addEventListener('paste', (e)=>{ pasteCount++; e.preventDefault(); showToast('Colagem bloqueada.'); });
+
+    document.addEventListener('keydown', (e)=>{
+      const k = e.key.toLowerCase();
+      const ctrl = e.ctrlKey || e.metaKey;
+      if (ctrl && (k==='c' || k==='v' || k==='x' || k==='s' || k==='p' || k==='f')) { e.preventDefault(); showToast('Atalho bloqueado.'); }
+      if (k==='f11'){ e.preventDefault(); showToast('F11 bloqueado.'); }
+    }, {capture:true});
+
+    document.addEventListener('contextmenu', (e)=> e.preventDefault());
+
+    document.addEventListener('fullscreenchange', ()=>{
+      if (started && !ended && !document.fullscreenElement){
+        // não força novamente para evitar novo popup
+      }
+    });
+  }
+
+  function grade(){
+    const answers = {}; let totalCorrect = 0, totalPossible = 0;
+    const byDiff = {easy:0, medium:0, hard:0};
+    const possibleByDiff = {easy:0, medium:0, hard:0};
+
+    const nodes = form.querySelectorAll('section.card');
+    nodes.forEach((sec)=>{
+      const diff = sec.dataset.difficulty;
+      if(diff === 'writing') return;
+
+      const radios = sec.querySelectorAll('input[type=radio]');
+      if (!radios.length) return;
+
+      const qname = radios[0].name;
+      const checked = sec.querySelector('input[type=radio]:checked');
+      const correct = sec.querySelector('input[type=radio][data-correct]');
+
+      const isCorrect = !!(checked && correct && checked === correct);
+      answers[qname] = checked ? checked.value : null;
+
+      if (diff in possibleByDiff) possibleByDiff[diff]++;
+      if (isCorrect){ totalCorrect++; if (diff in byDiff) byDiff[diff]++; }
+
+      totalPossible++;
+    });
+
+    const writing = {
+      q14: form.querySelector('[name=q14]')?.value.trim() || '',
+      q15: form.querySelector('[name=q15]')?.value.trim() || ''
+    };
+
+    return {
+      answers, writing,
+      score: { totalCorrect, totalPossible, byDifficulty: byDiff, possibleByDifficulty: possibleByDiff }
+    };
+  }
+
+  function collectPayload(reason='manual'){
+    const g = grade();
+    const now = new Date();
+    const studentNameSafe = (nameInput.value || '').trim() || '(no name)';
+    return {
+      testId: (testIdInput.value.trim() || 'Module3-Revolution-Quiz-v1'),
+      studentName: studentNameSafe,
+      startISO: startTime?.toISOString() || null,
+      endISO: now.toISOString(),
+      durationSec: startTime ? Math.round((now - startTime)/1000) : null,
+      reason,
+      score: g.score,
+      answers: g.answers,
+      writing: g.writing,
+      focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount }
+    };
+  }
+
+  function toCSV(obj){
+    const s = obj;
+    const row = [
+      new Date().toISOString(), s.testId, JSON.stringify(s.studentName), s.startISO, s.endISO, s.durationSec,
+      s.score.totalCorrect, s.score.totalPossible,
+      s.score.byDifficulty.easy, s.score.byDifficulty.medium, s.score.byDifficulty.hard,
+      s.focus.tabSwitches, s.focus.blurCount, s.focus.totalBlurMs, s.focus.copyCount, s.focus.pasteCount, s.focus.findCount,
+      JSON.stringify(s.answers), JSON.stringify(s.writing)
+    ];
+    const header = [
+      'timestamp','testId','studentName','startISO','endISO','durationSec','correct','possible','easyCorrect','mediumCorrect','hardCorrect','tabSwitches','blurCount','totalBlurMs','copyCount','pasteCount','findCount','answers','writing'
+    ];
+    return header.join(',') + '\n' + row.join(',');
+  }
+
+  async function sendResults(payload){
+    try{
+      const res = await fetch(ENDPOINT, {
+        method:'POST',
+        headers:{ 'Content-Type':'text/plain' },
+        body: JSON.stringify(payload)
+      });
+      return { posted: res.ok, status: res.status };
+    }catch(err){
+      console.warn('POST failed', err);
+      return { posted:false, error: String(err) };
+    }
+  }
+
+  function downloadCSV(name, csv){
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_Module5_Quiz.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  function lockTest(){
+    [...form.elements].forEach(el=>el.disabled = true);
+    submitBtn.disabled = true; downloadCsvBtn.disabled = false;
+    document.getElementById('notes').textContent = 'Locked. Answers recorded.';
+    document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
+  }
+
+  async function finalize(reason){
+    if(ended) return; ended = true; endTime = new Date(); clearInterval(timerInterval);
+    const payload = collectPayload(reason);
+    const csv = toCSV(payload);
+    const postRes = await sendResults(payload);
+    downloadCSV(payload.studentName || 'anonymous', csv);
+    lockTest();
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+    console.log('Result payload:', payload, 'POST:', postRes);
+  }
+  function autoSubmit(reason){ finalize(reason); }
+
+  // Eventos básicos
+  startBtn.addEventListener('click', startTest);
+  submitBtn.addEventListener('click', ()=> finalize('manual'));
+  downloadCsvBtn.addEventListener('click', ()=>{
+    const csv = toCSV(collectPayload('download-only'));
+    downloadCSV((nameInput.value || '').trim() || 'anonymous', csv);
+  });
+  resetBtn.addEventListener('click', ()=>{ location.reload(); });
+
+  // Anti-cheat + offset popup
+  document.addEventListener('visibilitychange', ()=>{
+    if(!started || ended) return;
+    if(document.visibilityState === 'hidden'){
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+      focusFlag.textContent = 'Focus LOST';
+      isBlurred = true; blurStart = Date.now();
+      maybeApplySystemPopupOffset();
+      showToast('Troca de aba registrada.');
+    } else {
+      focusFlag.textContent = 'Foco OK';
+      if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+    }
+  });
+  window.addEventListener('blur', ()=>{
+    if(!started || ended) return;
+    blurCount++;
+    if (document.visibilityState !== 'hidden') {
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+      maybeApplySystemPopupOffset();
+    }
+    focusFlag.textContent='Focus LOST'; isBlurred=true; blurStart=Date.now();
+  });
+  window.addEventListener('focus', ()=>{
+    if(!started || ended) return;
+    focusFlag.textContent='Foco OK';
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  });
+  window.addEventListener('pagehide', ()=>{
+    if(!started || ended) return;
+    tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    maybeApplySystemPopupOffset();
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  });
+
+  // Aceitar/Sair do modal
+  document.getElementById('acceptBtn').addEventListener('click', async ()=>{
+    const fullName = (modalName.value || '').trim();
+    const t = fullName.replace(/\s+/g,' ');
+    const parts = t.split(' ').filter(p => p.length >= 2);
+    if(parts.length < 2){
+      modalName.setAttribute('aria-invalid','true');
+      modalName.focus();
+      return;
+    }
+
+    // Preenche o nome visível no topo e bloqueia depois ao iniciar
+    document.getElementById('studentName').value = t;
+
+    // remove overlay (impede travamento)
+    const backdrop = document.getElementById('consentBackdrop');
+    if (backdrop) backdrop.remove();
+    document.body.style.overflow = '';
+
+    acceptTs = Date.now();
+    startTest();            // inicia já
+    try{ await goFullscreen(); }catch(e){}
+  });
+
+  document.getElementById('declineBtn').addEventListener('click', ()=>{
+    window.location.href = 'about:blank';
+  });
+
+  // enquanto o modal existe, bloqueia atalhos que poderiam atrapalhar
+  document.addEventListener('keydown', (e)=>{
+    if (document.getElementById('consentBackdrop')){
+      const k = e.key.toLowerCase();
+      if ((e.ctrlKey||e.metaKey) && (k==='w' || k==='r' || k==='p' || k==='s' || k==='f')) e.preventDefault();
+      if (k==='f11') e.preventDefault();
+    }
+  });
+
+  // bloqueio global do menu de contexto
+  document.addEventListener('contextmenu', (e)=> e.preventDefault());
+  </script>
+</body>
+</html>
