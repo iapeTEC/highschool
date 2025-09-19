@@ -117,8 +117,8 @@
     <div class="wrap">
       <div class="row" style="justify-content:space-between;align-items:center">
         <div>
-          <h1>Communication Quiz</h1>
-          <div class="sub">Types · Channels · Purpose · Barriers · Inclusion</div>
+          <h1>Prova 1 - Web Designer</h1>
+          <div class="sub">HTML e CSS</div>
         </div>
         <button id="themeToggle" class="icon-btn">🌓 Tema</button>
       </div>
@@ -131,7 +131,7 @@
           <span id="tabCount" class="badge">Contador de Aba: 0</span>
         </div>
         <div class="row">
-          <input id="testId" type="text" placeholder="Communication-Quiz-v1" />
+          <input id="testId" type="text" placeholder="Prova-Web-Designer1" />
           <button id="startBtn" class="hidden">Iniciar</button>
           <button id="submitBtn" disabled>Enviar</button>
         </div>
@@ -145,8 +145,8 @@
 
   <main class="wrap">
     <form id="quizForm" class="grid" autocomplete="off">
-      <!-- EASY (7) -->
-      <section class="card" data-difficulty="easy">
+      <!-- EASY (4) -->
+     <section class="card" data-difficulty="easy">
         <h3>Q1. Which is an example of <b>non-verbal communication</b>?</h3>
         <div class="muted">(Choose one)</div>
         <div class="options">
@@ -703,4 +703,14 @@
   // enquanto o modal existe, bloqueia atalhos que poderiam atrapalhar
   document.addEventListener('keydown', (e)=>{
     if (document.getElementById('consentBackdrop')){
-      const k = e.ke
+      const k = e.key.toLowerCase();
+      if ((e.ctrlKey||e.metaKey) && (k==='w' || k==='r' || k==='p' || k==='s' || k==='f')) e.preventDefault();
+      if (k==='f11') e.preventDefault();
+    }
+  });
+
+  // bloqueio global do menu de contexto
+  document.addEventListener('contextmenu', (e)=> e.preventDefault());
+  </script>
+</body>
+</html>
