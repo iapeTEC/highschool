@@ -1,396 +1,469 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>U.S. History – Midterm Readiness (GIA Values)</title>
+  <title>Prova – U.S. History (Midterm Readiness)</title>
   <style>
-    :root {
-      --bg: #f7f9fc;
-      --card: #ffffff;
-      --ink: #0f172a;
-      --muted: #64748b;
-      --accent: #2563eb;
-      --accent-2: #22c55e;
-      --warn: #f59e0b;
-      --danger: #ef4444;
-      --shadow: 0 8px 24px rgba(2, 6, 23, 0.08);
-      --radius: 16px;
+    :root{
+      --bg:#ffffff; --card:#ffffff; --text:#0b1220; --muted:#6b7280;
+      --accent:#1f6feb; --ok:#16a34a; --ok-weak:#dcfce7; --warn:#b45309; --bad:#dc2626;
+      --border:rgba(0,0,0,.12); --shadow:rgba(0,0,0,.08);
     }
-    html, body { height: 100%; }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-      color: var(--ink); background: var(--bg);
+    html[data-theme="dark"]{
+      --bg:#000000; --card:#0b0b0f; --text:#f5f7ff; --muted:#a3a7b7;
+      --accent:#7c9bff; --ok:#22c55e; --ok-weak:#062b14; --warn:#ffb02e; --bad:#ff6b6b;
+      --border:rgba(255,255,255,.14); --shadow:rgba(0,0,0,.55);
     }
-    header {
-      background: linear-gradient(135deg, #e0f2fe 0%, #f1f5f9 50%, #ede9fe 100%);
-      padding: 24px 16px; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #e2e8f0;
-    }
-    .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
-    h1 { margin: 0 0 8px; font-size: 28px; }
-    p.sub { margin: 0; color: var(--muted); }
-    .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
-    @media (min-width: 900px){ .grid { grid-template-columns: 1fr 1fr; }}
-    .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
-    .card h2 { margin: 0 0 8px; font-size: 20px; }
-    .card h3 { margin: 14px 0 6px; font-size: 16px; }
-    .muted { color: var(--muted); }
-    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    input[type="text"], textarea, select {
-      width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; font: inherit;
-    }
-    textarea { min-height: 110px; resize: vertical; }
-    .btn {
-      appearance: none; border: none; border-radius: 12px; padding: 10px 14px; cursor: pointer; font-weight: 600; box-shadow: var(--shadow);
-      background: var(--accent); color: #fff; transition: transform .06s ease, box-shadow .2s;
-    }
-    .btn.secondary { background: #0ea5e9; }
-    .btn.ghost { background: #e2e8f0; color: #0f172a; box-shadow: none; }
-    .btn:active { transform: translateY(1px); }
-    .badge { display: inline-block; background: #e2e8f0; color: #0f172a; padding: 2px 8px; border-radius: 999px; font-size: 12px; }
-    .pill { display: inline-flex; align-items: center; gap: 8px; background: #eef2ff; color: #4338ca; padding: 6px 10px; border-radius: 999px; font-size: 12px; }
 
-    /* Drag & Drop tokens */
-    .bank, .dropzone { display: flex; gap: 8px; flex-wrap: wrap; min-height: 44px; padding: 8px; border: 1px dashed #cbd5e1; border-radius: 12px; background: #f8fafc; }
-    .token {
-      user-select: none; padding: 8px 10px; border-radius: 999px; background: #edf2ff; color: #1e293b; font-weight: 600; cursor: grab; border: 1px solid #c7d2fe;
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    a{color:var(--accent);text-decoration:none}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.75);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border)}
+    html[data-theme="dark"] header{background:rgba(0,0,0,.7)}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 6px;font-size:clamp(22px,2.6vw,32px)}
+    .sub{color:var(--muted)}
+    .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:10px}
+    input[type=text], select, textarea{
+      background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;outline:none;width:100%;
     }
-    .token[draggable="true"]:active { cursor: grabbing; }
-    .dropzone.highlight { background: #ecfeff; border-color: #06b6d4; }
+    input::placeholder, textarea::placeholder{color:var(--muted)}
+    button{background:var(--accent);border:none;color:#ffffff;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px var(--shadow)}
+    button[disabled]{opacity:.5;cursor:not-allowed}
+    .icon-btn{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);padding:8px 12px;border-radius:999px}
+    .grid{display:grid;gap:16px;grid-template-columns:1fr}
+    @media(min-width:880px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:0 8px 30px var(--shadow)}
+    .card h3{margin:0 0 6px;font-size:18px}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:12px}
+    footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:var(--muted)}
+    .notice{border:1px dashed var(--border);padding:10px;border-radius:10px;color:var(--muted)}
+    .hidden{display:none!important}
+    .strike{opacity:.5;filter:grayscale(.3)}
+    .small{font-size:12px}
+    .timer{font-weight:800;letter-spacing:.5px}
 
-    .cloze-item { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: center; }
-    .blank { display: inline-flex; align-items: center; gap: 8px; }
-    .slot { min-width: 180px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center; border: 2px dashed #cbd5e1; border-radius: 10px; padding: 4px 8px; background: #fff; }
-
-    /* Matching */
-    .matching { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .match-list { display: grid; gap: 8px; }
-    .match-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; }
-
-    /* Toggles */
-    .tf-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
-    .toggle {
-      --w: 56px; --h: 30px; position: relative; width: var(--w); height: var(--h); background: #e2e8f0; border-radius: 999px; cursor: pointer; transition: background .2s;
+    /* Modal de Consentimento */
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.85);
+      display:flex; align-items:center; justify-content:center; z-index:9999;
     }
-    .toggle::after {
-      content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); transition: transform .2s;
+    .modal{
+      background:var(--card); color:var(--text);
+      width:min(680px, 92vw); border:1px solid var(--border);
+      border-radius:16px; padding:18px; box-shadow:0 20px 60px var(--shadow);
     }
-    .toggle.true { background: #22c55e; }
-    .toggle.true::after { transform: translateX(26px); }
-    .toggle.false { background: #ef4444; }
+    .modal h2{ margin:0 0 8px; }
+    .modal .muted{ margin-bottom:10px; }
+    .modal .rules{ background:rgba(0,0,0,.03); border:1px dashed var(--border); padding:12px; border-radius:12px; }
+    .modal footer{ display:flex; gap:10px; justify-content:flex-end; border:0; padding:0; margin-top:14px;}
+    .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); box-shadow:none;}
 
-    .footer { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-top: 12px; }
-    .small { font-size: 12px; color: var(--muted); }
+    /* Toast leve */
+    .toast{
+      position:fixed; left:50%; transform:translateX(-50%);
+      bottom:16px; background:#111827; color:#fff; padding:10px 14px;
+      border-radius:12px; font-size:14px; box-shadow:0 8px 30px rgba(0,0,0,.35);
+      z-index:9998; display:none;
+    }
+    .toast.show{ display:block; }
 
-    .section-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .timer { font-variant-numeric: tabular-nums; font-weight: 700; color: #1e293b; }
+    /* DnD tokens (Cloze/Matching) */
+    .bank, .dropzone{ display:flex; gap:8px; flex-wrap:wrap; min-height:44px; padding:8px; border:1px dashed #cbd5e1; border-radius:12px; background:#f8fafc; }
+    html[data-theme="dark"] .bank, html[data-theme="dark"] .dropzone{ background:#0f172a; border-color:#374151; }
+    .token{
+      user-select:none; padding:8px 10px; border-radius:999px; background:#edf2ff; color:#1e293b; font-weight:600; cursor:grab; border:1px solid #c7d2fe;
+    }
+    html[data-theme="dark"] .token{ background:#1f2937; color:#e5e7eb; border-color:#334155; }
+    .token[draggable="true"]:active{ cursor:grabbing; }
+    .dropzone.highlight{ background:#ecfeff; border-color:#06b6d4; }
+    .slot{ min-width:180px; min-height:36px; display:inline-flex; align-items:center; justify-content:center; border:2px dashed #cbd5e1; border-radius:10px; padding:4px 8px; background:#fff; }
+    html[data-theme="dark"] .slot{ background:#0b0b0f; border-color:#374151; }
 
-    .success { color: #065f46; background: #d1fae5; border: 1px solid #10b981; padding: 10px 12px; border-radius: 10px; display: none; }
+    .cloze-item{ display:grid; grid-template-columns:28px 1fr; gap:8px; align-items:center; }
+    .matching{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .match-list{ display:grid; gap:8px; }
+    .match-card{ background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px; }
+    html[data-theme="dark"] .match-card{ background:#0f172a; border-color:#374151; }
+
+    /* Toggles T/F */
+    .tf-row{ display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; }
+    .toggle{ --w:56px; --h:30px; position:relative; width:var(--w); height:var(--h); background:#e2e8f0; border-radius:999px; cursor:pointer; transition:background .2s; }
+    .toggle::after{ content:""; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.2); transition:transform .2s; }
+    .toggle.true{ background:#22c55e; }
+    .toggle.true::after{ transform:translateX(26px); }
+    .toggle.false{ background:#ef4444; }
   </style>
 </head>
 <body>
+  <!-- Modal de consentimento + nome -->
+  <div id="consentBackdrop" class="modal-backdrop" aria-modal="true" role="dialog">
+    <div class="modal">
+      <h2>Termos da Prova</h2>
+      <div class="muted">Preencha seu <b>nome completo</b> e clique em “Aceitar e começar”. O cronômetro inicia em seguida.</div>
+
+      <label for="modalName" class="muted" style="display:block;margin:10px 0 6px">Nome completo</label>
+      <input id="modalName" type="text" placeholder="Ex.: Maria Fernanda Silva" autocomplete="name"
+             style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text)" />
+
+      <div class="rules" style="margin-top:12px">
+        <ul>
+          <li>Tentaremos ativar <b>tela cheia</b> (se o navegador permitir).</li>
+          <li>Trocas de aba/janela são <b>registradas</b>.</li>
+          <li><b>Copiar/colar/recortar</b> e <b>Ctrl/Cmd+F</b> são bloqueados.</li>
+          <li>Não minimize ou feche a aba até enviar a prova.</li>
+        </ul>
+      </div>
+      <footer>
+        <button id="declineBtn" class="btn-ghost">Sair</button>
+        <button id="acceptBtn" disabled>Aceitar e começar</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite">Ação registrada.</div>
+
   <header>
-    <div class="container">
-      <h1>U.S. History – Midterm Readiness (GIA Values)</h1>
-      <p class="sub">Interactive practice: Cloze & Matching • Mini-Essay • True/False (fix it) • Map & Data. <span class="badge">60 minutes</span></p>
+    <div class="wrap">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <h1>U.S. History – Midterm Readiness (GIA Values)</h1>
+          <div class="sub">Cloze & Matching • Mini-Essay • True/False (fix it) • Map & Data</div>
+        </div>
+        <button id="themeToggle" class="icon-btn">🌓 Tema</button>
+      </div>
+
+      <div class="bar">
+        <div class="row">
+          <input id="studentName" type="text" placeholder="Nome (preenchido ao aceitar)" autocomplete="name" />
+          <span class="pill"><strong>Tempo:</strong> <span id="timer" class="timer">60:00</span></span>
+          <span id="focusFlag" class="badge">Foco OK</span>
+          <span id="tabCount" class="badge">Contador de Aba: 0</span>
+        </div>
+        <div class="row">
+          <input id="testId" type="text" placeholder="US-History-Midterm-v1" />
+          <button id="startBtn" class="hidden">Iniciar</button>
+          <button id="submitBtn" disabled>Enviar</button>
+        </div>
+      </div>
+
+      <div class="notice small" id="notes">
+        A prova será enviada automaticamente ao zerar o cronômetro.
+      </div>
     </div>
   </header>
 
-  <main class="container">
+  <main class="wrap">
+    <form id="quizForm" class="grid" autocomplete="off">
+      <!-- A) CLOZE -->
+      <section class="card" data-difficulty="auto">
+        <h3>A) Retrieval Race — Cloze (arraste o termo correto para cada lacuna)</h3>
+        <p class="muted">Arraste os tokens do banco para os espaços vazios. Você pode trocar depois.</p>
+        <div class="bank" id="cloze-bank"></div>
+        <div id="cloze-list" class="cloze-list" style="margin-top:10px"></div>
+      </section>
+
+      <!-- A) MATCHING -->
+      <section class="card" data-difficulty="auto">
+        <h3>A) Retrieval Race — Matching (arraste o ato/evento para a descrição correta)</h3>
+        <div class="matching">
+          <div class="match-list" id="match-descriptions"></div>
+          <div>
+            <h4>Opções</h4>
+            <div class="bank" id="match-bank"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- B) ESSAY -->
+      <section class="card" data-difficulty="writing">
+        <h3>B) Essay Drill (100–140 palavras)</h3>
+        <p class="muted">Escolha <b>um</b> tema. Use o planner e depois escreva. Integre explicitamente os valores GIA.</p>
+        <label class="small" for="prompt">Escolha o tema</label>
+        <select id="prompt">
+          <option value="P1">P1 — Articles of Confederation & early national problems</option>
+          <option value="P2">P2 — Northern vs Southern regional economies (c. 1700s)</option>
+          <option value="P3">P3 — Abolition & Women’s leadership</option>
+        </select>
+
+        <div class="grid" style="margin-top:10px">
+          <div>
+            <label class="small" for="claim">Claim (1–2 frases)</label>
+            <textarea id="claim" placeholder="Tese/afirmação breve"></textarea>
+          </div>
+          <div>
+            <label class="small" for="counter">Counterpoint + Refutation (1 linha)</label>
+            <input id="counter" type="text" placeholder="Contra-argumento + refutação" />
+          </div>
+        </div>
+        <div class="grid" style="margin-top:10px">
+          <div>
+            <label class="small" for="peel1">PEEL 1 (nomeie 1 valor GIA)</label>
+            <textarea id="peel1" placeholder="Point → Evidence → Explanation → Link (+ GIA)"></textarea>
+          </div>
+          <div>
+            <label class="small" for="peel2">PEEL 2 (nomeie 1 valor GIA)</label>
+            <textarea id="peel2" placeholder="Point → Evidence → Explanation → Link (+ GIA)"></textarea>
+          </div>
+        </div>
+        <label class="small" for="essayText" style="margin-top:10px;display:block">Mini-Essay (100–140 palavras)</label>
+        <textarea id="essayText" placeholder="Escreva aqui"></textarea>
+      </section>
+
+      <!-- C) TRUE / FALSE -->
+      <section class="card" data-difficulty="auto">
+        <h3>C) True/False — Corrija com evidência</h3>
+        <p class="muted">Alterne para True ou False; depois corrija a frase e justifique brevemente (uma linha).</p>
+        <div id="tf-list"></div>
+      </section>
+
+      <!-- D) MAP & DATA -->
+      <section class="card" data-difficulty="manual">
+        <h3>D) Map & Data Snap</h3>
+        <p class="muted">Responda com base em um mapa simplificado (1680s vs 1763) e uma mini tabela populacional.</p>
+        <div class="grid">
+          <div>
+            <h4>Map Questions</h4>
+            <div class="row">
+              <label class="small" for="qM1">By 1763, which two European powers dominated the Northwest?</label>
+              <input id="qM1" type="text" placeholder="Ex.: Britain & France" />
+            </div>
+            <div class="row" style="margin-top:8px">
+              <label class="small" for="qM2">Which empire controlled Florida in 1763?</label>
+              <input id="qM2" type="text" placeholder="Ex.: Spain" />
+            </div>
+          </div>
+          <div>
+            <h4>Data Questions</h4>
+            <div class="row">
+              <label class="small" for="qD1">Which state shows more enslaved than free white persons?</label>
+              <input id="qD1" type="text" placeholder="State name" />
+            </div>
+            <div class="row" style="margin-top:8px">
+              <label class="small" for="qD2">Which state has the largest total population?</label>
+              <input id="qD2" type="text" placeholder="State name" />
+            </div>
+          </div>
+        </div>
+        <p class="small muted" style="margin-top:6px">Obs.: esta seção não é pontuada automaticamente; fica registrada para correção manual.</p>
+      </section>
+    </form>
+
     <div class="card">
-      <div class="section-title">
-        <h2>Student Info</h2>
-        <div class="pill">GIA: Dignity • Honor • Respect • Integrity</div>
-      </div>
-      <div class="grid">
-        <div>
-          <label class="small" for="studentName">Student Name</label>
-          <input id="studentName" type="text" placeholder="Enter your full name" />
-        </div>
-        <div>
-          <label class="small" for="className">Class / Section</label>
-          <input id="className" type="text" placeholder="e.g., HS U.S. History – GRIGGS" />
-        </div>
+      <h3>Results & Admin</h3>
+      <p class="muted small">Somente professor.</p>
+      <div class="row" style="margin-top:10px">
+        <button id="downloadCsvBtn" disabled>Download CSV</button>
+        <button id="resetBtn" class="icon-btn">Reset</button>
       </div>
     </div>
 
-    <!-- A. Retrieval Race (Cloze) -->
-    <section class="card" id="cloze">
-      <div class="section-title">
-        <h2>A. Retrieval Race — Cloze (Drag each term into the correct blank)</h2>
-        <span class="timer" id="timer">00:00</span>
-      </div>
-      <p class="muted">Drag tokens from the bank into the slots. You can drag out to change your choice.</p>
-      <div class="bank" id="cloze-bank"></div>
-      <div class="cloze-list" id="cloze-list"></div>
-    </section>
-
-    <!-- A. Retrieval Race (Matching) -->
-    <section class="card" id="matching">
-      <h2>A. Retrieval Race — Matching (Drag the act/event to the matching description)</h2>
-      <div class="matching">
-        <div class="match-list" id="match-descriptions"></div>
-        <div>
-          <h3>Options</h3>
-          <div class="bank" id="match-bank"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- B. Essay Drill -->
-    <section class="card" id="essay">
-      <h2>B. Essay Drill (100–140 words)</h2>
-      <p class="muted">Choose <strong>one</strong> prompt. Use the planner, then write. Explicitly integrate GIA values.</p>
-
-      <label class="small" for="prompt">Choose your prompt</label>
-      <select id="prompt">
-        <option value="P1">P1 — Articles of Confederation & early national problems</option>
-        <option value="P2">P2 — Northern vs Southern regional economies (c. 1700s)</option>
-        <option value="P3">P3 — Abolition & Women’s leadership</option>
-      </select>
-
-      <h3>Planner</h3>
-      <div class="grid">
-        <div>
-          <label class="small" for="claim">Claim (1–2 sentences)</label>
-          <textarea id="claim" placeholder="Write your thesis/claim here (brief thesis statement, not a title)"></textarea>
-        </div>
-        <div>
-          <label class="small" for="counter">Counterpoint (1) + Refutation (1)</label>
-          <input id="counter" type="text" placeholder="Counter & refute in one line" />
-        </div>
-      </div>
-      <div class="grid">
-        <div>
-          <label class="small" for="peel1">PEEL Paragraph 1 (Name 1 GIA value)</label>
-          <textarea id="peel1" placeholder="Point → Evidence → Explanation → Link (+ GIA value)"></textarea>
-        </div>
-        <div>
-          <label class="small" for="peel2">PEEL Paragraph 2 (Name 1 GIA value)</label>
-          <textarea id="peel2" placeholder="Point → Evidence → Explanation → Link (+ GIA value)"></textarea>
-        </div>
-      </div>
-      <label class="small" for="essayText">Mini‑Essay (100–140 words)</label>
-      <textarea id="essayText" placeholder="Write your mini‑essay here (100–140 words)"></textarea>
-    </section>
-
-    <!-- C. True / False -->
-    <section class="card" id="truefalse">
-      <h2>C. True/False — Fix it with Evidence</h2>
-      <p class="muted">Toggle to True or False, then correct the sentence and briefly justify with evidence (one line).</p>
-      <div id="tf-list"></div>
-    </section>
-
-    <!-- D. Map & Data Snap (Multiple Choice style) -->
-    <section class="card" id="mapdata">
-      <h2>D. Map & Data Snap</h2>
-      <p class="muted">Answer based on a simplified historical map (1680s vs 1763) and a mini population table.</p>
-      <div class="grid">
-        <div>
-          <h3>Map Questions</h3>
-          <div class="row">
-            <label class="small" for="qM1">By 1763, which two European powers dominated the Northwest?</label>
-            <input id="qM1" type="text" placeholder="e.g., Britain & Spain" />
-          </div>
-          <div class="row">
-            <label class="small" for="qM2">Which empire controlled Florida in 1763?</label>
-            <input id="qM2" type="text" placeholder="e.g., Spain" />
-          </div>
-        </div>
-        <div>
-          <h3>Data Questions</h3>
-          <div class="row">
-            <label class="small" for="qD1">Which state shows more enslaved than free white persons?</label>
-            <input id="qD1" type="text" placeholder="State name" />
-          </div>
-          <div class="row">
-            <label class="small" for="qD2">Which state has the largest total population?</label>
-            <input id="qD2" type="text" placeholder="State name" />
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="footer">
-        <div class="row">
-          <button id="downloadCSV" class="btn">Submit & Download Excel‑ready CSV</button>
-          <button id="previewPDF" class="btn secondary">Print/Save as PDF (Preview)</button>
-          <button id="resetAll" class="btn ghost">Reset</button>
-        </div>
-        <div class="small">The CSV opens directly in Excel/Google Sheets. PDF uses your browser’s print dialog.</div>
-      </div>
-      <div id="successMsg" class="success">Your file is ready! If the download didn’t start, check pop‑up blockers.</div>
-    </section>
+    <footer>
+      <div class="small">Designed by MF Bruno (com GIA Values ✦)</div>
+    </footer>
   </main>
 
   <script>
-    // ===== Timer =====
-    const startTime = Date.now();
-    const timerEl = document.getElementById('timer');
-    setInterval(() => {
-      const s = Math.floor((Date.now() - startTime) / 1000);
-      const mm = String(Math.floor(s/60)).padStart(2,'0');
-      const ss = String(s%60).padStart(2,'0');
-      timerEl.textContent = `${mm}:${ss}`;
-    }, 1000);
-
-    // ===== CLOZE (Drag tokens into blanks) =====
-    const clozeItems = [
-      {
-        id: 'c1',
-        prompt: '1) The network that aided enslaved people to escape to free states was the',
-        answer: 'Underground Railroad'
-      },
-      {
-        id: 'c2',
-        prompt: '2) Laws passed in several Northern states to protect fugitives were called',
-        answer: 'personal liberty laws'
-      },
-      {
-        id: 'c3',
-        prompt: '3) Allowing voters in a territory to decide on slavery reflected',
-        answer: 'popular sovereignty'
-      },
-      {
-        id: 'c4',
-        prompt: '4) A belief hostile to immigrants and Catholics was',
-        answer: 'nativism'
-      },
-      {
-        id: 'c5',
-        prompt: '5) The novel that galvanized Northern opinion against slavery was',
-        answer: "Uncle Tom's Cabin"
-      },
-      {
-        id: 'c6',
-        prompt: '6) The doctrine claiming Congress could not ban slavery in territories came from the',
-        answer: 'Dred Scott'
-      }
-    ];
-    const clozeBankWords = [
-      'Underground Railroad',
-      'personal liberty laws',
-      'popular sovereignty',
-      'nativism',
-      "Uncle Tom's Cabin",
-      'Dred Scott'
-    ];
-
-    const bank = document.getElementById('cloze-bank');
-    const clozeList = document.getElementById('cloze-list');
-
-    function makeToken(label) {
-      const t = document.createElement('div');
-      t.className = 'token';
-      t.draggable = true;
-      t.textContent = label;
-      t.dataset.value = label;
-      t.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', label);
-        setTimeout(() => t.classList.add('dragging'), 0);
-      });
-      t.addEventListener('dragend', () => t.classList.remove('dragging'));
-      return t;
-    }
-
-    function makeDropzone(acceptAny=true) {
-      const z = document.createElement('div');
-      z.className = 'slot dropzone';
-      z.addEventListener('dragover', (e)=>{ e.preventDefault(); z.classList.add('highlight'); });
-      z.addEventListener('dragleave', ()=> z.classList.remove('highlight'));
-      z.addEventListener('drop', (e)=>{
-        e.preventDefault(); z.classList.remove('highlight');
-        const label = e.dataTransfer.getData('text/plain');
-        // If a token is already inside, move it back to bank
-        const existing = z.querySelector('.token');
-        if (existing) bank.appendChild(existing);
-        // Move dragged token into zone
-        const dragged = [...document.querySelectorAll('.token')].find(el => el.textContent === label && el.classList.contains('dragging'));
-        if (dragged) z.appendChild(dragged);
-      });
-      return z;
-    }
-
-    // Build bank (shuffle)
-    function shuffle(a){ for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
-    shuffle([...clozeBankWords]).forEach(w => bank.appendChild(makeToken(w)));
-
-    // Build cloze list
-    clozeItems.forEach((item, idx) => {
-      const row = document.createElement('div');
-      row.className = 'cloze-item';
-      const num = document.createElement('div');
-      num.textContent = String(idx+1).padStart(2,'0');
-      const content = document.createElement('div');
-      const span = document.createElement('span');
-      span.textContent = item.prompt + ' ';
-      const slot = makeDropzone();
-      slot.id = `cloze-slot-${item.id}`;
-      const end = document.createElement('span');
-      end.textContent = '.';
-      content.appendChild(span);
-      content.appendChild(slot);
-      content.appendChild(end);
-      row.appendChild(num);
-      row.appendChild(content);
-      clozeList.appendChild(row);
+  // ===== Tema =====
+  (function(){
+    const root = document.documentElement;
+    const saved = localStorage.getItem('theme') || 'light';
+    root.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
     });
+  })();
 
-    // ===== MATCHING =====
-    const matchDescriptions = [
-      { id: 'md1', text: 'First direct tax on printed materials in the colonies.' },
-      { id: 'md2', text: 'Law asserting Parliament\'s power to legislate “in all cases whatsoever.”' },
-      { id: 'md3', text: 'Duties on imports like glass, lead, paint.' },
-      { id: 'md4', text: 'Protest where colonists destroyed cargo to oppose monopoly.' },
-      { id: 'md5', text: 'Punitive measures closing a major port and altering a colonial charter.' },
-    ];
-    const matchOptions = [ 'Stamp Act', 'Declaratory Act', 'Townshend Acts', 'Boston Tea Party', 'Intolerable Acts' ];
+  // ===== Config =====
+  const DEFAULT_MINUTES = 60; // 60 min como no enunciado
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
 
+  // ===== State =====
+  let started = false, ended = false;
+  let startTime = null, endTime = null, timerInterval = null;
+  let secondsLeft = DEFAULT_MINUTES * 60;
+
+  // Anti-cheat
+  let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
+  let copyCount = 0, pasteCount = 0, findCount = 0;
+
+  // desconto de 1 logo após aceitar (popup do sistema)
+  let acceptTs = null;
+  const GRACE_MS = 2500;
+  let systemPopupOffsetApplied = false;
+
+  // DOM
+  const startBtn = document.getElementById('startBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const timerEl = document.getElementById('timer');
+  const form = document.getElementById('quizForm');
+  const nameInput = document.getElementById('studentName');
+  const testIdInput = document.getElementById('testId');
+  const focusFlag = document.getElementById('focusFlag');
+  const tabCountEl = document.getElementById('tabCount');
+  const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const toast = document.getElementById('toast');
+
+  // Modal
+  const consentBackdrop = document.getElementById('consentBackdrop');
+  const modalName = document.getElementById('modalName');
+  const acceptBtnEl = document.getElementById('acceptBtn');
+  document.body.style.overflow = 'hidden'; // trava scroll enquanto modal existe
+
+  // trava o form até iniciar
+  [...form.elements].forEach(el=>el.disabled = true);
+
+  function fmt(secs){
+    const m = Math.floor(secs/60).toString().padStart(2,'0');
+    const s = (secs%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+  function tick(){
+    secondsLeft--; if(secondsLeft < 0){ secondsLeft = 0; }
+    timerEl.textContent = fmt(secondsLeft);
+    if(secondsLeft === 0){ autoSubmit('time'); }
+  }
+  function startTimer(){ clearInterval(timerInterval); timerInterval = setInterval(tick, 1000); }
+  async function goFullscreen(){
+    try{ if (!document.fullscreenElement && document.documentElement.requestFullscreen) { await document.documentElement.requestFullscreen(); } }catch(e){}
+  }
+  function showToast(msg){ toast.textContent = msg || 'Ação registrada.'; toast.classList.add('show'); setTimeout(()=> toast.classList.remove('show'), 1500); }
+  function maybeApplySystemPopupOffset(){
+    if (started && !systemPopupOffsetApplied && acceptTs && (Date.now() - acceptTs) <= GRACE_MS){
+      tabSwitches = Math.max(0, tabSwitches - 1);
+      systemPopupOffsetApplied = true;
+      tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    }
+  }
+  function isValidFullName(n){
+    const t = (n||'').trim().replace(/\s+/g,' ');
+    const parts = t.split(' ').filter(p => p.length >= 2);
+    return parts.length >= 2;
+  }
+  modalName.addEventListener('input', ()=>{ acceptBtnEl.disabled = !isValidFullName(modalName.value); });
+
+  // ====== U.S. History — DATA (Cloze/Matching/TF) ======
+  const clozeItems = [
+    { id:'c1', prompt:'1) The network that aided enslaved people to escape to free states was the', answer:'Underground Railroad' },
+    { id:'c2', prompt:'2) Laws passed in several Northern states to protect fugitives were called', answer:'personal liberty laws' },
+    { id:'c3', prompt:'3) Allowing voters in a territory to decide on slavery reflected', answer:'popular sovereignty' },
+    { id:'c4', prompt:'4) A belief hostile to immigrants and Catholics was', answer:'nativism' },
+    { id:'c5', prompt:'5) The novel that galvanized Northern opinion against slavery was', answer:"Uncle Tom's Cabin" },
+    { id:'c6', prompt:'6) The doctrine claiming Congress could not ban slavery in territories came from the', answer:'Dred Scott' }
+  ];
+  const clozeBankWords = [
+    'Underground Railroad', 'personal liberty laws', 'popular sovereignty',
+    'nativism', "Uncle Tom's Cabin", 'Dred Scott'
+  ];
+
+  const matchDescriptions = [
+    { id:'md1', text:'First direct tax on printed materials in the colonies.' },
+    { id:'md2', text:'Law asserting Parliament\'s power to legislate “in all cases whatsoever.”' },
+    { id:'md3', text:'Duties on imports like glass, lead, paint.' },
+    { id:'md4', text:'Protest where colonists destroyed cargo to oppose monopoly.' },
+    { id:'md5', text:'Punitive measures closing a major port and altering a colonial charter.' },
+  ];
+  const matchOptions = [ 'Stamp Act', 'Declaratory Act', 'Townshend Acts', 'Boston Tea Party', 'Intolerable Acts' ];
+  const matchAnswerKey = {
+    md1: 'Stamp Act',
+    md2: 'Declaratory Act',
+    md3: 'Townshend Acts',
+    md4: 'Boston Tea Party',
+    md5: 'Intolerable Acts'
+  };
+
+  const tfItems = [
+    { id:'t1', text:'The Constitution assigns execution of the laws to the judicial branch.', correct:false },
+    { id:'t2', text:'Egalitarianism means a belief in the equality of people.', correct:true },
+    { id:'t3', text:'During early colonial conflicts, the French held Florida throughout the 1700s.', correct:false },
+    { id:'t4', text:'The Emancipation Proclamation freed enslaved people in all Union states.', correct:false },
+    { id:'t5', text:'In 1775, British troops marched to Concord to seize arms supplies.', correct:true },
+    { id:'t6', text:'Shakers’ founder was Ann Lee, associated with communal living and celibacy.', correct:true },
+  ];
+
+  // ===== DnD helpers =====
+  function makeToken(label){
+    const t = document.createElement('div');
+    t.className = 'token'; t.draggable = true; t.textContent = label; t.dataset.value = label;
+    t.addEventListener('dragstart', (e)=>{ e.dataTransfer.setData('text/plain', label); setTimeout(()=> t.classList.add('dragging'), 0); });
+    t.addEventListener('dragend', ()=> t.classList.remove('dragging'));
+    return t;
+  }
+  function makeDropzone(){
+    const z = document.createElement('div');
+    z.className = 'slot dropzone';
+    z.addEventListener('dragover', (e)=>{ e.preventDefault(); z.classList.add('highlight'); });
+    z.addEventListener('dragleave', ()=> z.classList.remove('highlight'));
+    z.addEventListener('drop', (e)=>{
+      e.preventDefault(); z.classList.remove('highlight');
+      const label = e.dataTransfer.getData('text/plain');
+      const existing = z.querySelector('.token');
+      if (existing) document.getElementById('trash-bank')?.appendChild(existing) || document.body.appendChild(existing);
+      const dragged = [...document.querySelectorAll('.token')].find(el => el.textContent === label && el.classList.contains('dragging'));
+      if (dragged) z.appendChild(dragged);
+    });
+    return z;
+  }
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+  function norm(s){
+    return (s||'').toString()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^\w\s'&-]+/g,'')
+      .trim().toLowerCase();
+  }
+  function readSlotValue(slotId){
+    const slot = document.getElementById(slotId);
+    const token = slot ? slot.querySelector('.token') : null;
+    return token ? token.dataset.value : '';
+  }
+
+  // ===== Build CLOZE
+  (function(){
+    const bank = document.getElementById('cloze-bank');
+    const list = document.getElementById('cloze-list');
+    shuffle([...clozeBankWords]).forEach(w => bank.appendChild(makeToken(w)));
+    clozeItems.forEach((item, idx)=>{
+      const row = document.createElement('div'); row.className = 'cloze-item';
+      const num = document.createElement('div'); num.textContent = String(idx+1).padStart(2,'0');
+      const content = document.createElement('div');
+      const span = document.createElement('span'); span.textContent = item.prompt + ' ';
+      const slot = makeDropzone(); slot.id = `cloze-slot-${item.id}`;
+      const end = document.createElement('span'); end.textContent='.';
+      content.appendChild(span); content.appendChild(slot); content.appendChild(end);
+      row.appendChild(num); row.appendChild(content); list.appendChild(row);
+    });
+  })();
+
+  // ===== Build MATCHING
+  (function(){
     const matchDescEl = document.getElementById('match-descriptions');
     const matchBank = document.getElementById('match-bank');
-
-    matchDescriptions.forEach((d, i) => {
-      const card = document.createElement('div');
-      card.className = 'match-card';
-      const p = document.createElement('p');
-      p.textContent = `${i+1}) ${d.text}`;
-      const dz = makeDropzone();
-      dz.id = `match-slot-${d.id}`;
-      card.appendChild(p);
-      card.appendChild(dz);
-      matchDescEl.appendChild(card);
+    matchDescriptions.forEach((d,i)=>{
+      const card = document.createElement('div'); card.className = 'match-card';
+      const p = document.createElement('p'); p.textContent = `${i+1}) ${d.text}`;
+      const dz = makeDropzone(); dz.id = `match-slot-${d.id}`;
+      card.appendChild(p); card.appendChild(dz); matchDescEl.appendChild(card);
     });
-
     shuffle([...matchOptions]).forEach(opt => matchBank.appendChild(makeToken(opt)));
+  })();
 
-    // ===== TRUE / FALSE =====
-    const tfItems = [
-      { id: 't1', text: 'The Constitution assigns execution of the laws to the judicial branch.', correct: false },
-      { id: 't2', text: 'Egalitarianism means a belief in the equality of people.', correct: true },
-      { id: 't3', text: 'During early colonial conflicts, the French held Florida throughout the 1700s.', correct: false },
-      { id: 't4', text: 'The Emancipation Proclamation freed enslaved people in all Union states.', correct: false },
-      { id: 't5', text: 'In 1775, British troops marched to Concord to seize arms supplies.', correct: true },
-      { id: 't6', text: 'Shakers’ founder was Ann Lee, associated with communal living and celibacy.', correct: true },
-    ];
-
+  // ===== Build TRUE/FALSE
+  (function(){
     const tfList = document.getElementById('tf-list');
     tfItems.forEach((it, idx) => {
       const row = document.createElement('div');
       row.className = 'tf-row';
-      const label = document.createElement('div');
-      label.textContent = `${idx+1}) ${it.text}`;
-      const ctrl = document.createElement('div');
-      const tog = document.createElement('div');
-      tog.className = 'toggle';
-      tog.dataset.value = 'false';
-      const stateTxt = document.createElement('span');
-      stateTxt.className = 'small';
-      stateTxt.style.marginLeft = '8px';
-      stateTxt.textContent = 'False';
-      ctrl.style.display = 'flex';
-      ctrl.style.alignItems = 'center';
-
+      const label = document.createElement('div'); label.textContent = `${idx+1}) ${it.text}`;
+      const ctrl = document.createElement('div'); ctrl.style.display='flex'; ctrl.style.alignItems='center';
+      const tog = document.createElement('div'); tog.className = 'toggle false'; tog.dataset.value='false';
+      const stateTxt = document.createElement('span'); stateTxt.className='small'; stateTxt.style.marginLeft='8px'; stateTxt.textContent='False';
       tog.addEventListener('click', ()=>{
         const isTrue = tog.classList.contains('true');
         tog.classList.toggle('true', !isTrue);
@@ -398,171 +471,277 @@
         tog.dataset.value = (!isTrue).toString();
         stateTxt.textContent = (!isTrue) ? 'True' : 'False';
       });
-      tog.classList.add('false');
-
       ctrl.appendChild(tog); ctrl.appendChild(stateTxt);
       row.appendChild(label); row.appendChild(ctrl);
-
-      // Correction input
+      // campo de correção
       const fix = document.createElement('input');
-      fix.type = 'text'; fix.placeholder = 'Correct statement + because (evidence)';
-      fix.id = `tf-fix-${it.id}`;
-      fix.style.margin = '8px 0 16px'; fix.style.gridColumn = '1 / -1';
-
-      tfList.appendChild(row);
-      tfList.appendChild(fix);
+      fix.type='text'; fix.placeholder='Correct statement + because (evidence)';
+      fix.id = `tf-fix-${it.id}`; fix.style.margin='8px 0 16px'; fix.style.gridColumn='1 / -1';
+      tfList.appendChild(row); tfList.appendChild(fix);
       tog.id = `tf-toggle-${it.id}`;
     });
+  })();
 
-    // ===== Helpers to read DnD values =====
-    function readSlotValue(slotId){
-      const slot = document.getElementById(slotId);
-      const token = slot ? slot.querySelector('.token') : null;
-      return token ? token.dataset.value : '';
-    }
+  // ===== Timer/start/anti-cheat =====
+  function startTest(){
+    started = true; startTime = new Date();
+    nameInput.disabled = true; testIdInput.disabled = true;
+    startBtn.disabled = true; startBtn.classList.add('hidden');
+    submitBtn.disabled = false;
 
-    // ===== CSV Export =====
-    function toCSV(rows){
-      return rows.map(r => r.map(v => {
-        const s = (v===undefined || v===null) ? '' : String(v);
-        if (/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
-        return s;
-      }).join(',')).join('\n');
-    }
+    // habilita formulário
+    [...form.elements].forEach(el=>el.disabled = false);
+    setTimeout(()=>{ [...form.elements].forEach(el=>el.disabled=false); }, 0);
 
-    function download(filename, content, mime){
-      const blob = new Blob([content], { type: mime });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename; document.body.appendChild(a); a.click();
-      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
-      document.getElementById('successMsg').style.display = 'block';
-    }
+    // timer
+    secondsLeft = DEFAULT_MINUTES * 60;
+    timerEl.textContent = fmt(secondsLeft);
+    startTimer();
 
-    function collectData(){
-      const name = document.getElementById('studentName').value.trim();
-      const clazz = document.getElementById('className').value.trim();
-      const elapsed = timerEl.textContent;
-      const ts = new Date().toISOString();
+    // bloqueios
+    document.addEventListener('copy', (e)=>{ copyCount++; e.preventDefault(); showToast('Cópia bloqueada.'); });
+    document.addEventListener('cut', (e)=>{ e.preventDefault(); showToast('Recorte bloqueado.'); });
+    document.addEventListener('paste', (e)=>{ pasteCount++; e.preventDefault(); showToast('Colagem bloqueada.'); });
+    document.addEventListener('keydown', (e)=>{
+      const k = e.key.toLowerCase(); const ctrl = e.ctrlKey || e.metaKey;
+      if (ctrl && (k==='c'||k==='v'||k==='x'||k==='s'||k==='p'||k==='f')) { e.preventDefault(); showToast('Atalho bloqueado.'); if(k==='f') findCount++; }
+      if (k==='f11'){ e.preventDefault(); showToast('F11 bloqueado.'); }
+    }, {capture:true});
+    document.addEventListener('contextmenu', (e)=> e.preventDefault());
+    document.addEventListener('fullscreenchange', ()=>{ /* não re-força para evitar popup */ });
+  }
 
-      // Cloze
-      const clozeAnswers = clozeItems.map(it => ({
-        id: it.id, prompt: it.prompt, answer: readSlotValue(`cloze-slot-${it.id}`)
-      }));
+  // ===== Grade + coleta =====
+  function grade(){
+    // Cloze
+    let clozeCorrect = 0;
+    const clozeAnswers = {};
+    clozeItems.forEach(it=>{
+      const val = readSlotValue(`cloze-slot-${it.id}`);
+      clozeAnswers[it.id] = { prompt: it.prompt, answer: val };
+      if (norm(val) === norm(it.answer)) clozeCorrect++;
+    });
 
-      // Matching
-      const matchAnswers = matchDescriptions.map(d => ({
-        id: d.id, prompt: d.text, answer: readSlotValue(`match-slot-${d.id}`)
-      }));
+    // Matching
+    let matchingCorrect = 0;
+    const matchAnswers = {};
+    matchDescriptions.forEach(d=>{
+      const val = readSlotValue(`match-slot-${d.id}`);
+      matchAnswers[d.id] = { prompt: d.text, answer: val };
+      if (norm(val) === norm(matchAnswerKey[d.id])) matchingCorrect++;
+    });
 
-      // Essay
-      const prompt = document.getElementById('prompt').value;
-      const claim = document.getElementById('claim').value.trim();
-      const counter = document.getElementById('counter').value.trim();
-      const peel1 = document.getElementById('peel1').value.trim();
-      const peel2 = document.getElementById('peel2').value.trim();
-      const essayText = document.getElementById('essayText').value.trim();
+    // True/False
+    let tfCorrect = 0;
+    const tfAnswers = {};
+    tfItems.forEach(it=>{
+      const tgl = document.getElementById(`tf-toggle-${it.id}`);
+      const val = tgl?.dataset.value === 'true';
+      tfAnswers[it.id] = { statement: it.text, value: val ? 'True' : 'False' };
+      if (val === !!it.correct) tfCorrect++;
+    });
 
-      // True/False
-      const tfAnswers = tfItems.map(it => {
-        const toggle = document.getElementById(`tf-toggle-${it.id}`);
-        const val = toggle?.dataset.value === 'true' ? 'True' : 'False';
-        const fix = document.getElementById(`tf-fix-${it.id}`).value.trim();
-        return { id: it.id, statement: it.text, value: val, fix };
+    // Totais automáticos
+    const totalCorrect = clozeCorrect + matchingCorrect + tfCorrect;
+    const totalPossible = clozeItems.length + matchDescriptions.length + tfItems.length; // 6 + 5 + 6 = 17
+
+    return {
+      score: {
+        totalCorrect, totalPossible,
+        bySection: { cloze: clozeCorrect, matching: matchingCorrect, truefalse: tfCorrect },
+        possibleBySection: { cloze: clozeItems.length, matching: matchDescriptions.length, truefalse: tfItems.length }
+      },
+      answers: { cloze: clozeAnswers, matching: matchAnswers, truefalse: tfAnswers }
+    };
+  }
+
+  function collectPayload(reason='manual'){
+    const now = new Date();
+    const g = grade();
+
+    // Essay / Planner
+    const essay = {
+      prompt: document.getElementById('prompt').value,
+      claim: document.getElementById('claim').value.trim(),
+      counter: document.getElementById('counter').value.trim(),
+      peel1: document.getElementById('peel1').value.trim(),
+      peel2: document.getElementById('peel2').value.trim(),
+      essayText: document.getElementById('essayText').value.trim()
+    };
+
+    // TF fixes (evidences)
+    const tfFixes = {};
+    tfItems.forEach(it=>{
+      tfFixes[it.id] = document.getElementById(`tf-fix-${it.id}`).value.trim();
+    });
+
+    // Map & Data
+    const mapdata = {
+      qM1: document.getElementById('qM1').value.trim(),
+      qM2: document.getElementById('qM2').value.trim(),
+      qD1: document.getElementById('qD1').value.trim(),
+      qD2: document.getElementById('qD2').value.trim()
+    };
+
+    const writing = { essay, tfFixes, mapdata };
+
+    const payload = {
+      testId: (testIdInput.value.trim() || 'US-History-Midterm-v1'),
+      studentName: (nameInput.value || '').trim() || '(no name)',
+      startISO: startTime?.toISOString() || null,
+      endISO: now.toISOString(),
+      durationSec: startTime ? Math.round((now - startTime)/1000) : null,
+      reason,
+      score: {
+        totalCorrect: g.score.totalCorrect,
+        totalPossible: g.score.totalPossible,
+        byDifficulty: { // compat com sua planilha (mantivemos campos)
+          easy: g.score.bySection.cloze,   // mapeamos seções p/ manter colunas
+          medium: g.score.bySection.matching,
+          hard: g.score.bySection.truefalse
+        },
+        possibleByDifficulty: {
+          easy: g.score.possibleBySection.cloze,
+          medium: g.score.possibleBySection.matching,
+          hard: g.score.possibleBySection.truefalse
+        }
+      },
+      answers: g.answers,
+      writing,
+      focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount }
+    };
+    return payload;
+  }
+
+  function toCSV(s){
+    const row = [
+      new Date().toISOString(), s.testId, JSON.stringify(s.studentName), s.startISO, s.endISO, s.durationSec,
+      s.score.totalCorrect, s.score.totalPossible,
+      s.score.byDifficulty.easy, s.score.byDifficulty.medium, s.score.byDifficulty.hard,
+      s.focus.tabSwitches, s.focus.blurCount, s.focus.totalBlurMs, s.focus.copyCount, s.focus.pasteCount, s.focus.findCount,
+      JSON.stringify(s.answers), JSON.stringify(s.writing)
+    ];
+    const header = [
+      'timestamp','testId','studentName','startISO','endISO','durationSec',
+      'correct','possible','easyCorrect','mediumCorrect','hardCorrect',
+      'tabSwitches','blurCount','totalBlurMs','copyCount','pasteCount','findCount','answers','writing'
+    ];
+    return header.join(',') + '\n' + row.join(',');
+  }
+
+  async function sendResults(payload){
+    try{
+      const res = await fetch(ENDPOINT, {
+        method:'POST',
+        headers:{ 'Content-Type':'text/plain' },
+        body: JSON.stringify(payload)
       });
-
-      // Map/Data
-      const qM1 = document.getElementById('qM1').value.trim();
-      const qM2 = document.getElementById('qM2').value.trim();
-      const qD1 = document.getElementById('qD1').value.trim();
-      const qD2 = document.getElementById('qD2').value.trim();
-
-      return { name, clazz, elapsed, ts, clozeAnswers, matchAnswers, prompt, claim, counter, peel1, peel2, essayText, tfAnswers, qM1, qM2, qD1, qD2 };
+      return { posted: res.ok, status: res.status };
+    }catch(err){
+      console.warn('POST failed', err);
+      return { posted:false, error: String(err) };
     }
+  }
 
-    function buildCSV(payload){
-      const rows = [];
-      rows.push(['Timestamp', payload.ts]);
-      rows.push(['Student Name', payload.name]);
-      rows.push(['Class/Section', payload.clazz]);
-      rows.push(['Elapsed (mm:ss)', payload.elapsed]);
-      rows.push([]);
+  function downloadCSV(name, csv){
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_US-History_Midterm.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
 
-      rows.push(['A) Cloze']);
-      rows.push(['#','Prompt','Answer']);
-      payload.clozeAnswers.forEach((c, i)=> rows.push([i+1, c.prompt, c.answer]));
-      rows.push([]);
+  function lockTest(){
+    [...form.elements].forEach(el=>el.disabled = true);
+    submitBtn.disabled = true; downloadCsvBtn.disabled = false;
+    document.getElementById('notes').textContent = 'Locked. Answers recorded.';
+    document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
+  }
 
-      rows.push(['A) Matching']);
-      rows.push(['#','Description','Chosen Option']);
-      payload.matchAnswers.forEach((m, i)=> rows.push([i+1, m.prompt, m.answer]));
-      rows.push([]);
+  async function finalize(reason){
+    if(ended) return; ended = true; endTime = new Date(); clearInterval(timerInterval);
+    const payload = collectPayload(reason);
+    const csv = toCSV(payload);
+    const postRes = await sendResults(payload);
+    downloadCSV(payload.studentName || 'anonymous', csv);
+    lockTest();
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+    console.log('Result payload:', payload, 'POST:', postRes);
+  }
+  function autoSubmit(reason){ finalize(reason); }
 
-      rows.push(['B) Essay']);
-      rows.push(['Prompt', payload.prompt]);
-      rows.push(['Claim', payload.claim]);
-      rows.push(['Counter+Refute', payload.counter]);
-      rows.push(['PEEL 1', payload.peel1]);
-      rows.push(['PEEL 2', payload.peel2]);
-      rows.push(['Essay (100–140)', payload.essayText]);
-      rows.push([]);
+  // Eventos básicos
+  startBtn.addEventListener('click', startTest);
+  submitBtn.addEventListener('click', ()=> finalize('manual'));
+  downloadCsvBtn.addEventListener('click', ()=>{ const csv = toCSV(collectPayload('download-only')); downloadCSV((nameInput.value||'').trim()||'anonymous', csv); });
+  resetBtn.addEventListener('click', ()=>{ location.reload(); });
 
-      rows.push(['C) True / False']);
-      rows.push(['#','Statement','T/F','Correction + because (evidence)']);
-      payload.tfAnswers.forEach((t, i)=> rows.push([i+1, t.statement, t.value, t.fix]));
-      rows.push([]);
-
-      rows.push(['D) Map & Data']);
-      rows.push(['Map Q1', payload.qM1]);
-      rows.push(['Map Q2', payload.qM2]);
-      rows.push(['Data Q1', payload.qD1]);
-      rows.push(['Data Q2', payload.qD2]);
-
-      return toCSV(rows);
+  // Anti-cheat + offset popup
+  document.addEventListener('visibilitychange', ()=>{
+    if(!started || ended) return;
+    if(document.visibilityState === 'hidden'){
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+      focusFlag.textContent = 'Focus LOST';
+      isBlurred = true; blurStart = Date.now();
+      maybeApplySystemPopupOffset();
+      showToast('Troca de aba registrada.');
+    } else {
+      focusFlag.textContent = 'Foco OK';
+      if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
     }
+  });
+  window.addEventListener('blur', ()=>{
+    if(!started || ended) return;
+    blurCount++;
+    if (document.visibilityState !== 'hidden') {
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+      maybeApplySystemPopupOffset();
+    }
+    focusFlag.textContent='Focus LOST'; isBlurred=true; blurStart=Date.now();
+  });
+  window.addEventListener('focus', ()=>{
+    if(!started || ended) return;
+    focusFlag.textContent='Foco OK';
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  });
+  window.addEventListener('pagehide', ()=>{
+    if(!started || ended) return;
+    tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    maybeApplySystemPopupOffset();
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  });
 
-    // Download CSV
-    document.getElementById('downloadCSV').addEventListener('click', () => {
-      const data = collectData();
-      const filenameSafeName = data.name ? data.name.replace(/[^a-z0-9\-_.]+/gi,'_') : 'student';
-      const csv = buildCSV(data);
-      download(`US-History-Midterm-Readiness_${filenameSafeName}.csv`, csv, 'text/csv;charset=utf-8');
-    });
+  // Aceitar/Sair do modal
+  document.getElementById('acceptBtn').addEventListener('click', async ()=>{
+    const fullName = (modalName.value || '').trim();
+    const t = fullName.replace(/\s+/g,' ');
+    const parts = t.split(' ').filter(p => p.length >= 2);
+    if(parts.length < 2){
+      modalName.setAttribute('aria-invalid','true');
+      modalName.focus();
+      return;
+    }
+    document.getElementById('studentName').value = t;
 
-    // Print/Save PDF (browser print)
-    document.getElementById('previewPDF').addEventListener('click', () => {
-      // Build a lightweight printable view
-      const data = collectData();
-      const w = window.open('', '_blank');
-      const styles = `body{font-family:system-ui,Segoe UI,Roboto,Arial;padding:20px;color:#0f172a} h1{font-size:20px;margin:0 0 8px} h2{font-size:16px;margin:16px 0 6px} table{width:100%;border-collapse:collapse;margin:6px 0} th,td{border:1px solid #cbd5e1;padding:6px;text-align:left;vertical-align:top} small{color:#64748b}`;
-      const esc = (s)=> (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const backdrop = document.getElementById('consentBackdrop');
+    if (backdrop) backdrop.remove();
+    document.body.style.overflow = '';
 
-      function table(rows){
-        return `<table>\n${rows.map((r,i)=>`<tr>${r.map(c=>`<td>${esc(String(c??''))}</td>`).join('')}</tr>`).join('\n')}\n</table>`;
-      }
-      const tfRows = [["#","Statement","T/F","Fix + evidence"]].concat(data.tfAnswers.map((t,i)=>[i+1, t.statement, t.value, t.fix]));
-      const clozeRows = [["#","Prompt","Answer"]].concat(data.clozeAnswers.map((c,i)=>[i+1,c.prompt,c.answer]));
-      const matchRows = [["#","Description","Option"]].concat(data.matchAnswers.map((m,i)=>[i+1,m.prompt,m.answer]));
+    acceptTs = Date.now();
+    startTest();
+    try{ await goFullscreen(); }catch(e){}
+  });
+  document.getElementById('declineBtn').addEventListener('click', ()=>{ window.location.href = 'about:blank'; });
 
-      w.document.write(`<!DOCTYPE html><html><head><meta charset='utf-8'><title>US History — Responses</title><style>${styles}</style></head><body>`);
-      w.document.write(`<h1>U.S. History – Midterm Readiness (Responses)</h1>`);
-      w.document.write(`<small>Student: ${esc(data.name)} | Class: ${esc(data.clazz)} | Elapsed: ${esc(data.elapsed)} | Timestamp: ${esc(data.ts)}</small>`);
-      w.document.write(`<h2>A) Cloze</h2>${table(clozeRows)}`);
-      w.document.write(`<h2>A) Matching</h2>${table(matchRows)}`);
-      w.document.write(`<h2>B) Essay</h2>${table([["Prompt",data.prompt],["Claim",data.claim],["Counter+Refute",data.counter],["PEEL 1",data.peel1],["PEEL 2",data.peel2],["Essay",data.essayText]])}`);
-      w.document.write(`<h2>C) True/False</h2>${table(tfRows)}`);
-      w.document.write(`<h2>D) Map & Data</h2>${table([["Map Q1",data.qM1],["Map Q2",data.qM2],["Data Q1",data.qD1],["Data Q2",data.qD2]])}`);
-      w.document.write(`</body></html>`);
-      w.document.close();
-      w.focus();
-      w.print();
-    });
-
-    // Reset
-    document.getElementById('resetAll').addEventListener('click', () => {
-      if (!confirm('Reset all fields?')) return;
-      location.reload();
-    });
+  // bloqueios enquanto o modal existe
+  document.addEventListener('keydown', (e)=>{
+    if (document.getElementById('consentBackdrop')){
+      const k = e.key.toLowerCase();
+      if ((e.ctrlKey||e.metaKey) && (k==='w'||k==='r'||k==='p'||k==='s'||k==='f')) e.preventDefault();
+      if (k==='f11') e.preventDefault();
+    }
+  });
+  document.addEventListener('contextmenu', (e)=> e.preventDefault());
   </script>
 </body>
 </html>
