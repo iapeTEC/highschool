@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Timeline — Drag or Tap to Place</title>
+<style>
+  :root{
+    --bg:#ffffff; --ink:#0b1220; --muted:#667085;
+    --line:#e5e7eb; --node:#f3f4f6; --drop:#fafafa; --accent:#0ea5e9;
+    --ok:#22c55e; --bad:#ef4444; --ring:rgba(14,165,233,.25);
+    --radius:14px; --pad:44px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,Segoe UI,Roboto,Arial}
+  header{position:sticky;top:0;z-index:10;background:#fff;backdrop-filter:blur(6px);border-bottom:1px solid #e5e7eb}
+  header .bar{max-width:1400px;width:96vw;margin:0 auto;padding:14px 0;display:flex;gap:12px;align-items:center;justify-content:space-between}
+  h1{margin:0;font-size:clamp(18px,2.2vw,26px);font-weight:800}
+  .muted{color:var(--muted)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  select,button{
+    appearance:none;background:#fff;border:1px solid #e5e7eb;color:var(--ink);
+    border-radius:12px;padding:10px 12px;cursor:pointer;font-weight:600;
+  }
+  button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  button.ghost{background:#fff}
+  main{max-width:1400px;width:96vw;margin:16px auto;padding-bottom:24px;display:grid;gap:16px;grid-template-columns:1fr}
+  .board{border:1px solid #e5e7eb;border-radius:16px;background:#fff;padding:16px 16px 12px}
+  .board h2{margin:0 0 8px;font-size:16px;font-weight:800}
+  .footer{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-top:6px}
+  .score{font-weight:800}
+  .badge{border:1px solid #e5e7eb;border-radius:999px;padding:4px 10px;font-size:12px;color:var(--muted)}
+
+  /* Timeline */
+  .timeline{position:relative;height:220px;margin:8px 0 6px;border-radius:12px;background:#fff;border:1px solid #f1f5f9;overflow:hidden}
+  .axis{position:absolute;left:var(--pad);right:var(--pad);top:50%;height:3px;background:var(--line);transform:translateY(-50%);border-radius:999px}
+  .node{
+    position:absolute;top:50%;transform:translate(-50%,-50%);width:66px;height:66px;border-radius:50%;
+    background:var(--node);border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;z-index:1;
+  }
+  .node .year{position:absolute;top:74px;font-size:12px;color:var(--muted);white-space:nowrap}
+  .drop{
+    position:absolute;top:-48px;left:50%;transform:translateX(-50%);
+    width:200px;min-height:46px;border:2px dashed #e5e7eb;border-radius:12px;background:var(--drop);
+    display:flex;align-items:center;justify-content:center;text-align:center;padding:6px 8px;z-index:2;
+  }
+  .drop.highlight{border-color:var(--accent);box-shadow:0 0 0 6px var(--ring)}
+  .drop .card{margin:0}
+
+  /* Cards */
+  .bank{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:8px}
+  .card{
+    background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:10px;cursor:grab;user-select:none;
+    box-shadow:0 2px 0 rgba(2,6,23,.04)
+  }
+  .card.dragging{opacity:.8;transform:scale(1.02)}
+  .card.selected{outline:2px solid var(--accent)}
+  .title{font-weight:800}
+  .small{font-size:12px;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div>
+      <h1>Timeline — drag or tap to place</h1>
+      <div class="muted">Years appear only on the timeline; cards do not show years.</div>
+    </div>
+    <div class="row">
+      <label class="muted" for="setSel">Set:</label>
+      <select id="setSel">
+        <option value="crisis1763">1763–1775 • Imperial/Colonial Crisis</option>
+        <option value="precivil">1850–1863 • Road to the Civil War</option>
+      </select>
+      <button id="checkBtn" class="primary">Check</button>
+      <button id="resetBtn" class="ghost">Reset</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="board">
+    <h2 id="boardTitle">1763–1775 • Imperial/Colonial Crisis</h2>
+    <div class="timeline" id="timeline">
+      <div class="axis"></div>
+      <!-- nodes & drops injected -->
+    </div>
+    <div class="footer">
+      <div class="score" id="score">Placed: 0/0</div>
+      <div class="badge">Tip: on mobile, tap a card, then tap a node.</div>
+    </div>
+  </section>
+
+  <section class="board">
+    <h2>Cards</h2>
+    <div class="bank" id="bank"></div>
+  </section>
+</main>
+
+<script>
+/* ===== Data =====
+   Cards DO NOT display years; nodes carry the year + key.
+   Feel free to add more events; follow the id/key pattern.
+*/
+const SETS = {
+  crisis1763: {
+    title: '1763–1775 • Imperial/Colonial Crisis',
+    nodes: [
+      {year:1763, key:'treaty_paris'},
+      {year:1763, key:'proclamation_line'},
+      {year:1764, key:'sugar_act'},
+      {year:1765, key:'stamp_act'},
+      {year:1766, key:'declaratory_act'},
+      {year:1767, key:'townshend_acts'},
+      {year:1770, key:'boston_massacre'},
+      {year:1773, key:'tea_party'},
+      {year:1774, key:'intolerable_acts'},
+      {year:1775, key:'lexington_concord'}
+    ],
+    cards: [
+      {id:'treaty_paris',   title:'Treaty of Paris', info:'Britain gains Canada & Florida; Spain takes Louisiana west of the Mississippi.'},
+      {id:'proclamation_line', title:'Royal Proclamation Line', info:'Limits settlement to east of the Appalachians.'},
+      {id:'sugar_act',      title:'Sugar Act', info:'Revamps tariffs and customs enforcement for revenue.'},
+      {id:'stamp_act',      title:'Stamp Act', info:'Direct tax on printed materials.'},
+      {id:'declaratory_act',title:'Declaratory Act', info:'Parliament asserts power “in all cases whatsoever.”'},
+      {id:'townshend_acts', title:'Townshend Acts', info:'Duties on glass, lead, paint (and tea).'},
+      {id:'boston_massacre',title:'Boston Massacre', info:'Fatal clash that inflames public opinion.'},
+      {id:'tea_party',      title:'Boston Tea Party', info:'Action against tea monopoly/tax.'},
+      {id:'intolerable_acts',title:'Intolerable Acts', info:'Punishments: Boston port closed; Massachusetts charter altered.'},
+      {id:'lexington_concord',title:'Lexington & Concord', info:'British move to seize arms; first shots of the war.'}
+    ]
+  },
+  precivil: {
+    title: '1850–1863 • Road to the Civil War',
+    nodes: [
+      {year:1850, key:'fugitive_act'},
+      {year:1852, key:'uncle_tom'},
+      {year:1854, key:'kansas_nebraska'},
+      {year:1856, key:'sumner_caning'},
+      {year:1857, key:'dred_scott'},
+      {year:1859, key:'john_brown'},
+      {year:1860, key:'lincoln_elected'},
+      {year:1861, key:'fort_sumter'},
+      {year:1863, key:'emancipation'}
+    ],
+    cards: [
+      {id:'fugitive_act',   title:'Fugitive Slave Act', info:'Mandates return of fugitives; penalties for helpers.'},
+      {id:'uncle_tom',      title:'Uncle Tom’s Cabin', info:'Stowe’s novel intensifies Northern opposition to slavery.'},
+      {id:'kansas_nebraska',title:'Kansas–Nebraska Act', info:'Popular sovereignty → “Bleeding Kansas.”'},
+      {id:'sumner_caning',  title:'Caning of Charles Sumner', info:'Assault in the Senate; symbol of sectional tensions.'},
+      {id:'dred_scott',     title:'Dred Scott v. Sandford', info:'Congress cannot ban slavery in territories; Black people not citizens.'},
+      {id:'john_brown',     title:'John Brown’s Raid', info:'Harpers Ferry attack aiming to spark an uprising.'},
+      {id:'lincoln_elected',title:'Lincoln Elected', info:'Victory accelerates Southern secessions.'},
+      {id:'fort_sumter',    title:'Fort Sumter', info:'Opening bombardment; formal start of the war.'},
+      {id:'emancipation',   title:'Emancipation Proclamation', info:'Frees enslaved people in rebelling states (Confederacy).'}
+    ]
+  }
+};
+
+/* ===== Util ===== */
+const bankEl = document.getElementById('bank');
+const timelineEl = document.getElementById('timeline');
+const setSel = document.getElementById('setSel');
+const boardTitle = document.getElementById('boardTitle');
+const scoreEl = document.getElementById('score');
+const checkBtn = document.getElementById('checkBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let currentSetKey = setSel.value;
+let placements = {}; // nodeKey -> cardId
+let dragId = null;   // for desktop DnD
+let selectedId = null; // tap/click selection (mobile-friendly)
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function posWithin(pct){ return `calc( (100% - (2 * var(--pad))) * ${pct} + var(--pad) )`; }
+
+function renderSet(setKey){
+  currentSetKey = setKey;
+  const data = SETS[setKey];
+  boardTitle.textContent = data.title;
+  placements = {};
+  selectedId = null;
+
+  // clear
+  timelineEl.querySelectorAll('.node, .drop').forEach(el=>el.remove());
+  bankEl.innerHTML = '';
+
+  const N = data.nodes.length;
+  data.nodes.forEach((node, idx)=>{
+    const pct = (N===1)?0.5:(idx/(N-1));
+
+    // dropzone (above the node)
+    const drop = document.createElement('div');
+    drop.className = 'drop';
+    drop.style.left = posWithin(pct);
+    drop.dataset.nodeKey = node.key;
+    makeDropzone(drop);
+    timelineEl.appendChild(drop);
+
+    // node (behind the drop)
+    const dot = document.createElement('div');
+    dot.className = 'node';
+    dot.style.left = posWithin(pct);
+    const label = document.createElement('div');
+    label.className = 'year';
+    label.textContent = node.year;
+    dot.appendChild(label);
+    timelineEl.appendChild(dot);
+
+    // tap-to-place fallback
+    dot.addEventListener('click', ()=> handleNodeClick(node.key));
+    drop.addEventListener('click', ()=> handleNodeClick(node.key));
+  });
+
+  // render shuffled cards (no years shown)
+  shuffle([...data.cards]).forEach(card=>{
+    bankEl.appendChild(makeCard(card));
+  });
+
+  updatePlaced();
+}
+
+function makeCard(card){
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.draggable = true;
+  el.id = `card-${card.id}`;
+  el.dataset.cardId = card.id;
+  el.innerHTML = `<div class="title">${card.title}</div>${card.info?`<div class="small">${card.info}</div>`:''}`;
+
+  // Desktop drag & drop
+  el.addEventListener('dragstart', e=>{
+    dragId = card.id; el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', card.id);
+  });
+  el.addEventListener('dragend', ()=>{ dragId = null; el.classList.remove('dragging'); });
+
+  // Click-to-select (mobile fallback)
+  el.addEventListener('click', ()=>{
+    if (selectedId === card.id){
+      selectedId = null;
+      el.classList.remove('selected');
+    } else {
+      document.querySelectorAll('.card.selected').forEach(c=>c.classList.remove('selected'));
+      selectedId = card.id;
+      el.classList.add('selected');
+    }
+  });
+
+  return el;
+}
+
+function makeDropzone(drop){
+  drop.addEventListener('dragover', e=>{ e.preventDefault(); e.dataTransfer.dropEffect='move'; drop.classList.add('highlight'); });
+  drop.addEventListener('dragleave', ()=> drop.classList.remove('highlight'));
+  drop.addEventListener('drop', e=>{
+    e.preventDefault(); drop.classList.remove('highlight');
+    const cid = e.dataTransfer.getData('text/plain') || dragId;
+    if(!cid) return;
+    placeCardOnNode(cid, drop.dataset.nodeKey);
+  });
+}
+
+function placeCardOnNode(cardId, nodeKey){
+  const drop = document.querySelector(`.drop[data-node-key="${nodeKey}"]`);
+  if (!drop) return;
+
+  // If a card already sits here, return it to bank
+  const existing = drop.querySelector('.card');
+  if (existing) bankEl.appendChild(existing);
+
+  // If the card was placed elsewhere, free that spot
+  const prevDrop = document.querySelector(`.drop .card[data-card-id="${cardId}"]`)?.parentElement;
+  if (prevDrop && prevDrop !== drop) prevDrop.innerHTML = '';
+
+  const cardEl = document.getElementById(`card-${cardId}`);
+  if (cardEl) {
+    drop.appendChild(cardEl);
+    placements[nodeKey] = cardId;
+  }
+
+  // clear selection highlight
+  document.querySelectorAll('.card.selected').forEach(c=>c.classList.remove('selected'));
+  selectedId = null;
+
+  updatePlaced();
+}
+
+function handleNodeClick(nodeKey){
+  if (!selectedId) return;
+  placeCardOnNode(selectedId, nodeKey);
+}
+
+function updatePlaced(){
+  const total = SETS[currentSetKey].nodes.length;
+  const placed = Object.values(placements).filter(Boolean).length;
+  scoreEl.textContent = `Placed: ${placed}/${total}`;
+}
+
+function checkAnswers(){
+  const setData = SETS[currentSetKey];
+  let correct = 0;
+  setData.nodes.forEach(node=>{
+    const drop = document.querySelector(`.drop[data-node-key="${node.key}"]`);
+    const placed = placements[node.key];
+    const ok = placed === node.key;
+    drop.style.borderColor = ok ? 'var(--ok)' : 'var(--bad)';
+    drop.style.boxShadow = ok ? '0 0 0 6px rgba(34,197,94,.12)' : '0 0 0 6px rgba(239,68,68,.12)';
+    if (ok) correct++;
+  });
+  scoreEl.textContent = `Correct: ${correct}/${setData.nodes.length}`;
+}
+
+function resetBoard(){
+  // send all placed cards back to bank
+  Array.from(document.querySelectorAll('.drop .card')).forEach(c=> bankEl.appendChild(c));
+  // clear feedback
+  document.querySelectorAll('.drop').forEach(d=>{
+    d.classList.remove('highlight'); d.style.borderColor = '#e5e7eb'; d.style.boxShadow='none';
+  });
+  placements = {};
+  selectedId = null;
+  document.querySelectorAll('.card.selected').forEach(c=>c.classList.remove('selected'));
+  updatePlaced();
+}
+
+/* Unplace by dropping onto the bank area */
+bankEl.addEventListener('dragover', e=>{ e.preventDefault(); bankEl.style.outline='2px dashed var(--accent)'; });
+bankEl.addEventListener('dragleave', ()=>{ bankEl.style.outline='none'; });
+bankEl.addEventListener('drop', e=>{
+  e.preventDefault(); bankEl.style.outline='none';
+  const cid = e.dataTransfer.getData('text/plain') || dragId;
+  const cardEl = document.getElementById(`card-${cid}`);
+  if (cardEl) {
+    bankEl.appendChild(cardEl);
+    const prev = Object.entries(placements).find(([k,v])=> v===cid);
+    if (prev) { const [k] = prev; delete placements[k]; }
+  }
+  updatePlaced();
+});
+
+/* Events */
+setSel.addEventListener('change', e=> renderSet(e.target.value));
+document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+document.getElementById('resetBtn').addEventListener('click', resetBoard);
+
+/* Init */
+renderSet(currentSetKey);
+</script>
+</body>
+</html>
