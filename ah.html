@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Studio — RPG • Video • Comic (Static)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Old+Standard+TT:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#ffffff; --ink:#111111; --muted:#6b7280; --line:#111111; --bar:#111111; --backdrop: rgba(0,0,0,.75); }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family:"Old Standard TT", Georgia, serif; line-height:1.5; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;}
+    .shell{max-width:960px; margin:0 auto; padding:24px}
+    header{display:flex; align-items:flex-end; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:24px}
+    .brand{font-family:"Special Elite", ui-monospace, monospace; font-size:clamp(18px,3vw,26px); letter-spacing:.3px}
+    .sub{color:var(--muted); font-size:14px}
+    nav a{color:var(--ink); text-decoration:none; margin-left:14px; border-bottom:1px solid transparent}
+    nav a:hover{border-color:var(--ink)}
+
+    .stack{display:flex; flex-direction:column; gap:16px; margin-top:12px}
+    .bar{border:1px solid var(--line); border-radius:4px; position:relative; height:44px; cursor:pointer; background:#fff}
+    .bar .fill{position:absolute; inset:0; width:var(--w,0%); background:var(--bar)}
+    .bar .label{position:absolute; inset:0; display:flex; align-items:center; justify-content:space-between; padding:0 12px; font-family:"Special Elite", ui-monospace, monospace; letter-spacing:.2px}
+    .bar .name{color:#ffffff; mix-blend-mode:difference}
+    .bar .perc{color:#ffffff; mix-blend-mode:difference}
+
+    .view{display:none}
+    .view.active{display:block}
+
+    .h{font-family:"Special Elite"; font-size:clamp(18px,3vw,24px); margin:18px 0 10px}
+    .card{border:1px solid var(--line); padding:14px; border-radius:6px}
+    .muted{color:var(--muted); font-size:13px}
+
+    .kv{display:grid; grid-template-columns:160px 1fr; gap:8px; margin:10px 0}
+    .kv .k{font-family:"Special Elite"}
+
+    .taskList{display:grid; gap:10px}
+    .task{display:grid; gap:8px; padding:10px; border:1px solid var(--line); border-radius:6px}
+    .task .title{font-family:"Special Elite"}
+    .task .status{font-size:13px; color:var(--muted)}
+
+    .thumbs{display:flex; gap:8px; flex-wrap:wrap}
+    .thumb{width:90px; height:90px; object-fit:cover; border:1px solid var(--line); border-radius:4px; cursor:pointer}
+
+    .embed{border:1px solid var(--line); border-radius:4px; padding:8px; margin-top:12px}
+    video{width:100%; max-height:420px; background:#000}
+    iframe{width:100%; height:420px; border:0}
+
+    footer{border-top:1px solid var(--line); margin-top:24px; padding-top:12px; font-family:"Special Elite"; font-size:13px; color:var(--muted)}
+
+    /* Lightbox */
+    .lightbox{position:fixed; inset:0; background:var(--backdrop); backdrop-filter: blur(4px); display:none; align-items:center; justify-content:center; z-index:50}
+    .lightbox.show{display:flex}
+    .lightbox img{max-width:92vw; max-height:92vh; box-shadow:0 10px 40px rgba(0,0,0,.5)}
+    .lightbox .close{position:absolute; top:16px; right:16px; font-family:"Special Elite"; background:#fff; border:1px solid var(--line); padding:8px 12px; cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div>
+        <div class="brand">Studio — Class Projects</div>
+        <div class="sub">Minimal • typewriter vibe • Ello-style (black on white)</div>
+      </div>
+      <nav>
+        <a href="#/home">Home</a>
+        <a href="#/rpg">RPG</a>
+        <a href="#/video">Video</a>
+        <a href="#/comic">Comic</a>
+      </nav>
+    </header>
+
+    <main id="home" class="view active" aria-label="Home">
+      <div class="stack">
+        <div class="bar" data-target="#/rpg" id="bar-rpg"><div class="fill"></div><div class="label"><span class="name">RPG team</span><span class="perc"></span></div></div>
+        <div class="bar" data-target="#/video" id="bar-video"><div class="fill"></div><div class="label"><span class="name">VIDEO team</span><span class="perc"></span></div></div>
+        <div class="bar" data-target="#/comic" id="bar-comic"><div class="fill"></div><div class="label"><span class="name">COMIC BOOK team</span><span class="perc"></span></div></div>
+      </div>
+      <p class="muted" style="margin-top:10px">Click a black bar to open a team page. <strong>Read-only for students.</strong> Update data by editing the <code>DATA</code> object in the HTML and committing to Git.</p>
+    </main>
+
+    <section id="rpg" class="view" aria-label="RPG">
+      <div class="h">RPG team — progress</div>
+      <div class="card" id="rpgCard"></div>
+      <div class="h">RPG Playground Embed</div>
+      <div class="embed"><iframe id="rpgFrame" src="" title="RPG Playground"></iframe></div>
+      <footer><a href="#/home">Home</a></footer>
+    </section>
+
+    <section id="video" class="view" aria-label="Video">
+      <div class="h">VIDEO team — progress</div>
+      <div class="card" id="videoCard"></div>
+      <div class="h">Final video</div>
+      <div class="embed"><video id="vid" controls preload="metadata"></video></div>
+      <footer><a href="#/home">Home</a></footer>
+    </section>
+
+    <section id="comic" class="view" aria-label="Comic">
+      <div class="h">COMIC BOOK team — progress</div>
+      <div class="card" id="comicCard"></div>
+      <div class="h">Gallery — Comic pages</div>
+      <div class="embed"><div class="thumbs" id="comicGallery"></div></div>
+      <footer><a href="#/home">Home</a></footer>
+    </section>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="close" onclick="closeLightbox()">✕ Close</button>
+    <img id="lightImg" alt="preview" />
+  </div>
+
+  <script>
+    // === EDIT THIS DATA AND COMMIT ===
+    // You control everything by editing the DATA object and pushing a Git commit.
+    // Use absolute URLs or relative paths (e.g., ./images/thumbnail1.jpg).
+    const DATA = {
+      progress: { rpg: 15, video: 0, comic: 0 },
+      rpg: {
+        grade: null,
+        comment: "",
+        embedUrl: "", // e.g., https://rpgplayground.com/game/...
+        steps: [
+          { id: "rpg_guide", title: "Clipe/Thumbnail/Poster", done: true, thumbs: ["thumbnailrpg.jpeg"] },
+          { id: "rpg_cards", title: "10–16 cards", done: false, thumbs: [] },
+          { id: "rpg_map", title: "Map / timeline", done: false, thumbs: [] },
+          { id: "rpg_demo", title: "Demo 10–15 min recorded", done: false, thumbs: [] }
+        ]
+      },
+      video: {
+        grade: null,
+        comment: "",
+        videoUrl: "", // MP4 or streamable URL
+        steps: [
+          { id: "vid_thesis", title: "Clipe/Thumbnail/Poster", done: false, thumbs: [] },
+          { id: "vid_storyboard", title: "Storyboard 6–8", done: false, thumbs: [] },
+          { id: "vid_shoot", title: "Capture (presentation + B-roll)", done: false, thumbs: [] },
+          { id: "vid_rough", title: "Rough cut 90–120s", done: false, thumbs: [] },
+          { id: "vid_export", title: "Export 1080p", done: false, thumbs: [] }
+        ]
+      },
+      comic: {
+        grade: null,
+        comment: "",
+        steps: [
+          { id: "comic_outline", title: "Clipe/Thumbnail/Poster", done: false, thumbs: [] },
+          { id: "comic_pages", title: "Pages 1–6", done: false, thumbs: [] },
+          { id: "comic_hmh", title: "HMH on each page", done: false, thumbs: [] },
+          { id: "comic_pdf", title: "Final PDF", done: false, thumbs: [] }
+        ],
+        gallery: [] // array of image URLs
+      }
+    };
+
+    // === RENDER LOGIC — NO EDITS NEEDED BELOW ===
+    const routes = ["home","rpg","video","comic"];
+    function show(id){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); (document.getElementById(id)||document.getElementById('home')).classList.add('active'); if(id==='home') location.hash = '#/home'; }
+    function parseHash(){ const h=(location.hash||'#/home').replace('#/',''); show(routes.includes(h)?h:'home'); }
+    window.addEventListener('hashchange', parseHash); parseHash();
+
+    document.querySelectorAll('.bar').forEach(b=> b.addEventListener('click', ()=>{ location.hash = b.dataset.target; }));
+
+    function setBar(el, pct){ pct = Math.max(0, Math.min(100, Number(pct)||0)); el.style.setProperty('--w', pct+'%'); el.querySelector('.perc').textContent = pct+'%'; }
+    setBar(document.getElementById('bar-rpg'), DATA.progress.rpg);
+    setBar(document.getElementById('bar-video'), DATA.progress.video);
+    setBar(document.getElementById('bar-comic'), DATA.progress.comic);
+
+    function renderTeam(cardEl, data){
+      const kv = document.createElement('div'); kv.className='kv';
+      const k1 = document.createElement('div'); k1.className='k'; k1.textContent='Project grade';
+      const v1 = document.createElement('div'); v1.textContent = data.grade==null? '—' : String(data.grade);
+      const k2 = document.createElement('div'); k2.className='k'; k2.textContent='Brief comment';
+      const v2 = document.createElement('div'); v2.textContent = data.comment || '—';
+      kv.appendChild(k1); kv.appendChild(v1); kv.appendChild(k2); kv.appendChild(v2);
+      cardEl.appendChild(kv);
+
+      const list = document.createElement('div'); list.className='taskList';
+      (data.steps||[]).forEach(st=>{
+        const t = document.createElement('div'); t.className='task';
+        const title = document.createElement('div'); title.className='title'; title.textContent = st.title + (st.done? '  ✓' : '');
+        const status = document.createElement('div'); status.className='status'; status.textContent = st.done? 'Completed' : 'In progress';
+        const thumbs = document.createElement('div'); thumbs.className='thumbs';
+        (st.thumbs||[]).forEach(src=>{ const img=new Image(); img.src=src; img.className='thumb'; img.alt=st.title; img.addEventListener('click', ()=> openLightbox(src)); thumbs.appendChild(img); });
+        t.appendChild(title); t.appendChild(status); t.appendChild(thumbs); list.appendChild(t);
+      });
+      cardEl.appendChild(list);
+    }
+
+    renderTeam(document.getElementById('rpgCard'), DATA.rpg);
+    renderTeam(document.getElementById('videoCard'), DATA.video);
+    renderTeam(document.getElementById('comicCard'), DATA.comic);
+
+    // Media embeds
+    document.getElementById('rpgFrame').src = DATA.rpg.embedUrl || '';
+    document.getElementById('vid').src = DATA.video.videoUrl || '';
+
+    const gal = document.getElementById('comicGallery');
+    (DATA.comic.gallery||[]).forEach(src=>{ const img=new Image(); img.src=src; img.className='thumb'; img.alt='comic page'; img.addEventListener('click', ()=> openLightbox(src)); gal.appendChild(img); });
+
+    // Lightbox
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightImg');
+    function openLightbox(src){ lbImg.src=src; lb.classList.add('show'); lb.setAttribute('aria-hidden','false'); }
+    function closeLightbox(){ lb.classList.remove('show'); lb.setAttribute('aria-hidden','true'); lbImg.src=''; }
+    window.closeLightbox = closeLightbox;
+    lb.addEventListener('click', (e)=>{ if(e.target===lb) closeLightbox();});
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLightbox();});
+  </script>
+</body>
+</html>
