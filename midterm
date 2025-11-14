@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GIA – American History Midterm</title>
+  <style>
+    :root{
+      --bg:#ffffff; --card:#ffffff; --text:#0b1220; --muted:#6b7280;
+      --accent:#1f6feb; --ok:#16a34a; --ok-weak:#dcfce7; --warn:#b45309; --bad:#dc2626;
+      --border:rgba(0,0,0,.12); --shadow:rgba(0,0,0,.08);
+    }
+    html[data-theme="dark"]{
+      --bg:#000000; --card:#0b0b0f; --text:#f5f7ff; --muted:#a3a7b7;
+      --accent:#7c9bff; --ok:#22c55e; --ok-weak:#062b14; --warn:#ffb02e; --bad:#ff6b6b;
+      --border:rgba(255,255,255,.14); --shadow:rgba(0,0,0,.55);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.75);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border)}
+    html[data-theme="dark"] header{background:rgba(0,0,0,.7)}
+    .wrap{max-width:1000px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:clamp(22px,2.6vw,32px)}
+    .sub{color:var(--muted)}
+    .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:10px}
+    input[type=text], select{background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;min-width:220px;outline:none}
+    input[type=text]::placeholder{color:var(--muted)}
+    button{background:var(--accent);border:none;color:#fff;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px var(--shadow)}
+    button[disabled]{opacity:.5;cursor:not-allowed}
+    .icon-btn{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);padding:8px 12px;border-radius:999px}
+    .grid{display:grid;gap:16px;grid-template-columns:1fr}
+    @media(min-width:880px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:0 8px 30px var(--shadow)}
+    .card h3{margin:0 0 6px;font-size:18px}
+    .muted{color:var(--muted)}
+    .options{display:grid;gap:8px;margin-top:8px}
+    .options label{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;
+      padding:10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;background:transparent;
+      transition:transform .08s ease, background .12s ease, border-color .12s ease, color .12s ease;
+      box-shadow:0 2px 0 var(--shadow);}
+    .options label:has(input[type=radio]:checked){
+      background:var(--ok-weak); border-color:var(--ok); transform:translateY(1px);
+      box-shadow:inset 0 2px 0 rgba(0,0,0,.06); color:#064e3b;}
+    .options input[type=radio]{margin-top:3px}
+    .writing{min-height:120px;width:100%;resize:vertical;background:transparent;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
+    .small{font-size:12px}
+    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:12px}
+    .notice{border:1px dashed var(--border);padding:10px;border-radius:10px;color:var(--muted)}
+    .img-wrap{border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--card)}
+    .img-wrap img{max-width:100%;height:auto;display:block;margin:0 auto}
+    .strike{opacity:.5;filter:grayscale(.3)}
+    footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:var(--muted)}
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9999}
+    .modal{background:var(--card);color:var(--text);width:min(680px, 92vw);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 20px 60px var(--shadow)}
+    .modal footer{display:flex;gap:10px;justify-content:flex-end;border:0;padding:0;margin-top:14px}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:#111827;color:#fff;padding:10px 14px;border-radius:12px;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.35);z-index:9998;display:none}
+    .toast.show{display:block}
+  </style>
+</head>
+<body>
+  <!-- Modal de consentimento -->
+  <div id="consentBackdrop" class="modal-backdrop" aria-modal="true" role="dialog">
+    <div class="modal">
+      <h2>Griggs International Academy — American History — Midterm</h2>
+      <div class="muted">Preencha seu <b>nome completo</b> e clique em “Aceitar e começar”. O cronômetro inicia em seguida.</div>
+      <label class="muted" style="display:block;margin:10px 0 6px">Nome completo</label>
+      <input id="modalName" type="text" placeholder="Ex.: Maria Fernanda Silva" autocomplete="name"
+             style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text)" />
+      <div class="notice" style="margin-top:12px">
+        <ul class="small">
+          <li>Tentaremos ativar <b>tela cheia</b> (se o navegador permitir).</li>
+          <li>Trocas de aba/janela são <b>registradas</b>.</li>
+          <li><b>Copiar/colar/recortar</b> e <b>Ctrl/Cmd+F</b> são bloqueados.</li>
+        </ul>
+      </div>
+      <footer>
+        <button id="declineBtn" class="icon-btn">Sair</button>
+        <button id="acceptBtn" disabled>Aceitar e começar</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite">Ação registrada.</div>
+
+  <header>
+    <div class="wrap">
+      <div class="bar">
+        <div>
+          <h1>GIA — American History — Midterm Exam</h1>
+          <div class="sub">Leia com atenção. Siga as instruções de cada categoria.</div>
+        </div>
+        <button id="themeToggle" class="icon-btn">🌓 Tema</button>
+      </div>
+
+      <div class="bar" style="margin-top:8px">
+        <div class="row">
+          <input id="studentName" type="text" placeholder="Nome (preenchido ao aceitar)" autocomplete="name" />
+          <span class="pill"><strong>Tempo:</strong> <span id="timer" class="timer">60:00</span></span>
+          <span id="focusFlag" class="badge">Foco OK</span>
+          <span id="tabCount" class="badge">Contador de Aba: 0</span>
+        </div>
+        <div class="row">
+          <input id="testId" type="text" placeholder="American-History-Midterm-2025" />
+          <button id="startBtn" class="hidden">Iniciar</button>
+          <button id="submitBtn" disabled>Enviar</button>
+        </div>
+      </div>
+
+      <div class="notice small" id="notes">A prova será enviada automaticamente em 60 minutos.</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <form id="quizForm" class="grid" autocomplete="off">
+
+      <!-- ===== Category 1 — Essays (Q1–Q4) ===== -->
+      <section class="card" data-difficulty="writing">
+        <h3>Category 1 – Essay Questions (25 pts each)</h3>
+        <p class="muted small">Do NOT write on this sheet. Use the answer sheet provided. You have one hour to answer only two (2) of the four questions. Word count: <b>≥ 100 words</b> each answer.</p>
+        <ol>
+          <li><b>Q1.</b> Describe some basic problems of the Articles of Confederation… (unity, lack of executive, economy/tax, foreign affairs). Add one GIA key value. <br>
+            <textarea name="q1" class="writing" placeholder="Write at least 100 words…"></textarea></li>
+          <li><b>Q2.</b> Describe the main characteristics of the economies of the northern vs southern colonies (what was produced; where people lived; role of enslaved Africans). Add one GIA key value. <br>
+            <textarea name="q2" class="writing" placeholder="Write at least 100 words…"></textarea></li>
+          <li><b>Q3.</b> In your own words, tell what Lucretia Coffin Mott thinks about injustice and slavery; two reasons abolitionism and women’s movement were connected; one GIA value for each. <br>
+            <textarea name="q3" class="writing" placeholder="Write at least 100 words…"></textarea></li>
+          <li><b>Q4.</b> Describe what Reconstruction was; Lincoln’s plan; Johnson’s plan; Congress’s plan; one law; how it ended; one consequence; + one GIA value. <br>
+            <textarea name="q4" class="writing" placeholder="Write at least 100 words…"></textarea></li>
+        </ol>
+        <div class="small muted">Dica: escreva as duas melhores respostas; as outras podem ficar em branco.</div>
+      </section>
+
+      <!-- ===== Category 2 — Fill in the Blanks (Q5–Q14) ===== -->
+      <section class="card" data-difficulty="medium">
+        <h3>Category 2 – Fill in the Blanks (1 pt each)</h3>
+        <p class="small muted">Use the list: a) Dred Scott decision • b) Underground Railroad • c) John Brown • d) Compromise of 1850 • e) Kansas–Nebraska Act • f) nativism • g) personal liberty laws • h) Uncle Tom’s Cabin • i) confederation • j) Wilmot Proviso • k) popular sovereignty • l) Jefferson Davis • m) conscription • n) secession</p>
+        <ol start="5">
+          <!-- Dropdowns com letra (mantém correção simples). Você pode ajustar data-correct depois, se quiser. -->
+          <li><b>Q5.</b> The _____ allowed California to be admitted… 
+            <select name="q5"><option value="">—</option><option>a</option><option>b</option><option>c</option><option selected data-correct>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option><option>k</option><option>l</option><option>m</option><option>n</option></select></li>
+          <li><b>Q6.</b> The _____ proposed prohibiting slavery in California…
+            <select name="q6"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option selected data-correct>j</option><option>k</option><option>l</option><option>m</option><option>n</option></select></li>
+          <li><b>Q7.</b> The alliance of the southern states… was called _____.
+            <select name="q7"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option selected data-correct>i</option><option>j</option><option>k</option><option>l</option><option>m</option><option>n</option></select></li>
+          <li><b>Q8.</b> According to _____, residents had the right to vote on slavery.
+            <select name="q8"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option><option selected data-correct>k</option><option>l</option><option>m</option><option>n</option></select></li>
+          <li><b>Q9.</b> Nine Northern states passed _____ forbidding imprisonment of runaways.
+            <select name="q9"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option selected data-correct>f</option><option selected>g</option><option>h</option><option>i</option><option>j</option><option>k</option><option>l</option><option>m</option><option>n</option></select></li>
+          <li><b>Q10.</b> The actions of _____ at Pottawatomie Creek…
+            <select name="q10"><option value="">—</option><option>a</option><option>b</option><option selected data-correct>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option><option>k</option><option>l</option><option>m</option><option>n</option></select></li>
+          <li><b>Q11.</b> _____ was based on mistrust toward immigrants and Catholics.
+            <select name="q11"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option selected data-correct>f</option><option>g</option><option>h</option><option>i</option><option>j</option><option>k</option><option>l</option><option>m</option><option>n</option></select></li>
+          <li><b>Q12.</b> The _____ included a more effective fugitive slave law.
+            <select name="q12"><option value="">—</option><option>a</option><option>b</option><option>c</option><option selected data-correct>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option><option>k</option><option>l</option><option>m</option><option>n</option></select></li>
+          <li><b>Q13.</b> To replenish armies, both sides used _____ (draft).
+            <select name="q13"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option><option>k</option><option selected data-correct>m</option><option>n</option></select></li>
+          <li><b>Q14.</b> According to the _____, Congress could not forbid slavery…
+            <select name="q14"><option value="">—</option><option selected data-correct>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option><option>k</option><option>l</option><option>m</option><option>n</option></select></li>
+        </ol>
+      </section>
+
+      <!-- ===== Category 2 — Matching (Q15–Q24) ===== -->
+      <section class="card" data-difficulty="medium">
+        <h3>Category 2 – Matching (1 pt each)</h3>
+        <p class="small muted">Match the event to the description (a–j). Escreva a letra correta no seletor.</p>
+        <p class="small muted"><b>a</b> Squabble colonists vs soldiers • <b>b</b> Tax on Paper • <b>c</b> Last battle (Revolutionary War) • <b>d</b> Tax on imported goods • <b>e</b> Confirmed Britain’s authority to tax • <b>f</b> “shot heard around the world” • <b>g</b> Seeds for the Revolutionary War • <b>h</b> Punish Massachusetts • <b>i</b> Tea monopoly • <b>j</b> Threw tea cargo</p>
+        <ol start="15">
+          <!-- Usei <select>; você pode ajustar os corretos (data-correct) depois. -->
+          <li><b>Q15.</b> Stamp Act <select name="q15"><option value="">—</option><option data-correct>b>b</option><option>a</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option></select></li>
+          <li><b>Q16.</b> Declaratory Act <select name="q16"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option data-correct>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option></select></li>
+          <li><b>Q17.</b> Townshend Act <select name="q17"><option value="">—</option><option>a</option><option>b</option><option>c</option><option data-correct>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option></select></li>
+          <li><b>Q18.</b> Boston Massacre <select name="q18"><option value="">—</option><option data-correct>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option></select></li>
+          <li><b>Q19.</b> Tea Act <select name="q19"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option data-correct>i</option><option>j</option></select></li>
+          <li><b>Q20.</b> Boston Tea Party <select name="q20"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option data-correct>j</option></select></li>
+          <li><b>Q21.</b> Intolerable Acts <select name="q21"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option data-correct>h</option><option>g</option><option>i</option><option>j</option></select></li>
+          <li><b>Q22.</b> Lexington <select name="q22"><option value="">—</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option data-correct>f</option><option>g</option><option>h</option><option>i</option><option>j</option></select></li>
+          <li><b>Q23.</b> French and Indian War <select name="q23"><option value="">—</option><option>a</option><option>b</option><option data-correct>g</option><option>d</option><option>e</option><option>f</option><option>h</option><option>i</option><option>j</option><option>c</option></select></li>
+          <li><b>Q24.</b> Battle of Yorktown <select name="q24"><option value="">—</option><option>a</option><option>b</option><option data-correct>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option></select></li>
+        </ol>
+      </section>
+
+      <!-- ===== Category 3 — True/False (Q25–Q35) ===== -->
+      <section class="card" data-difficulty="medium">
+        <h3>Category 3 – True or False (2 pts each). If false, type the correct info.</h3>
+        <ol start="25">
+          <!-- T/F + campo de correção opcional -->
+          <li><b>Q25.</b> As part of the Missouri Compromise, Missouri was admitted as a free state.
+            <div class="options"><label><input type="radio" name="q25" value="T"> T</label><label><input type="radio" name="q25" value="F" data-correct> F</label></div>
+            <input type="text" name="q25_fix" placeholder="If false, correct it (e.g., Missouri was a slave state; Maine free)." /></li>
+
+          <li><b>Q26.</b> Ann Lee persuaded nine Southern states to establish public hospitals for the mentally ill.
+            <div class="options"><label><input type="radio" name="q26" value="T"> T</label><label><input type="radio" name="q26" value="F" data-correct> F</label></div>
+            <input type="text" name="q26_fix" placeholder="Correct: Dorothea Dix." /></li>
+
+          <li><b>Q27.</b> A Copperhead was a Northern Democrat who supported peace with the South.
+            <div class="options"><label><input type="radio" name="q27" value="T" data-correct> T</label><label><input type="radio" name="q27" value="F"> F</label></div>
+            <input type="text" name="q27_fix" placeholder="If false, correct it." /></li>
+
+          <li><b>Q28.</b> Early in the war, the Confederacy tried to gain support from France.
+            <div class="options"><label><input type="radio" name="q28" value="T" data-correct> T</label><label><input type="radio" name="q28" value="F"> F</label></div>
+            <input type="text" name="q28_fix" placeholder="If false, correct it." /></li>
+
+          <li><b>Q29.</b> The different ways of life of early Native Americans resulted mainly from differences in their trade relationships.
+            <div class="options"><label><input type="radio" name="q29" value="T"> T</label><label><input type="radio" name="q29" value="F" data-correct> F</label></div>
+            <input type="text" name="q29_fix" placeholder="Correct: physical environments." /></li>
+
+          <li><b>Q30.</b> Separatists felt it was impossible to reform the Puritan Church from within.
+            <div class="options"><label><input type="radio" name="q30" value="T" data-correct> T</label><label><input type="radio" name="q30" value="F"> F</label></div>
+            <input type="text" name="q30_fix" placeholder="If false, correct it." /></li>
+
+          <li><b>Q31.</b> Indigo is a cash crop mainly grown for sale, not for the farmer’s own use.
+            <div class="options"><label><input type="radio" name="q31" value="T" data-correct> T</label><label><input type="radio" name="q31" value="F"> F</label></div>
+            <input type="text" name="q31_fix" placeholder="If false, correct it." /></li>
+
+          <li><b>Q32.</b> The Constitution assigns carrying out laws to the judicial branch.
+            <div class="options"><label><input type="radio" name="q32" value="T"> T</label><label><input type="radio" name="q32" value="F" data-correct> F</label></div>
+            <input type="text" name="q32_fix" placeholder="Correct: executive branch." /></li>
+
+          <li><b>Q33.</b> Egalitarianism is a belief in the equality of people.
+            <div class="options"><label><input type="radio" name="q33" value="T" data-correct> T</label><label><input type="radio" name="q33" value="F"> F</label></div>
+            <input type="text" name="q33_fix" placeholder="If false, correct it." /></li>
+
+          <li><b>Q34.</b> In the debate between “large” and “small” states, “large” meant most land area.
+            <div class="options"><label><input type="radio" name="q34" value="T"> T</label><label><input type="radio" name="q34" value="F" data-correct> F</label></div>
+            <input type="text" name="q34_fix" placeholder="Correct: population." /></li>
+
+          <li><b>Q35.</b> In spring 1775, British troops marched to Bunker Hill to seize stockpiles of firearms and gunpowder.
+            <div class="options"><label><input type="radio" name="q35" value="T"> T</label><label><input type="radio" name="q35" value="F" data-correct> F</label></div>
+            <input type="text" name="q35_fix" placeholder="Correct: It was Lexington/Concord for the supplies." /></li>
+        </ol>
+      </section>
+
+      <!-- ===== EXHIBIT between 35 and 36 ===== -->
+      <section class="card img-wrap">
+        <h3>Using the exhibit, choose the letter of the best answer. (1 Point)</h3>
+        <img src="exhibit1.png" alt="Exhibit for Q36–Q40" />
+        <p class="small muted">Coloque seu arquivo <code>exhibit1.png</code> nesta pasta e mantenha o nome.</p>
+      </section>
+
+      <!-- ===== Exhibit Questions Q36–Q40 (True/False de leitura do mapa) ===== -->
+      <section class="card" data-difficulty="medium">
+        <ol start="36">
+          <li><b>Q36.</b> In 1682, the French claimed the largest part of the present-day United States.
+            <div class="options"><label><input type="radio" name="q36" value="T"> T</label><label><input type="radio" name="q36" value="F"> F</label></div></li>
+          <li><b>Q37.</b> By 1763, the Spanish claimed most of eastern North America.
+            <div class="options"><label><input type="radio" name="q37" value="T"> T</label><label><input type="radio" name="q37" value="F"> F</label></div></li>
+          <li><b>Q38.</b> The English, by 1763, had lost nearly all holdings in North America.
+            <div class="options"><label><input type="radio" name="q38" value="T"> T</label><label><input type="radio" name="q38" value="F"> F</label></div></li>
+          <li><b>Q39.</b> In 1682, the Spanish claimed the area that is present-day Florida?
+            <div class="options"><label><input type="radio" name="q39" value="T"> T</label><label><input type="radio" name="q39" value="F"> F</label></div></li>
+          <li><b>Q40.</b> In 1763, the English and Spanish claimed the northwestern corner of present-day USA?
+            <div class="options"><label><input type="radio" name="q40" value="T"> T</label><label><input type="radio" name="q40" value="F"> F</label></div></li>
+        </ol>
+      </section>
+
+      <!-- ===== Category 4 — Multiple Choice (Q41–Q60) ===== -->
+      <section class="card" data-difficulty="medium">
+        <h3>Category 4 – Multiple Choice (1 pt each)</h3>
+        <ol start="41">
+          <li><b>Q41.</b> After Europeans arrived in the Caribbean, what caused countless deaths?
+            <div class="options">
+              <label><input type="radio" name="q41" value="a"> a) wars</label>
+              <label><input type="radio" name="q41" value="b" data-correct> b) diseases</label>
+              <label><input type="radio" name="q41" value="c"> c) hurricanes</label>
+              <label><input type="radio" name="q41" value="d"> d) droughts</label>
+            </div></li>
+
+          <li><b>Q42.</b> Which led to a new confidence in human achievement?
+            <div class="options">
+              <label><input type="radio" name="q42" value="a"> a) Columbian Exchange</label>
+              <label><input type="radio" name="q42" value="b" data-correct> b) Renaissance</label>
+              <label><input type="radio" name="q42" value="c"> c) Crusades</label>
+              <label><input type="radio" name="q42" value="d"> d) Hundred Years War</label>
+            </div></li>
+
+          <li><b>Q43.</b> The first English colonies were set up hoping for
+            <div class="options">
+              <label><input type="radio" name="q43" value="a" data-correct> a) financial gain for investors</label>
+              <label><input type="radio" name="q43" value="b"> b) political freedom</label>
+              <label><input type="radio" name="q43" value="c"> c) religious freedom</label>
+              <label><input type="radio" name="q43" value="d"> d) military supremacy</label>
+            </div></li>
+
+          <li><b>Q44.</b> The Navigation Acts restricted the following, <i>except</i>
+            <div class="options">
+              <label><input type="radio" name="q44" value="a" data-correct> a) all colonial goods could be sold to other countries</label>
+              <label><input type="radio" name="q44" value="b"> b) goods in English/colonial ships</label>
+              <label><input type="radio" name="q44" value="c"> c) ¾ English crews</label>
+              <label><input type="radio" name="q44" value="d"> d) goods must go through English port</label>
+            </div></li>
+
+          <li><b>Q45.</b> Proclamation of 1763 attempted to
+            <div class="options">
+              <label><input type="radio" name="q45" value="a" data-correct> a) stop settlement west of the Appalachians</label>
+              <label><input type="radio" name="q45" value="b"> b) encourage settlement west</label>
+              <label><input type="radio" name="q45" value="c"> c) force France off continent</label>
+              <label><input type="radio" name="q45" value="d"> d) claim Canada/east of Mississippi</label>
+            </div></li>
+
+          <li><b>Q46.</b> Which country supported the colonies in the Revolutionary War?
+            <div class="options">
+              <label><input type="radio" name="q46" value="a"> a) Italy</label>
+              <label><input type="radio" name="q46" value="b" data-correct> b) France</label>
+              <label><input type="radio" name="q46" value="c"> c) Germany</label>
+              <label><input type="radio" name="q46" value="d"> d) Spain</label>
+            </div></li>
+
+          <li><b>Q47.</b> Lei Áurea (Brazil) foi assinada em
+            <div class="options">
+              <label><input type="radio" name="q47" value="a"> a) 1898</label>
+              <label><input type="radio" name="q47" value="b"> b) 1863</label>
+              <label><input type="radio" name="q47" value="c" data-correct> c) 1888</label>
+              <label><input type="radio" name="q47" value="d"> d) 1790</label>
+            </div></li>
+
+          <li><b>Q48.</b> One accomplishment of the Northwest Ordinance (1787):
+            <div class="options">
+              <label><input type="radio" name="q48" value="a"> a) plan for surveying lands</label>
+              <label><input type="radio" name="q48" value="b"> b) challenge Spain on Mississippi</label>
+              <label><input type="radio" name="q48" value="c"> c) transfer ownership to national gov</label>
+              <label><input type="radio" name="q48" value="d" data-correct> d) requirements for admitting new states</label>
+            </div></li>
+
+          <li><b>Q49.</b> The Great Compromise was an agreement about how to
+            <div class="options">
+              <label><input type="radio" name="q49" value="a"> a) ratify the Constitution</label>
+              <label><input type="radio" name="q49" value="b"> b) count slaves for population</label>
+              <label><input type="radio" name="q49" value="c" data-correct> c) determine representation in Congress</label>
+              <label><input type="radio" name="q49" value="d"> d) divide powers federal/estados</label>
+            </div></li>
+
+          <li><b>Q50.</b> Who suggested moving the capital south to help pass the debt plan?
+            <div class="options">
+              <label><input type="radio" name="q50" value="a"> a) George Washington</label>
+              <label><input type="radio" name="q50" value="b" data-correct> b) Alexander Hamilton</label>
+              <label><input type="radio" name="q50" value="c"> c) John Jay</label>
+              <label><input type="radio" name="q50" value="d"> d) Thomas Jefferson</label>
+            </div></li>
+
+          <li><b>Q51.</b> Hamilton viewed the Whiskey Rebellion as an opportunity for the federal gov to
+            <div class="options">
+              <label><input type="radio" name="q51" value="a"> a) negotiate trade abroad</label>
+              <label><input type="radio" name="q51" value="b"> b) unite the country in war</label>
+              <label><input type="radio" name="q51" value="c"> c) convince on his plan</label>
+              <label><input type="radio" name="q51" value="d" data-correct> d) show it could enforce the law</label>
+            </div></li>
+
+          <li><b>Q52.</b> System that maintains separation of powers is
+            <div class="options">
+              <label><input type="radio" name="q52" value="a"> a) reserved powers</label>
+              <label><input type="radio" name="q52" value="b"> b) delegated powers</label>
+              <label><input type="radio" name="q52" value="c" data-correct> c) checks and balances</label>
+              <label><input type="radio" name="q52" value="d"> d) bicameral legislature</label>
+            </div></li>
+
+          <li><b>Q53.</b> When the Civil War began, Lincoln’s main goal was
+            <div class="options">
+              <label><input type="radio" name="q53" value="a"> a) abolish slavery</label>
+              <label><input type="radio" name="q53" value="b"> b) punish the South</label>
+              <label><input type="radio" name="q53" value="c" data-correct> c) restore the Union</label>
+              <label><input type="radio" name="q53" value="d"> d) end the war immediately</label>
+            </div></li>
+
+          <li><b>Q54.</b> Formal withdrawal of a state from the Union:
+            <div class="options">
+              <label><input type="radio" name="q54" value="a"> a) confederacy</label>
+              <label><input type="radio" name="q54" value="b"> b) compromise</label>
+              <label><input type="radio" name="q54" value="c" data-correct> c) secession</label>
+              <label><input type="radio" name="q54" value="d"> d) popular sovereignty</label>
+            </div></li>
+
+          <li><b>Q55.</b> Who discovered Brazil?
+            <div class="options">
+              <label><input type="radio" name="q55" value="a"> a) Raposo Tavares</label>
+              <label><input type="radio" name="q55" value="b" data-correct> b) Pedro Álvares Cabral</label>
+              <label><input type="radio" name="q55" value="c"> c) Las Casas</label>
+              <label><input type="radio" name="q55" value="d"> d) Cortés</label>
+            </div></li>
+
+          <li><b>Q56.</b> Which was true of women during the Industrial Revolution?
+            <div class="options">
+              <label><input type="radio" name="q56" value="a"> a) could vote</label>
+              <label><input type="radio" name="q56" value="b"> b) free to spend wages</label>
+              <label><input type="radio" name="q56" value="c"> c) not allowed to work</label>
+              <label><input type="radio" name="q56" value="d" data-correct> d) earned less than men</label>
+            </div></li>
+        </ol>
+      </section>
+
+      <!-- ===== EXHIBIT between 56 and 57 (tabela de estados/pessoas) ===== -->
+      <section class="card img-wrap">
+        <h3>Study the table (Exhibit). Answer Q57–Q60.</h3>
+        <img src="exhibit2.png" alt="Exhibit for Q57–Q60 (state populations)" />
+        <p class="small muted">Coloque <code>exhibit2.png</code> com os dados do enunciado.</p>
+      </section>
+
+      <!-- ===== Q57–Q60 (dependem do exhibit2) ===== -->
+      <section class="card" data-difficulty="medium">
+        <ol start="57">
+          <li><b>Q57.</b> Which state listed had the most people?
+            <div class="options">
+              <label><input type="radio" name="q57" value="a"> a) Louisiana</label>
+              <label><input type="radio" name="q57" value="b"> b) Virginia</label>
+              <label><input type="radio" name="q57" value="c"> c) Massachusetts</label>
+              <label><input type="radio" name="q57" value="d"> d) New York</label>
+            </div></li>
+
+          <li><b>Q58.</b> Which state had the fewest free white persons?
+            <div class="options">
+              <label><input type="radio" name="q58" value="a"> a) Louisiana</label>
+              <label><input type="radio" name="q58" value="b"> b) Massachusetts</label>
+              <label><input type="radio" name="q58" value="c"> c) Vermont</label>
+              <label><input type="radio" name="q58" value="d"> d) South Carolina</label>
+            </div></li>
+
+          <li><b>Q59.</b> Which state had the most free black persons?
+            <div class="options">
+              <label><input type="radio" name="q59" value="a"> a) Louisiana</label>
+              <label><input type="radio" name="q59" value="b"> b) New York</label>
+              <label><input type="radio" name="q59" value="c"> c) Virginia</label>
+              <label><input type="radio" name="q59" value="d"> d) South Carolina</label>
+            </div></li>
+
+          <li><b>Q60.</b> Which states had fewer free white persons than enslaved persons?
+            <div class="options">
+              <label><input type="radio" name="q60" value="a"> a) Virginia and Louisiana</label>
+              <label><input type="radio" name="q60" value="b"> b) Louisiana and South Carolina</label>
+              <label><input type="radio" name="q60" value="c"> c) South Carolina and Virginia</label>
+              <label><input type="radio" name="q60" value="d"> d) Louisiana and Vermont</label>
+            </div></li>
+        </ol>
+      </section>
+
+      <!-- ===== CHART between 60 and 61 (para Category 5) ===== -->
+      <section class="card img-wrap">
+        <h3>Category 5 – Short Answer – Study the chart</h3>
+        <img src="chart.png" alt="Jamestown occupations chart" />
+        <p class="small muted">Coloque <code>chart.png</code> (o gráfico de ocupações de Jamestown).</p>
+      </section>
+
+      <!-- ===== Category 5 — Short Answer (Q61–Q62) ===== -->
+      <section class="card" data-difficulty="writing">
+        <h3>Category 5 – Short Answer (10 pts each)</h3>
+        <ol start="61">
+          <li><b>Q61.</b> List the occupations most/least useful for Jamestown’s first year. (10–30 words)
+            <textarea name="q61" class="writing" placeholder="10–30 words…"></textarea></li>
+          <li><b>Q62.</b> Based on Jamestown’s failure, give ONE reason the chart suggests poor planning by the Virginia Company. (10–30 words)
+            <textarea name="q62" class="writing" placeholder="10–30 words…"></textarea></li>
+        </ol>
+      </section>
+
+      <!-- ===== Plano B: Envio via Plataforma (Dropbox File Request) ===== -->
+      <section class="card">
+        <h3>Envio de arquivo (Plano B – sem conta)</h3>
+        <p class="muted small">Se algo falhar, envie sua redação/print/respostas por aqui:</p>
+        <a id="fileReqBtn" class="icon-btn" href="DROPBOX_FILE_REQUEST_URL_AQUI" target="_blank" rel="noopener">📤 Abrir página de envio (Dropbox)</a>
+        <p class="small muted">O arquivo será associado ao seu nome. Aceita PDF, imagens e DOCX.</p>
+      </section>
+
+      <!-- ===== Admin ===== -->
+      <section class="card">
+        <h3>Results & Admin</h3>
+        <p class="muted small">Teacher only.</p>
+        <div class="row" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button id="downloadCsvBtn" disabled>Download CSV</button>
+          <button id="resetBtn" class="icon-btn">Reset</button>
+        </div>
+      </section>
+
+      <footer>
+        <div class="small">Designed by MF Bruno — GIA American History Midterm</div>
+      </footer>
+
+    </form>
+  </main>
+
+  <script>
+  // ===== Tema =====
+  (function(){
+    const root = document.documentElement;
+    const saved = localStorage.getItem('theme') || 'light';
+    root.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+  })();
+
+  // ===== Config =====
+  const DEFAULT_MINUTES = 60; // midterm
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
+
+  // ===== State =====
+  let started = false, ended = false;
+  let startTime = null, endTime = null, timerInterval = null;
+  let secondsLeft = DEFAULT_MINUTES * 60;
+
+  // Anti-cheat
+  let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
+  let copyCount = 0, pasteCount = 0, findCount = 0;
+
+  // popup offset
+  let acceptTs = null; const GRACE_MS = 2500; let systemPopupOffsetApplied = false;
+
+  // DOM
+  const submitBtn = document.getElementById('submitBtn');
+  const timerEl = document.getElementById('timer');
+  const form = document.getElementById('quizForm');
+  const nameInput = document.getElementById('studentName');
+  const testIdInput = document.getElementById('testId');
+  const focusFlag = document.getElementById('focusFlag');
+  const tabCountEl = document.getElementById('tabCount');
+  const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const toast = document.getElementById('toast');
+
+  // Modal
+  const consentBackdrop = document.getElementById('consentBackdrop');
+  const modalName = document.getElementById('modalName');
+  const acceptBtnEl = document.getElementById('acceptBtn');
+  document.body.style.overflow = 'hidden'; // trava scroll
+
+  // trava form
+  [...form.elements].forEach(el=>el.disabled = true);
+
+  function showToast(msg){ toast.textContent = msg || 'Ação registrada.'; toast.classList.add('show'); setTimeout(()=> toast.classList.remove('show'), 1500); }
+  function fmt(secs){ const m=String(Math.floor(secs/60)).padStart(2,'0'); const s=String(secs%60).padStart(2,'0'); return `${m}:${s}`; }
+  function tick(){ secondsLeft--; if(secondsLeft<0) secondsLeft=0; timerEl.textContent = fmt(secondsLeft); if(secondsLeft===0){ autoSubmit('time'); } }
+  function startTimer(){ clearInterval(timerInterval); timerInterval = setInterval(tick, 1000); }
+  async function goFullscreen(){ try{ if(!document.fullscreenElement && document.documentElement.requestFullscreen){ await document.documentElement.requestFullscreen(); } }catch(e){} }
+  function maybeApplySystemPopupOffset(){
+    if (started && !systemPopupOffsetApplied && acceptTs && (Date.now()-acceptTs)<=GRACE_MS){
+      tabSwitches = Math.max(0, tabSwitches - 1); systemPopupOffsetApplied = true;
+      tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    }
+  }
+  function isValidFullName(n){ const t=(n||'').trim().replace(/\s+/g,' '); const parts=t.split(' ').filter(p=>p.length>=2); return parts.length>=2; }
+  modalName.addEventListener('input', ()=>{ acceptBtnEl.disabled = !isValidFullName(modalName.value); });
+
+  function startTest(){
+    started = true; startTime = new Date();
+    nameInput.disabled = true; testIdInput.disabled = true;
+    submitBtn.disabled = false;
+    // habilita formulário
+    [...form.elements].forEach(el=>el.disabled = false);
+    setTimeout(()=>{ [...form.elements].forEach(el=>el.disabled=false); }, 0);
+    startTimer();
+
+    // bloqueios
+    document.addEventListener('copy', (e)=>{ copyCount++; e.preventDefault(); showToast('Cópia bloqueada.'); });
+    document.addEventListener('cut', (e)=>{ e.preventDefault(); showToast('Recorte bloqueado.'); });
+    document.addEventListener('paste', (e)=>{ pasteCount++; e.preventDefault(); showToast('Colagem bloqueada.'); });
+    document.addEventListener('keydown', (e)=>{
+      const k=e.key.toLowerCase(); const ctrl=e.ctrlKey||e.metaKey;
+      if (ctrl && (k==='c'||k==='v'||k==='x'||k==='s'||k==='p'||k==='f')) { e.preventDefault(); showToast('Atalho bloqueado.'); }
+      if (k==='f11'){ e.preventDefault(); showToast('F11 bloqueado.'); }
+    }, {capture:true});
+    document.addEventListener('contextmenu', (e)=> e.preventDefault());
+  }
+
+  // ===== Grading: agora também corrige <select> e T/F =====
+  function grade(){
+    const answers = {}; let totalCorrect = 0, totalPossible = 0;
+    const byDiff = {easy:0, medium:0, hard:0};
+    const possibleByDiff = {easy:0, medium:0, hard:0};
+
+    const sections = form.querySelectorAll('section.card');
+
+    sections.forEach(sec=>{
+      const diff = sec.dataset.difficulty;
+      // Radios (MC e T/F)
+      const radioGroups = Array.from(sec.querySelectorAll('.options')).map(div=>{
+        const firstRadio = div.querySelector('input[type=radio]');
+        if(!firstRadio) return null;
+        const qname = firstRadio.name;
+        const checked = div.querySelector('input[type=radio]:checked');
+        const correct = div.querySelector('input[type=radio][data-correct]');
+        if (!qname) return null;
+
+        if (diff !== 'writing'){ // só corrige se não for writing
+          if (diff in possibleByDiff) possibleByDiff[diff]++;
+          totalPossible++;
+        }
+
+        if (checked) answers[qname] = checked.value; else answers[qname] = null;
+
+        const isCorrect = !!(checked && correct && checked === correct);
+        if (diff !== 'writing' && isCorrect){ totalCorrect++; if (diff in byDiff) byDiff[diff]++; }
+
+        return true;
+      });
+
+      // Selects (matching/fill-in)
+      const selects = sec.querySelectorAll('select[name]');
+      selects.forEach(sel=>{
+        const qname = sel.name;
+        const val = sel.value || '';
+        answers[qname] = val || null;
+
+        const opt = sel.querySelector('option[data-correct]');
+        const correctVal = opt ? opt.value || opt.textContent.trim() : null;
+
+        if (diff !== 'writing'){ if (diff in possibleByDiff) possibleByDiff[diff]++; totalPossible++; }
+
+        if (correctVal && val === correctVal){
+          if (diff !== 'writing'){ totalCorrect++; if (diff in byDiff) byDiff[diff]++; }
+        }
+      });
+
+      // Essay/Short answers
+      if (diff === 'writing'){
+        const texts = sec.querySelectorAll('textarea[name]');
+        texts.forEach(t=>{
+          answers[t.name] = t.value.trim();
+        });
+      }
+
+      // Campos de correção de T/F (opcionais)
+      const fixes = sec.querySelectorAll('input[type=text][name$="_fix"]');
+      fixes.forEach(f=>{ answers[f.name] = f.value.trim(); });
+    });
+
+    return { answers, score: { totalCorrect, totalPossible, byDifficulty: byDiff, possibleByDifficulty: possibleByDiff } };
+  }
+
+  function collectPayload(reason='manual'){
+    const g = grade();
+    const now = new Date();
+    const studentNameSafe = (nameInput.value || '').trim() || '(no name)';
+    return {
+      testId: (testIdInput.value.trim() || 'American-History-Midterm-2025'),
+      studentName: studentNameSafe,
+      startISO: startTime?.toISOString() || null,
+      endISO: now.toISOString(),
+      durationSec: startTime ? Math.round((now - startTime)/1000) : null,
+      reason,
+      score: g.score,
+      answers: g.answers,
+      focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount }
+    };
+  }
+
+  function toCSV(obj){
+    const s = obj;
+    const row = [
+      new Date().toISOString(), s.testId, JSON.stringify(s.studentName), s.startISO, s.endISO, s.durationSec,
+      s.score.totalCorrect, s.score.totalPossible,
+      s.score.byDifficulty.easy, s.score.byDifficulty.medium, s.score.byDifficulty.hard,
+      s.focus.tabSwitches, s.focus.blurCount, s.focus.totalBlurMs, s.focus.copyCount, s.focus.pasteCount, s.focus.findCount,
+      JSON.stringify(s.answers)
+    ];
+    const header = [
+      'timestamp','testId','studentName','startISO','endISO','durationSec','correct','possible',
+      'easyCorrect','mediumCorrect','hardCorrect','tabSwitches','blurCount','totalBlurMs','copyCount','pasteCount','findCount','answers'
+    ];
+    return header.join(',') + '\n' + row.join(',');
+  }
+
+  // ===== Envio robusto (com fallback de content-type) =====
+  async function sendResults(payload){
+    async function tryPost(contentType){
+      try{
+        const res = await fetch(ENDPOINT, {
+          method:'POST',
+          headers:{ 'Content-Type': contentType },
+          body: JSON.stringify(payload)
+        });
+        return { ok: res.ok, status: res.status, text: await res.text() };
+      }catch(err){
+        return { ok:false, status: 'FETCH_ERR', text: String(err) };
+      }
+    }
+    let r = await tryPost('text/plain'); // compatível com seu GAS
+    if(!r.ok){ console.warn('POST text/plain falhou, tentando application/json…', r); r = await tryPost('application/json'); }
+    if(r.ok){ showToast('Enviado ✔ (HTTP ' + r.status + ')'); } else { showToast('Falha no envio ✖ (HTTP ' + r.status + ')'); }
+    console.log('POST result:', r.status, r.text?.slice(0,300));
+    return { posted: r.ok, status: r.status, responseText: r.text };
+  }
+
+  function downloadCSV(name, csv){
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_AmericanHistory_Midterm.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  function lockTest(){
+    [...form.elements].forEach(el=>el.disabled = true);
+    submitBtn.disabled = true; downloadCsvBtn.disabled = false;
+    document.getElementById('notes').textContent = 'Locked. Answers recorded.';
+    document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
+  }
+
+  async function finalize(reason){
+    if(ended) return; ended = true; endTime = new Date(); clearInterval(timerInterval);
+    const payload = collectPayload(reason);
+    const csv = toCSV(payload);
+    const postRes = await sendResults(payload);
+    downloadCSV(payload.studentName || 'anonymous', csv);
+    lockTest();
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+    console.log('Result payload:', payload, 'POST:', postRes);
+  }
+  function autoSubmit(reason){ finalize(reason); }
+
+  // Eventos básicos
+  submitBtn.addEventListener('click', ()=> finalize('manual'));
+  downloadCsvBtn.addEventListener('click', ()=>{
+    const csv = toCSV(collectPayload('download-only'));
+    downloadCSV((nameInput.value || '').trim() || 'anonymous', csv);
+  });
+  resetBtn.addEventListener('click', ()=> location.reload());
+
+  // Anti-cheat + offset popup
+  document.addEventListener('visibilitychange', ()=>{
+    if(!started || ended) return;
+    if(document.visibilityState === 'hidden'){
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+      focusFlag.textContent = 'Focus LOST'; isBlurred = true; blurStart = Date.now();
+      maybeApplySystemPopupOffset(); showToast('Troca de aba registrada.');
+    } else {
+      focusFlag.textContent = 'Foco OK';
+      if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+    }
+  });
+  window.addEventListener('blur', ()=>{
+    if(!started || ended) return;
+    blurCount++;
+    if (document.visibilityState !== 'hidden'){
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+      maybeApplySystemPopupOffset();
+    }
+    focusFlag.textContent='Focus LOST'; isBlurred=true; blurStart=Date.now();
+  });
+  window.addEventListener('focus', ()=>{
+    if(!started || ended) return;
+    focusFlag.textContent='Foco OK';
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  });
+  window.addEventListener('pagehide', ()=>{
+    if(!started || ended) return;
+    tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    maybeApplySystemPopupOffset();
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  });
+
+  // Aceitar/Sair do modal
+  document.getElementById('acceptBtn').addEventListener('click', async ()=>{
+    const fullName = (modalName.value || '').trim();
+    const t = fullName.replace(/\s+/g,' ');
+    const parts = t.split(' ').filter(p => p.length >= 2);
+    if(parts.length < 2){ modalName.setAttribute('aria-invalid','true'); modalName.focus(); return; }
+
+    document.getElementById('studentName').value = t;
+
+    const backdrop = document.getElementById('consentBackdrop');
+    if (backdrop) backdrop.remove();
+    document.body.style.overflow = '';
+
+    started = true; acceptTs = Date.now(); startTest();
+    try{ await goFullscreen(); }catch(e){}
+  });
+  document.getElementById('declineBtn').addEventListener('click', ()=>{ window.location.href='about:blank'; });
+
+  // enquanto o modal existe, bloqueia atalhos que poderiam atrapalhar
+  document.addEventListener('keydown', (e)=>{
+    if (document.getElementById('consentBackdrop')){
+      const k = e.key.toLowerCase();
+      if ((e.ctrlKey||e.metaKey) && (k==='w'||k==='r'||k==='p'||k==='s'||k==='f')) e.preventDefault();
+      if (k==='f11') e.preventDefault();
+    }
+  });
+
+  // bloqueio global
+  document.addEventListener('contextmenu', (e)=> e.preventDefault());
+  </script>
+</body>
+</html>
