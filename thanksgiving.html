@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quiz</title>
+  <title>Pilgrims & Roger Williams – Quiz</title>
   <style>
     :root{
       --bg:#ffffff; --card:#ffffff; --text:#0b1220; --muted:#6b7280;
@@ -17,21 +17,20 @@
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    a{color:var(--accent);text-decoration:none}
     header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.75);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border)}
     html[data-theme="dark"] header{background:rgba(0,0,0,.7)}
-    .wrap{max-width:1000px;margin:0 auto;padding:16px}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
     h1{margin:0 0 6px;font-size:clamp(22px,2.6vw,32px)}
     .sub{color:var(--muted)}
     .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:10px}
-    input[type=text]{background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;min-width:220px;outline:none}
+    input[type=text]{background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;min-width:240px;outline:none}
     input[type=text]::placeholder{color:var(--muted)}
-    button{background:var(--accent);border:none;color:#ffffff;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px var(--shadow)}
+    button{background:var(--accent);border:none;color:#fff;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px var(--shadow)}
     button[disabled]{opacity:.5;cursor:not-allowed}
     .icon-btn{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
     .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);padding:8px 12px;border-radius:999px}
     .grid{display:grid;gap:16px;grid-template-columns:1fr}
-    @media(min-width:880px){.grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:860px){.grid{grid-template-columns:1fr 1fr}}
     .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:0 8px 30px var(--shadow)}
     .card h3{margin:0 0 6px;font-size:18px}
     .muted{color:var(--muted)}
@@ -39,309 +38,326 @@
     .options label{
       display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;
       padding:10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;background:transparent;
-      transition:transform .08s ease, box-shadow .08s ease, background .12s ease, border-color .12s ease, color .12s ease;
+      transition:transform .08s ease, background .12s ease, border-color .12s ease, color .12s ease;
       box-shadow:0 2px 0 var(--shadow);
     }
     .options label:has(input[type=radio]:checked){
       background:var(--ok-weak); border-color:var(--ok); transform:translateY(1px);
-      box-shadow:inset 0 2px 0 rgba(0,0,0,.06);
-      color:#064e3b;
+      box-shadow:inset 0 2px 0 rgba(0,0,0,.06); color:#064e3b;
     }
-    .options input[type=radio]{margin-top:3px}
-    .writing{min-height:100px;width:100%;resize:vertical;background:transparent;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:12px}
-    footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:var(--muted)}
-    .notice{border:1px dashed var(--border);padding:10px;border-radius:10px;color:var(--muted)}
-    .hidden{display:none!important}
-    .strike{opacity:.5;filter:grayscale(.3)}
+    .writing{min-height:90px;width:100%;resize:vertical;background:transparent;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
     .small{font-size:12px}
-    .timer{font-weight:800;letter-spacing:.5px}
-    /* Modal de Consentimento */
-    .modal-backdrop{
-      position:fixed; inset:0; background:rgba(0,0,0,.85);
-      display:flex; align-items:center; justify-content:center; z-index:9999;
-    }
-    .modal{
-      background:var(--card); color:var(--text);
-      width:min(680px, 92vw); border:1px solid var(--border);
-      border-radius:16px; padding:18px; box-shadow:0 20px 60px var(--shadow);
-    }
-    .modal h2{ margin:0 0 8px; }
-    .modal .muted{ margin-bottom:10px; }
-    .modal .rules{ background:rgba(0,0,0,.03); border:1px dashed var(--border); padding:12px; border-radius:12px; }
-    .modal footer{ display:flex; gap:10px; justify-content:flex-end; border:0; padding:0; margin-top:14px;}
-    .btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); box-shadow:none;}
-    /* Toast leve */
-    .toast{
-      position:fixed; left:50%; transform:translateX(-50%);
-      bottom:16px; background:#111827; color:#fff; padding:10px 14px;
-      border-radius:12px; font-size:14px; box-shadow:0 8px 30px rgba(0,0,0,.35);
-      z-index:9998; display:none;
-    }
-    .toast.show{ display:block; }
+    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:12px}
+    .notice{border:1px dashed var(--border);padding:10px;border-radius:10px;color:var(--muted)}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:#111827;color:#fff;padding:10px 14px;border-radius:12px;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.35);z-index:9998;display:none}
+    .toast.show{display:block}
+    .strike{opacity:.5;filter:grayscale(.3)}
+    footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:var(--muted)}
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9999}
+    .modal{background:var(--card);color:var(--text);width:min(640px,92vw);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 20px 60px var(--shadow)}
+    .modal footer{display:flex;gap:10px;justify-content:flex-end;border:0;padding:0;margin-top:14px}
   </style>
 </head>
 <body>
-  <!-- Modal de consentimento + nome (único popup) -->
+  <!-- Modal de consentimento -->
   <div id="consentBackdrop" class="modal-backdrop" aria-modal="true" role="dialog">
     <div class="modal">
-      <h2>Quiz Terms</h2>
-      <div class="muted">Enter your <b>full name</b> and click “Accept and start”. The timer begins immediately.</div>
-      <label for="modalName" class="muted" style="display:block;margin:10px 0 6px">Full name</label>
+      <h2>Pilgrims & Roger Williams — Quiz</h2>
+      <div class="muted">Preencha seu <b>nome completo</b> e clique em “Aceitar e começar”. O cronômetro inicia em seguida.</div>
+      <label class="muted" style="display:block;margin:10px 0 6px">Nome completo</label>
       <input id="modalName" type="text" placeholder="Ex.: Maria Fernanda Silva" autocomplete="name"
              style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text)" />
-      <div class="rules" style="margin-top:12px">
+      <div class="notice small" style="margin-top:12px">
         <ul>
-          <li>We will attempt to activate <b>fullscreen</b> (if the browser allows).</li>
-          <li>Tab/window switches are <b>recorded</b>.</li>
-          <li><b>Copy/paste/cut</b> and <b>Ctrl/Cmd+F</b> are blocked.</li>
-          <li>Do not minimize or close the tab until submitting the quiz.</li>
+          <li>Trocas de aba/janela são registradas.</li>
+          <li>Copiar/colar/recortar e Ctrl/Cmd+F são bloqueados.</li>
         </ul>
       </div>
       <footer>
-        <button id="declineBtn" class="btn-ghost">Exit</button>
-        <button id="acceptBtn" disabled>Accept and start</button>
+        <button id="declineBtn" class="icon-btn">Sair</button>
+        <button id="acceptBtn" disabled>Aceitar e começar</button>
       </footer>
     </div>
   </div>
-  <div id="toast" class="toast" aria-live="polite">Action recorded.</div>
+
+  <div id="toast" class="toast" aria-live="polite">Ação registrada.</div>
+
   <header>
     <div class="wrap">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <div>
-          <h1>Quiz — Roger Williams & Thanksgiving</h1>
-          <div class="sub">History (1620–1663)</div>
-        </div>
-        <button id="themeToggle" class="icon-btn">🌓 Theme</button>
-      </div>
       <div class="bar">
+        <div>
+          <h1>Pilgrims & Roger Williams</h1>
+          <div class="sub">History — seleção única (a–e) + 2 respostas abertas.</div>
+        </div>
+        <button id="themeToggle" class="icon-btn">🌓 Tema</button>
+      </div>
+
+      <div class="bar" style="margin-top:8px">
         <div class="row">
-          <input id="studentName" type="text" placeholder="Name (filled upon acceptance)" autocomplete="name" />
-          <span class="pill"><strong>Time:</strong> <span id="timer" class="timer">30:00</span></span>
-          <span id="focusFlag" class="badge">Focus OK</span>
-          <span id="tabCount" class="badge">Tab Counter: 0</span>
+          <input id="studentName" type="text" placeholder="Nome (preenchido ao aceitar)" autocomplete="name" />
+          <span class="pill"><strong>Tempo:</strong> <span id="timer" class="timer">30:00</span></span>
+          <span id="focusFlag" class="badge">Foco OK</span>
+          <span id="tabCount" class="badge">Contador de Aba: 0</span>
         </div>
         <div class="row">
-          <input id="testId" type="text" placeholder="Quiz-Web-Designer1" />
-          <button id="startBtn" class="hidden">Start</button>
-          <button id="submitBtn" disabled>Submit</button>
+          <input id="testId" type="text" placeholder="Pilgrims-Roger-Quiz-v1" />
+          <button id="submitBtn" disabled>Enviar</button>
         </div>
       </div>
-      <div class="notice small" id="notes">
-        The quiz will be submitted automatically in 30 minutes.
-      </div>
+
+      <div class="notice small" id="notes">A prova será enviada automaticamente em 30 minutos.</div>
     </div>
   </header>
+
   <main class="wrap">
     <form id="quizForm" class="grid" autocomplete="off">
-      <!-- ===== 18 MULTIPLE CHOICE (q1–q13 and q16–q20) ===== -->
-      <section class="card" data-difficulty="easy">
-        <h3>Q1. In what year did the <i>Mayflower</i> arrive at Cape Cod (near present-day Massachusetts)?</h3>
+      <!-- 1 -->
+      <section class="card">
+        <h3>Q1. Who were the Pilgrims that sailed on the Mayflower (1620)?</h3>
         <div class="options">
-          <label><input type="radio" name="q1" value="a"> a) 1607</label>
-          <label><input type="radio" name="q1" value="b"> b) 1619</label>
-          <label><input type="radio" name="q1" value="c" data-correct> c) 1620</label>
-          <label><input type="radio" name="q1" value="d"> d) 1631</label>
-          <label><input type="radio" name="q1" value="e"> e) 1636</label>
+          <label><input type="radio" name="q1" value="a"> a) Puritans staying within the Church of England</label>
+          <label><input type="radio" name="q1" value="b" data-correct> b) Separatists seeking to form independent congregations</label>
+          <label><input type="radio" name="q1" value="c"> c) Quakers led by William Penn</label>
+          <label><input type="radio" name="q1" value="d"> d) Catholics fleeing Maryland</label>
+          <label><input type="radio" name="q1" value="e"> e) French Huguenots</label>
         </div>
       </section>
-      <section class="card" data-difficulty="easy">
-        <h3>Q2. Main reason the Pilgrims left England:</h3>
+      <!-- 2 -->
+      <section class="card">
+        <h3>Q2. Before crossing the Atlantic, the Pilgrims lived for years in</h3>
         <div class="options">
-          <label><input type="radio" name="q2" value="a"> a) Gold</label>
-          <label><input type="radio" name="q2" value="b"> b) Better climate</label>
-          <label><input type="radio" name="q2" value="c" data-correct> c) Religious freedom</label>
-          <label><input type="radio" name="q2" value="d"> d) Tobacco trade</label>
-          <label><input type="radio" name="q2" value="e"> e) Tourism and adventure</label>
+          <label><input type="radio" name="q2" value="a"> a) Dublin</label>
+          <label><input type="radio" name="q2" value="b"> b) Lisbon</label>
+          <label><input type="radio" name="q2" value="c" data-correct> c) Leiden (Netherlands)</label>
+          <label><input type="radio" name="q2" value="d"> d) Geneva</label>
+          <label><input type="radio" name="q2" value="e"> e) Hamburg</label>
         </div>
       </section>
-      <section class="card" data-difficulty="easy">
-        <h3>Q3. The <i>Mayflower Compact</i> mainly established:</h3>
+      <!-- 3 -->
+      <section class="card">
+        <h3>Q3. The Mayflower Compact (1620) is best described as</h3>
         <div class="options">
-          <label><input type="radio" name="q3" value="a"> a) A local monarchy</label>
-          <label><input type="radio" name="q3" value="b"> b) Full freedom of the press</label>
-          <label><input type="radio" name="q3" value="c" data-correct> c) Self-government with “just and equal laws”</label>
-          <label><input type="radio" name="q3" value="d"> d) A standing army</label>
-          <label><input type="radio" name="q3" value="e"> e) Trade treaty with Spain</label>
+          <label><input type="radio" name="q3" value="a"> a) A trade treaty with France</label>
+          <label><input type="radio" name="q3" value="b"> b) A royal charter from King James I</label>
+          <label><input type="radio" name="q3" value="c" data-correct> c) A covenant for self-government by the settlers</label>
+          <label><input type="radio" name="q3" value="d"> d) A military alliance with Wampanoag</label>
+          <label><input type="radio" name="q3" value="e"> e) A plan to abolish slavery</label>
         </div>
       </section>
-      <section class="card" data-difficulty="easy">
-        <h3>Q4. Which indigenous nation helped the Pilgrims in the first year (1620–1621)?</h3>
+      <!-- 4 -->
+      <section class="card">
+        <h3>Q4. The colony established by the Mayflower group was</h3>
         <div class="options">
-          <label><input type="radio" name="q4" value="a" data-correct> a) Wampanoag</label>
-          <label><input type="radio" name="q4" value="b"> b) Iroquois</label>
-          <label><input type="radio" name="q4" value="c"> c) Cherokee</label>
-          <label><input type="radio" name="q4" value="d"> d) Powhatan</label>
-          <label><input type="radio" name="q4" value="e"> e) Mohawk</label>
+          <label><input type="radio" name="q4" value="a"> a) Jamestown</label>
+          <label><input type="radio" name="q4" value="b" data-correct> b) Plymouth</label>
+          <label><input type="radio" name="q4" value="c"> c) Providence</label>
+          <label><input type="radio" name="q4" value="d"> d) New Amsterdam</label>
+          <label><input type="radio" name="q4" value="e"> e) Salem</label>
         </div>
       </section>
-      <section class="card" data-difficulty="easy">
-        <h3>Q5. The 1621 encounter, linked to the “First Thanksgiving”, was essentially:</h3>
+      <!-- 5 -->
+      <section class="card">
+        <h3>Q5. Who helped the Pilgrims learn local agriculture and survive the first year?</h3>
         <div class="options">
-          <label><input type="radio" name="q5" value="a"> a) Royal military parade</label>
-          <label><input type="radio" name="q5" value="b"> b) International trade fair</label>
-          <label><input type="radio" name="q5" value="c" data-correct> c) A local harvest celebration after a difficult year</label>
-          <label><input type="radio" name="q5" value="d"> d) Official national holiday decree</label>
-          <label><input type="radio" name="q5" value="e"> e) Anglican coronation ceremony</label>
+          <label><input type="radio" name="q5" value="a"> a) Pocahontas</label>
+          <label><input type="radio" name="q5" value="b" data-correct> b) Squanto (Tisquantum)</label>
+          <label><input type="radio" name="q5" value="c"> c) Tecumseh</label>
+          <label><input type="radio" name="q5" value="d"> d) Sacagawea</label>
+          <label><input type="radio" name="q5" value="e"> e) Geronimo</label>
         </div>
       </section>
-      <section class="card" data-difficulty="medium">
-        <h3>Q6. A <b>documented</b> Wampanoag contribution to the 1621 gathering was:</h3>
+      <!-- 6 -->
+      <section class="card">
+        <h3>Q6. The 1621 harvest celebration often linked to “Thanksgiving” involved the Pilgrims and the</h3>
         <div class="options">
-          <label><input type="radio" name="q6" value="a" data-correct> a) Deer meat (venison)</label>
-          <label><input type="radio" name="q6" value="b"> b) Mashed potatoes with butter</label>
-          <label><input type="radio" name="q6" value="c"> c) Pumpkin pie</label>
-          <label><input type="radio" name="q6" value="d"> d) Cranberry sauce with refined sugar</label>
-          <label><input type="radio" name="q6" value="e"> e) Smoked turkey with gravy</label>
+          <label><input type="radio" name="q6" value="a"> a) Iroquois</label>
+          <label><input type="radio" name="q6" value="b" data-correct> b) Wampanoag</label>
+          <label><input type="radio" name="q6" value="c"> c) Cherokee</label>
+          <label><input type="radio" name="q6" value="d"> d) Sioux</label>
+          <label><input type="radio" name="q6" value="e"> e) Apache</label>
         </div>
       </section>
-      <section class="card" data-difficulty="medium">
-        <h3>Q7. The Wampanoag sachem/leader who formed an alliance with the Plymouth settlers was:</h3>
+      <!-- 7 -->
+      <section class="card">
+        <h3>Q7. A central idea of the Mayflower Compact was</h3>
         <div class="options">
-          <label><input type="radio" name="q7" value="a"> a) Canonicus</label>
-          <label><input type="radio" name="q7" value="b"> b) Miantonomi</label>
-          <label><input type="radio" name="q7" value="c" data-correct> c) Massasoit (Ousamequin)</label>
-          <label><input type="radio" name="q7" value="d"> d) Powhatan</label>
-          <label><input type="radio" name="q7" value="e"> e) Tecumseh</label>
+          <label><input type="radio" name="q7" value="a" data-correct> a) government derives its power from the consent of the governed</label>
+          <label><input type="radio" name="q7" value="b"> b) divine right of kings</label>
+          <label><input type="radio" name="q7" value="c"> c) mercantilism</label>
+          <label><input type="radio" name="q7" value="d"> d) separation of powers</label>
+          <label><input type="radio" name="q7" value="e"> e) judicial review</label>
         </div>
       </section>
-      <section class="card" data-difficulty="easy">
-        <h3>Q8. The settlement founded by the Pilgrims was named:</h3>
+      <!-- 8 -->
+      <section class="card">
+        <h3>Q8. William Bradford is best remembered as</h3>
         <div class="options">
-          <label><input type="radio" name="q8" value="a"> a) Jamestown</label>
-          <label><input type="radio" name="q8" value="b" data-correct> b) Plymouth</label>
-          <label><input type="radio" name="q8" value="c"> c) Providence</label>
-          <label><input type="radio" name="q8" value="d"> d) New Amsterdam</label>
-          <label><input type="radio" name="q8" value="e"> e) Salem</label>
+          <label><input type="radio" name="q8" value="a"> a) founder of Providence</label>
+          <label><input type="radio" name="q8" value="b" data-correct> b) long-time governor and historian of Plymouth</label>
+          <label><input type="radio" name="q8" value="c"> c) author of Common Sense</label>
+          <label><input type="radio" name="q8" value="d"> d) leader of Jamestown</label>
+          <label><input type="radio" name="q8" value="e"> e) Dutch merchant in Leiden</label>
         </div>
       </section>
-      <section class="card" data-difficulty="medium">
-        <h3>Q9. “Thanksgiving” as a national proclamation in the U.S., during the Civil War, was issued by:</h3>
+      <!-- 9 -->
+      <section class="card">
+        <h3>Q9. Roger Williams was banished from Massachusetts Bay mainly because he</h3>
         <div class="options">
-          <label><input type="radio" name="q9" value="a"> a) George Washington</label>
-          <label><input type="radio" name="q9" value="b" data-correct> b) Abraham Lincoln (1863)</label>
-          <label><input type="radio" name="q9" value="c"> c) Thomas Jefferson</label>
-          <label><input type="radio" name="q9" value="d"> d) Franklin D. Roosevelt</label>
-          <label><input type="radio" name="q9" value="e"> e) John Adams</label>
+          <label><input type="radio" name="q9" value="a"> a) supported monarchy</label>
+          <label><input type="radio" name="q9" value="b" data-correct> b) defended liberty of conscience and separation of church and state</label>
+          <label><input type="radio" name="q9" value="c"> c) advocated slavery</label>
+          <label><input type="radio" name="q9" value="d"> d) was a Quaker missionary</label>
+          <label><input type="radio" name="q9" value="e"> e) opposed trial by jury</label>
         </div>
       </section>
-      <section class="card" data-difficulty="easy">
-        <h3>Q10. Roger Williams arrived in New England in:</h3>
+      <!-- 10 -->
+      <section class="card">
+        <h3>Q10. In winter 1636, fleeing in snow, Williams was aided first near Sowams by allies of the sachem</h3>
         <div class="options">
-          <label><input type="radio" name="q10" value="a"> a) 1620</label>
-          <label><input type="radio" name="q10" value="b" data-correct> b) 1631</label>
-          <label><input type="radio" name="q10" value="c"> c) 1635</label>
-          <label><input type="radio" name="q10" value="d"> d) 1636</label>
-          <label><input type="radio" name="q10" value="e"> e) 1644</label>
+          <label><input type="radio" name="q10" value="a"> a) Canonicus of the Pequot</label>
+          <label><input type="radio" name="q10" value="b" data-correct> b) Massasoit (Wampanoag)</label>
+          <label><input type="radio" name="q10" value="c"> c) Powhatan</label>
+          <label><input type="radio" name="q10" value="d"> d) Pontiac</label>
+          <label><input type="radio" name="q10" value="e"> e) Sitting Bull</label>
         </div>
       </section>
-      <section class="card" data-difficulty="medium">
-        <h3>Q11. The main reason for his banishment from Massachusetts Bay (1635) was:</h3>
+      <!-- 11 -->
+      <section class="card">
+        <h3>Q11. With Narragansett permission, Roger Williams founded Providence in</h3>
         <div class="options">
-          <label><input type="radio" name="q11" value="a"> a) Theft</label>
-          <label><input type="radio" name="q11" value="b"> b) Plagiarism</label>
-          <label><input type="radio" name="q11" value="c" data-correct> c) “Dangerous” ideas about freedom of conscience and Church–State separation</label>
-          <label><input type="radio" name="q11" value="d"> d) Military desertion</label>
-          <label><input type="radio" name="q11" value="e"> e) Tobacco smuggling</label>
+          <label><input type="radio" name="q11" value="a"> a) 1620</label>
+          <label><input type="radio" name="q11" value="b"> b) 1630</label>
+          <label><input type="radio" name="q11" value="c" data-correct> c) 1636</label>
+          <label><input type="radio" name="q11" value="d"> d) 1644</label>
+          <label><input type="radio" name="q11" value="e"> e) 1663</label>
         </div>
       </section>
-      <section class="card" data-difficulty="hard">
-        <h3>Q12. In the winter of 1635–1636, Roger Williams found shelter and support mainly:</h3>
+      <!-- 12 -->
+      <section class="card">
+        <h3>Q12. Which principle was most associated with Williams’s Providence?</h3>
         <div class="options">
-          <label><input type="radio" name="q12" value="a"> a) In Boston, by colonial officials</label>
-          <label><input type="radio" name="q12" value="b" data-correct> b) With Wampanoag sachem Massasoit, in Sowams</label>
-          <label><input type="radio" name="q12" value="c"> c) Aboard a Dutch ship</label>
-          <label><input type="radio" name="q12" value="d"> d) In an English fort</label>
-          <label><input type="radio" name="q12" value="e"> e) In Jamestown, Virginia</label>
+          <label><input type="radio" name="q12" value="a" data-correct> a) freedom of religion for all (liberty of conscience)</label>
+          <label><input type="radio" name="q12" value="b"> b) state-established church</label>
+          <label><input type="radio" name="q12" value="c"> c) hereditary aristocracy</label>
+          <label><input type="radio" name="q12" value="d"> d) absolute monarchy</label>
+          <label><input type="radio" name="q12" value="e"> e) military rule</label>
         </div>
       </section>
-      <section class="card" data-difficulty="hard">
-        <h3>Q13. In spring 1636, Roger Williams <b>purchased</b> land to found Providence from which leaders?</h3>
+      <!-- 13 -->
+      <section class="card">
+        <h3>Q13. Williams insisted that land should be acquired from Native peoples by</h3>
         <div class="options">
-          <label><input type="radio" name="q13" value="a"> a) Powhatan and Pocahontas</label>
-          <label><input type="radio" name="q13" value="b" data-correct> b) Canonicus and Miantonomi (Narragansett)</label>
-          <label><input type="radio" name="q13" value="c"> c) Metacom (King Philip) and Tecumseh</label>
-          <label><input type="radio" name="q13" value="d"> d) John Winthrop and William Bradford</label>
-          <label><input type="radio" name="q13" value="e"> e) Anne Hutchinson and John Cotton</label>
+          <label><input type="radio" name="q13" value="a"> a) royal decree</label>
+          <label><input type="radio" name="q13" value="b" data-correct> b) fair purchase/consent</label>
+          <label><input type="radio" name="q13" value="c"> c) conquest</label>
+          <label><input type="radio" name="q13" value="d"> d) church tithe</label>
+          <label><input type="radio" name="q13" value="e"> e) lottery</label>
         </div>
       </section>
-      <!-- ===== 2 OPEN-ENDED (q14, q15) — names preserved ===== -->
-      <section class="card" data-difficulty="writing">
-        <h3>Q14. In 2–3 sentences, explain how <b>God’s Providence</b> appears in both the 1621 harvest and Roger Williams’ rescue in the winter of 1635–1636.</h3>
-        <textarea name="q14" class="writing" placeholder="Write your answer..."></textarea>
-      </section>
-      <section class="card" data-difficulty="writing">
-        <h3>Q15. Describe one practical act of “Thanksgiving” today that reflects these stories (sharing, hospitality, justice, gratitude).</h3>
-        <textarea name="q15" class="writing" placeholder="Write your answer..."></textarea>
-      </section>
-      <!-- ===== Back to multiple choice (q16–q20) ===== -->
-      <section class="card" data-difficulty="medium">
-        <h3>Q16. The name “Providence” was chosen by Roger Williams to acknowledge:</h3>
+      <!-- 14 -->
+      <section class="card">
+        <h3>Q14. The 1644 charter (and later 1663) helped secure for Rhode Island</h3>
         <div class="options">
-          <label><input type="radio" name="q16" value="a"> a) An English military victory</label>
-          <label><input type="radio" name="q16" value="b" data-correct> b) God’s providence in guiding and sustaining him</label>
-          <label><input type="radio" name="q16" value="c"> c) Homage to King Charles II</label>
-          <label><input type="radio" name="q16" value="d"> d) A European city of the same name</label>
-          <label><input type="radio" name="q16" value="e"> e) A famous sea route</label>
+          <label><input type="radio" name="q14" value="a"> a) exclusive trade with Spain</label>
+          <label><input type="radio" name="q14" value="b"> b) abolition of slavery</label>
+          <label><input type="radio" name="q14" value="c" data-correct> c) legal protection for religious liberty/governance</label>
+          <label><input type="radio" name="q14" value="d"> d) union with Connecticut</label>
+          <label><input type="radio" name="q14" value="e"> e) royal governorship</label>
         </div>
       </section>
-      <section class="card" data-difficulty="medium">
-        <h3>Q17. The 1663 Royal Charter (Rhode Island and Providence Plantations) mainly guaranteed:</h3>
+      <!-- 15 -->
+      <section class="card">
+        <h3>Q15. Which statement is most accurate about Separatists vs. Puritans?</h3>
         <div class="options">
-          <label><input type="radio" name="q17" value="a"> a) Hereditary governor</label>
-          <label><input type="radio" name="q17" value="b"> b) Standing army</label>
-          <label><input type="radio" name="q17" value="c" data-correct> c) Broad religious freedom/tolerance</label>
-          <label><input type="radio" name="q17" value="d"> d) Exclusive trade with the Netherlands</label>
-          <label><input type="radio" name="q17" value="e"> e) Mandatory religious censorship</label>
+          <label><input type="radio" name="q15" value="a"> a) Separatists wanted to reform the church from within</label>
+          <label><input type="radio" name="q15" value="b" data-correct> b) Puritans wanted reform; Separatists left to form independent churches</label>
+          <label><input type="radio" name="q15" value="c"> c) Both supported royal supremacy</label>
+          <label><input type="radio" name="q15" value="d"> d) Both opposed any reform</label>
+          <label><input type="radio" name="q15" value="e"> e) Neither migrated to New England</label>
         </div>
       </section>
-      <section class="card" data-difficulty="hard">
-        <h3>Q18. Which principle did Roger Williams <b>vehemently defend</b>?</h3>
+      <!-- 16 -->
+      <section class="card">
+        <h3>Q16. The ship that initially failed to cross with the Mayflower was the</h3>
         <div class="options">
-          <label><input type="radio" name="q18" value="a"> a) Religious tests for voting</label>
-          <label><input type="radio" name="q18" value="b" data-correct> b) Separation of Church and State</label>
-          <label><input type="radio" name="q18" value="c"> c) Mandatory church attendance</label>
-          <label><input type="radio" name="q18" value="d"> d) Exile of dissenters</label>
-          <label><input type="radio" name="q18" value="e"> e) Prohibition of land purchase</label>
+          <label><input type="radio" name="q16" value="a"> a) Susan Constant</label>
+          <label><input type="radio" name="q16" value="b"> b) Discovery</label>
+          <label><input type="radio" name="q16" value="c" data-correct> c) Speedwell</label>
+          <label><input type="radio" name="q16" value="d"> d) Godspeed</label>
+          <label><input type="radio" name="q16" value="e"> e) Half Moon</label>
         </div>
       </section>
-      <section class="card" data-difficulty="medium">
-        <h3>Q19. Providence is located in the region of:</h3>
+      <!-- 17 -->
+      <section class="card">
+        <h3>Q17. Which best connects “Thanksgiving” to a key value for community life?</h3>
         <div class="options">
-          <label><input type="radio" name="q19" value="a"> a) Chesapeake Bay (Virginia)</label>
-          <label><input type="radio" name="q19" value="b" data-correct> b) Narragansett Bay (present-day Rhode Island)</label>
-          <label><input type="radio" name="q19" value="c"> c) Hudson Bay</label>
-          <label><input type="radio" name="q19" value="d"> d) Delaware Bay</label>
-          <label><input type="radio" name="q19" value="e"> e) Massachusetts Bay</label>
+          <label><input type="radio" name="q17" value="a" data-correct> a) Gratitude and mutual aid among diverse peoples</label>
+          <label><input type="radio" name="q17" value="b"> b) Military victory over New France</label>
+          <label><input type="radio" name="q17" value="c"> c) Monopolies over corn trade</label>
+          <label><input type="radio" name="q17" value="d"> d) Royal taxation</label>
+          <label><input type="radio" name="q17" value="e"> e) Judicial supremacy</label>
         </div>
       </section>
-      <section class="card" data-difficulty="easy">
-        <h3>Q20. Roger Williams helped start, in 1638/1639, the church known as:</h3>
+      <!-- 18 -->
+      <section class="card">
+        <h3>Q18. Which Native nation’s leaders Canonicus and Miantonomi supported Williams?</h3>
         <div class="options">
-          <label><input type="radio" name="q20" value="a"> a) Old North Church (Boston)</label>
-          <label><input type="radio" name="q20" value="b"> b) St. Paul’s Chapel (NY)</label>
-          <label><input type="radio" name="q20" value="c" data-correct> c) First Baptist Church of Providence</label>
-          <label><input type="radio" name="q20" value="d"> d) Trinity Church (Newport)</label>
-          <label><input type="radio" name="q20" value="e"> e) King’s Chapel (Boston)</label>
+          <label><input type="radio" name="q18" value="a"> a) Wampanoag</label>
+          <label><input type="radio" name="q18" value="b" data-correct> b) Narragansett</label>
+          <label><input type="radio" name="q18" value="c"> c) Pequot</label>
+          <label><input type="radio" name="q18" value="d"> d) Mohawk</label>
+          <label><input type="radio" name="q18" value="e"> e) Shawnee</label>
         </div>
       </section>
+      <!-- 19 -->
+      <section class="card">
+        <h3>Q19. Why did Williams name the settlement “Providence”?</h3>
+        <div class="options">
+          <label><input type="radio" name="q19" value="a"> a) To honor a Dutch patron</label>
+          <label><input type="radio" name="q19" value="b" data-correct> b) Gratitude for God’s providential care in his deliverance</label>
+          <label><input type="radio" name="q19" value="c"> c) Because of rich mines</label>
+          <label><input type="radio" name="q19" value="d"> d) Royal command</label>
+          <label><input type="radio" name="q19" value="e"> e) To honor King Charles I</label>
+        </div>
+      </section>
+      <!-- 20 -->
+      <section class="card">
+        <h3>Q20. Which legacy is most associated with Rhode Island under Williams?</h3>
+        <div class="options">
+          <label><input type="radio" name="q20" value="a"> a) Slave-based plantation aristocracy</label>
+          <label><input type="radio" name="q20" value="b" data-correct> b) Early model of religious liberty and church–state separation</label>
+          <label><input type="radio" name="q20" value="c"> c) Theocratic rule by ministers</label>
+          <label><input type="radio" name="q20" value="d"> d) Spanish alliance</label>
+          <label><input type="radio" name="q20" value="e"> e) Military dictatorship</label>
+        </div>
+      </section>
+
+      <!-- 21 (aberta) -->
+      <section class="card">
+        <h3>Q21. (Open) Cite one GIA key value present in the Mayflower Compact and explain it in 1–2 sentences.</h3>
+        <textarea name="q21" class="writing" placeholder="Ex.: Integrity—assumir compromisso com o bem comum, etc."></textarea>
+      </section>
+      <!-- 22 (aberta) -->
+      <section class="card">
+        <h3>Q22. (Open) Em 2–3 frases, explique como a experiência de Roger Williams na neve e com as tribos reforça a ideia “God provides”.</h3>
+        <textarea name="q22" class="writing" placeholder="Use fatos: fuga no inverno de 1636; acolhimento; fundação de Providence..."></textarea>
+      </section>
+
       <!-- Admin -->
-      <div class="card">
+      <section class="card">
         <h3>Results & Admin</h3>
         <p class="muted small">Teacher only.</p>
-        <div class="row" style="margin-top:10px">
+        <div class="row" style="display:flex;gap:8px;flex-wrap:wrap">
           <button id="downloadCsvBtn" disabled>Download CSV</button>
           <button id="resetBtn" class="icon-btn">Reset</button>
         </div>
-      </div>
-      <footer>
-        <div class="small">Designed by MF Bruno, your MF teacher! Hey yo...</div>
-      </footer>
+      </section>
     </form>
   </main>
+
   <script>
-  // ===== Theme =====
+  // ===== Tema =====
   (function(){
     const root = document.documentElement;
     const saved = localStorage.getItem('theme') || 'light';
@@ -352,22 +368,21 @@
       localStorage.setItem('theme', next);
     });
   })();
+
   // ===== Config =====
   const DEFAULT_MINUTES = 30;
-  const ENDPOINT = 'https://script.google.com/macisdiction/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
+
   // ===== State =====
   let started = false, ended = false;
   let startTime = null, endTime = null, timerInterval = null;
   let secondsLeft = DEFAULT_MINUTES * 60;
+
   // Anti-cheat
   let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
   let copyCount = 0, pasteCount = 0, findCount = 0;
-  // desconto de 1 logo após aceitar (popup do sistema)
-  let acceptTs = null;
-  const GRACE_MS = 2500;
-  let systemPopupOffsetApplied = false;
+
   // DOM
-  const startBtn = document.getElementById('startBtn');
   const submitBtn = document.getElementById('submitBtn');
   const timerEl = document.getElementById('timer');
   const form = document.getElementById('quizForm');
@@ -378,116 +393,65 @@
   const downloadCsvBtn = document.getElementById('downloadCsvBtn');
   const resetBtn = document.getElementById('resetBtn');
   const toast = document.getElementById('toast');
+
   // Modal
-  const consentBackdrop = document.getElementById('consentBackdrop');
   const modalName = document.getElementById('modalName');
   const acceptBtnEl = document.getElementById('acceptBtn');
-  document.body.style.overflow = 'hidden'; // trava scroll enquanto modal existe
-  // trava o form até iniciar
+  document.body.style.overflow = 'hidden';
+
+  // trava form até iniciar
   [...form.elements].forEach(el=>el.disabled = true);
-  function fmt(secs){
-    const m = Math.floor(secs/60).toString().padStart(2,'0');
-    const s = (secs%60).toString().padStart(2,'0');
-    return `${m}:${s}`;
-  }
-  function tick(){
-    secondsLeft--; if(secondsLeft < 0){ secondsLeft = 0; }
-    timerEl.textContent = fmt(secondsLeft);
-    if(secondsLeft === 0){ autoSubmit('time'); }
-  }
-  function startTimer(){
-    clearInterval(timerInterval);
-    timerInterval = setInterval(tick, 1000);
-  }
-  async function goFullscreen(){
-    try{
-      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
-      }
-    }catch(e){}
-  }
-  function showToast(msg){
-    toast.textContent = msg || 'Action recorded.';
-    toast.classList.add('show');
-    setTimeout(()=> toast.classList.remove('show'), 1500);
-  }
-  function maybeApplySystemPopupOffset(){
-    if (started && !systemPopupOffsetApplied && acceptTs && (Date.now() - acceptTs) <= GRACE_MS){
-      tabSwitches = Math.max(0, tabSwitches - 1);
-      systemPopupOffsetApplied = true;
-      tabCountEl.textContent = `Tab Counter: ${tabSwitches}`;
-    }
-  }
-  function isValidFullName(n){
-    const t = (n||'').trim().replace(/\s+/g,' ');
-    const parts = t.split(' ').filter(p => p.length >= 2);
-    return parts.length >= 2;
-  }
-  // habilita o botão quando o nome é válido
-  modalName.addEventListener('input', ()=>{
-    acceptBtnEl.disabled = !isValidFullName(modalName.value);
-  });
+
+  function showToast(msg){ toast.textContent = msg || 'Ação registrada.'; toast.classList.add('show'); setTimeout(()=> toast.classList.remove('show'), 1500); }
+  function fmt(secs){ const m=String(Math.floor(secs/60)).padStart(2,'0'); const s=String(secs%60).padStart(2,'0'); return `${m}:${s}`; }
+  timerEl.textContent = fmt(secondsLeft);
+  function tick(){ secondsLeft--; if(secondsLeft<0) secondsLeft=0; timerEl.textContent = fmt(secondsLeft); if(secondsLeft===0){ autoSubmit('time'); } }
+  function startTimer(){ clearInterval(timerInterval); timerInterval = setInterval(tick, 1000); }
+
   function startTest(){
     started = true; startTime = new Date();
-    nameInput.disabled = true; // fica somente leitura após iniciar
-    testIdInput.disabled = true;
-    startBtn.disabled = true; startBtn.classList.add('hidden');
+    nameInput.disabled = true; testIdInput.disabled = true;
     submitBtn.disabled = false;
     // habilita formulário
     [...form.elements].forEach(el=>el.disabled = false);
     setTimeout(()=>{ [...form.elements].forEach(el=>el.disabled=false); }, 0);
     startTimer();
-    // bloqueios (apenas após iniciar)
-    document.addEventListener('copy', (e)=>{ copyCount++; e.preventDefault(); showToast('Copy blocked.'); });
-    document.addEventListener('cut', (e)=>{ e.preventDefault(); showToast('Cut blocked.'); });
-    document.addEventListener('paste', (e)=>{ pasteCount++; e.preventDefault(); showToast('Paste blocked.'); });
+
+    // bloqueios
+    document.addEventListener('copy', (e)=>{ copyCount++; e.preventDefault(); showToast('Cópia bloqueada.'); });
+    document.addEventListener('cut', (e)=>{ e.preventDefault(); showToast('Recorte bloqueado.'); });
+    document.addEventListener('paste', (e)=>{ pasteCount++; e.preventDefault(); showToast('Colagem bloqueada.'); });
     document.addEventListener('keydown', (e)=>{
-      const k = e.key.toLowerCase();
-      const ctrl = e.ctrlKey || e.metaKey;
-      if (ctrl && (k==='c' || k==='v' || k==='x' || k==='s' || k==='p' || k==='f')) { e.preventDefault(); showToast('Shortcut blocked.'); }
-      if (k==='f11'){ e.preventDefault(); showToast('F11 blocked.'); }
+      const k=e.key.toLowerCase(); const ctrl=e.ctrlKey||e.metaKey;
+      if (ctrl && (k==='c'||k==='v'||k==='x'||k==='s'||k==='p'||k==='f')) { e.preventDefault(); showToast('Atalho bloqueado.'); }
+      if (k==='f11'){ e.preventDefault(); showToast('F11 bloqueado.'); }
     }, {capture:true});
     document.addEventListener('contextmenu', (e)=> e.preventDefault());
-    document.addEventListener('fullscreenchange', ()=>{
-      if (started && !ended && !document.fullscreenElement){
-        // não força novamente para evitar novo popup
-      }
-    });
   }
+
+  // ===== Correção automática (conta apenas MC/T-F; abertas vão no payload) =====
   function grade(){
     const answers = {}; let totalCorrect = 0, totalPossible = 0;
-    const byDiff = {easy:0, medium:0, hard:0};
-    const possibleByDiff = {easy:0, medium:0, hard:0};
-    const nodes = form.querySelectorAll('section.card');
-    nodes.forEach((sec)=>{
-      const diff = sec.dataset.difficulty;
-      if(diff === 'writing') return;
-      const radios = sec.querySelectorAll('input[type=radio]');
-      if (!radios.length) return;
-      const qname = radios[0].name;
-      const checked = sec.querySelector('input[type=radio]:checked');
-      const correct = sec.querySelector('input[type=radio][data-correct]');
-      const isCorrect = !!(checked && correct && checked === correct);
-      answers[qname] = checked ? checked.value : null;
-      if (diff in possibleByDiff) possibleByDiff[diff]++;
-      if (isCorrect){ totalCorrect++; if (diff in byDiff) byDiff[diff]++; }
-      totalPossible++;
+    const radios = form.querySelectorAll('input[type=radio]');
+    const groups = new Set([...radios].map(r=>r.name));
+    groups.forEach(name=>{
+      const checked = form.querySelector(`input[type=radio][name="${name}"]:checked`);
+      const correct = form.querySelector(`input[type=radio][name="${name}"][data-correct]`);
+      answers[name] = checked ? checked.value : null;
+      if (correct){ totalPossible++; if (checked && checked === correct) totalCorrect++; }
     });
-    const writing = {
-      q14: form.querySelector('[name=q14]')?.value.trim() || '',
-      q15: form.querySelector('[name=q15]')?.value.trim() || ''
-    };
-    return {
-      answers, writing,
-      score: { totalCorrect, totalPossible, byDifficulty: byDiff, possibleByDifficulty: possibleByDiff }
-    };
+    // abertas
+    const texts = form.querySelectorAll('textarea[name]');
+    texts.forEach(t=>{ answers[t.name] = t.value.trim(); });
+    return { answers, score: { totalCorrect, totalPossible } };
   }
+
   function collectPayload(reason='manual'){
     const g = grade();
     const now = new Date();
     const studentNameSafe = (nameInput.value || '').trim() || '(no name)';
     return {
-      testId: (testIdInput.value.trim() || 'Module3-Revolution-Quiz-v1'),
+      testId: (testIdInput.value.trim() || 'Pilgrims-Roger-Quiz-v1'),
       studentName: studentNameSafe,
       startISO: startTime?.toISOString() || null,
       endISO: now.toISOString(),
@@ -495,50 +459,60 @@
       reason,
       score: g.score,
       answers: g.answers,
-      writing: g.writing,
       focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount }
     };
   }
+
   function toCSV(obj){
     const s = obj;
     const row = [
       new Date().toISOString(), s.testId, JSON.stringify(s.studentName), s.startISO, s.endISO, s.durationSec,
       s.score.totalCorrect, s.score.totalPossible,
-      s.score.byDifficulty.easy, s.score.byDifficulty.medium, s.score.byDifficulty.hard,
-      s.focus.tabSwitches, s.focus.blurCount, s.focus.totalBlurMs, s.focus.copyCount, s.focus.pasteCount, s.focus.findCount,
-      JSON.stringify(s.answers), JSON.stringify(s.writing)
+      JSON.stringify(s.answers)
     ];
     const header = [
-      'timestamp','testId','studentName','startISO','endISO','durationSec','correct','possible','easyCorrect','mediumCorrect','hardCorrect','tabSwitches','blurCount','totalBlurMs','copyCount','pasteCount','findCount','answers','writing'
+      'timestamp','testId','studentName','startISO','endISO','durationSec',
+      'correct','possible','answers'
     ];
     return header.join(',') + '\n' + row.join(',');
   }
+
+  // ===== Envio robusto (fallback de Content-Type) =====
   async function sendResults(payload){
-    try{
-      const res = await fetch(ENDPOINT, {
-        method:'POST',
-        headers:{ 'Content-Type':'text/plain' },
-        body: JSON.stringify(payload)
-      });
-      return { posted: res.ok, status: res.status };
-    }catch(err){
-      console.warn('POST failed', err);
-      return { posted:false, error: String(err) };
+    async function tryPost(contentType){
+      try{
+        const res = await fetch(ENDPOINT, {
+          method:'POST',
+          headers:{ 'Content-Type': contentType },
+          body: JSON.stringify(payload)
+        });
+        return { ok: res.ok, status: res.status, text: await res.text() };
+      }catch(err){
+        return { ok:false, status:'FETCH_ERR', text:String(err) };
+      }
     }
+    let r = await tryPost('text/plain'); // compatível com muitos doPost
+    if(!r.ok){ console.warn('POST text/plain falhou, tentando application/json…', r); r = await tryPost('application/json'); }
+    if(r.ok){ showToast('Enviado ✔ (HTTP ' + r.status + ')'); } else { showToast('Falha no envio ✖ (HTTP ' + r.status + ')'); }
+    console.log('POST result:', r.status, r.text?.slice(0,300));
+    return { posted: r.ok, status: r.status, responseText: r.text };
   }
+
   function downloadCSV(name, csv){
     const blob = new Blob([csv], {type:'text/csv'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_Module5_Quiz.csv`;
+    a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_PilgrimsRoger_Quiz.csv`;
     document.body.appendChild(a); a.click(); a.remove();
   }
+
   function lockTest(){
     [...form.elements].forEach(el=>el.disabled = true);
     submitBtn.disabled = true; downloadCsvBtn.disabled = false;
     document.getElementById('notes').textContent = 'Locked. Answers recorded.';
     document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
   }
+
   async function finalize(reason){
     if(ended) return; ended = true; endTime = new Date(); clearInterval(timerInterval);
     const payload = collectPayload(reason);
@@ -550,82 +524,41 @@
     console.log('Result payload:', payload, 'POST:', postRes);
   }
   function autoSubmit(reason){ finalize(reason); }
-  // Eventos básicos
-  startBtn.addEventListener('click', startTest);
-  submitBtn.addEventListener('click', ()=> finalize('manual'));
 
+  // Eventos básicos
+  submitBtn.addEventListener('click', ()=> finalize('manual'));
   downloadCsvBtn.addEventListener('click', ()=>{
     const csv = toCSV(collectPayload('download-only'));
     downloadCSV((nameInput.value || '').trim() || 'anonymous', csv);
   });
-  resetBtn.addEventListener('click', ()=>{ location.reload(); });
-  // Anti-cheat + offset popup
+  resetBtn.addEventListener('click', ()=> location.reload());
+
+  // Anti-cheat leve
   document.addEventListener('visibilitychange', ()=>{
     if(!started || ended) return;
     if(document.visibilityState === 'hidden'){
-      tabSwitches++; tabCountEl.textContent = `Tab Counter: ${tabSwitches}`;
+      tabSwitches++; tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
       focusFlag.textContent = 'Focus LOST';
       isBlurred = true; blurStart = Date.now();
-      maybeApplySystemPopupOffset();
-      showToast('Tab switch recorded.');
+      showToast('Troca de aba registrada.');
     } else {
-      focusFlag.textContent = 'Focus OK';
+      focusFlag.textContent = 'Foco OK';
       if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
     }
   });
-  window.addEventListener('blur', ()=>{
-    if(!started || ended) return;
-    blurCount++;
-    if (document.visibilityState !== 'hidden') {
-      tabSwitches++; tabCountEl.textContent = `Tab Counter: ${tabSwitches}`;
-      maybeApplySystemPopupOffset();
-    }
-    focusFlag.textContent='Focus LOST'; isBlurred=true; blurStart=Date.now();
-  });
-  window.addEventListener('focus', ()=>{
-    if(!started || ended) return;
-    focusFlag.textContent='Focus OK';
-    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
-  });
-  window.addEventListener('pagehide', ()=>{
-    if(!started || ended) return;
-    tabSwitches++; tabCountEl.textContent = `Tab Counter: ${tabSwitches}`;
-    maybeApplySystemPopupOffset();
-    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
-  });
-  // Aceitar/Sair do modal
+
+  // Modal: valida o nome e inicia
+  function isValidFullName(n){ const t=(n||'').trim().replace(/\s+/g,' '); const parts=t.split(' ').filter(p=>p.length>=2); return parts.length>=2; }
+  modalName.addEventListener('input', ()=>{ acceptBtnEl.disabled = !isValidFullName(modalName.value); });
   document.getElementById('acceptBtn').addEventListener('click', async ()=>{
     const fullName = (modalName.value || '').trim();
     const t = fullName.replace(/\s+/g,' ');
-    const parts = t.split(' ').filter(p => p.length >= 2);
-    if(parts.length < 2){
-      modalName.setAttribute('aria-invalid','true');
-      modalName.focus();
-      return;
-    }
-    // Preenche o nome visível no topo e bloqueia depois ao iniciar
+    if(!isValidFullName(t)){ modalName.setAttribute('aria-invalid','true'); modalName.focus(); return; }
     document.getElementById('studentName').value = t;
-    // remove overlay (impede travamento)
-    const backdrop = document.getElementById('consentBackdrop');
-    if (backdrop) backdrop.remove();
-    document.body.style.overflow = '';
-    acceptTs = Date.now();
-    startTest(); // inicia já
-    try{ await goFullscreen(); }catch(e){}
+    const backdrop = document.getElementById('consentBackdrop'); if (backdrop) backdrop.remove(); document.body.style.overflow = '';
+    startTest();
   });
-  document.getElementById('declineBtn').addEventListener('click', ()=>{
-    window.location.href = 'about:blank';
-  });
-  // enquanto o modal existe, bloqueia atalhos que poderiam atrapalhar
-  document.addEventListener('keydown', (e)=>{
-    if (document.getElementById('consentBackdrop')){
-      const k = e.key.toLowerCase();
-      if ((e.ctrlKey||e.metaKey) && (k==='w' || k==='r' || k==='p' || k==='s' || k==='f')) e.preventDefault();
-      if (k==='f11') e.preventDefault();
-    }
-  });
-  // bloqueio global do menu de contexto
-  document.addEventListener('contextmenu', (e)=> e.preventDefault());
+  document.getElementById('declineBtn').addEventListener('click', ()=>{ window.location.href='about:blank'; });
   </script>
 </body>
 </html>
