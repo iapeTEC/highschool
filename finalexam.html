@@ -96,7 +96,7 @@
       <div class="bar" style="margin-top:8px">
         <div class="row">
           <input id="studentName" type="text" placeholder="Nome (preenchido ao aceitar)" autocomplete="name" />
-          <span class="pill"><strong>Tempo:</strong> <span id="timer" class="timer">60:00</span></span>
+          <span class="pill"><strong>Tempo:</strong> <span id="timer" class="timer">120:00</span></span>
           <span id="focusFlag" class="badge">Foco OK</span>
           <span id="tabCount" class="badge">Contador de Aba: 0</span>
         </div>
@@ -106,7 +106,7 @@
         </div>
       </div>
 
-      <div class="notice small" id="notes">A prova será enviada automaticamente em 60 minutos.</div>
+      <div class="notice small" id="notes">A prova será enviada automaticamente em 120 minutos (2 horas).</div>
     </div>
   </header>
 
@@ -182,7 +182,7 @@
         <div class="options">
           <label><input type="radio" name="q6" value="a"> a) Alabama</label>
           <label><input type="radio" name="q6" value="b"> b) Mississippi</label>
-          <label><input type="radio" name="q6" value="c" data-correct> c) Arkansas (Little Rock)</label>
+          <label><input type="radio" name="q6" value="c" data-correct> c) Arkansas</label>
           <label><input type="radio" name="q6" value="d"> d) Georgia</label>
         </div>
       </section>
@@ -191,10 +191,22 @@
       <section class="card">
         <h3>Q7. The National Urban League tried to support African Americans mainly by</h3>
         <div class="options">
-          <label><input type="radio" name="q7" value="a"> a) leading only voting-rights marches</label>
-          <label><input type="radio" name="q7" value="b" data-correct> b) offering leadership and education programs to empower them</label>
-          <label><input type="radio" name="q7" value="c"> c) running only soup kitchens in big cities</label>
-          <label><input type="radio" name="q7" value="d"> d) controlling all labor unions in factories</label>
+          <label>
+            <input type="radio" name="q7" value="a">
+            a) organizing long-term voting-rights campaigns and marches in several major northern cities.
+          </label>
+          <label>
+            <input type="radio" name="q7" value="b" data-correct>
+            b) offering leadership training and education programs that empowered people in work and community life.
+          </label>
+          <label>
+            <input type="radio" name="q7" value="c">
+            c) creating large emergency food centers and permanent soup kitchens in every industrial neighborhood.
+          </label>
+          <label>
+            <input type="radio" name="q7" value="d">
+            d) controlling most labor unions and negotiating every factory contract in the United States.
+          </label>
         </div>
       </section>
 
@@ -202,10 +214,10 @@
       <section class="card">
         <h3>Q8. New patterns in divorce often left women without money and helped create what situation?</h3>
         <div class="options">
-          <label><input type="radio" name="q8" value="a"> a) The baby boom</label>
-          <label><input type="radio" name="q8" value="b" data-correct> b) The feminization of poverty</label>
-          <label><input type="radio" name="q8" value="c"> c) The Great Migration</label>
-          <label><input type="radio" name="q8" value="d"> d) The Red Scare</label>
+          <label><input type="radio" name="q8" value="a" data-correct> a) The feminization of poverty</label>
+          <label><input type="radio" name="q8" value="b"> b) The feminilization of poverty</label>
+          <label><input type="radio" name="q8" value="c"> c) The feminilization of povertie</label>
+          <label><input type="radio" name="q8" value="d"> d) The Great Migration</label>
         </div>
       </section>
 
@@ -237,7 +249,7 @@
         <div class="options">
           <label><input type="radio" name="q11" value="a"> a) Warren Commission</label>
           <label><input type="radio" name="q11" value="b" data-correct> b) Kerner Commission</label>
-          <label><input type="radio" name="q11" value="c"> c) Marshall Commission</label>
+          <label><input type="radio" name="q11" value="c"> c) Kernel Commission</label>
           <label><input type="radio" name="q11" value="d"> d) Brown Commission</label>
         </div>
       </section>
@@ -246,10 +258,10 @@
       <section class="card">
         <h3>Q12. In which place did the Brown Berets first organize protests and activities?</h3>
         <div class="options">
-          <label><input type="radio" name="q12" value="a"> a) San Antonio</label>
-          <label><input type="radio" name="q12" value="b"> b) Chicago</label>
+          <label><input type="radio" name="q12" value="a"> a) East San Antonio</label>
+          <label><input type="radio" name="q12" value="b"> b) West Los Angeles</label>
           <label><input type="radio" name="q12" value="c" data-correct> c) East Los Angeles</label>
-          <label><input type="radio" name="q12" value="d"> d) Miami</label>
+          <label><input type="radio" name="q12" value="d"> d) West Miami</label>
         </div>
       </section>
 
@@ -258,7 +270,7 @@
         <h3>Q13. In the 1950s and 1960s, which type of job was most common for women?</h3>
         <div class="options">
           <label><input type="radio" name="q13" value="a"> a) Factory jobs</label>
-          <label><input type="radio" name="q13" value="b" data-correct> b) Clerical work (office work)</label>
+          <label><input type="radio" name="q13" value="b" data-correct> b) Office work (secretaries, typing, filing, etc.)</label>
           <label><input type="radio" name="q13" value="c"> c) Military service</label>
           <label><input type="radio" name="q13" value="d"> d) Construction work</label>
         </div>
@@ -271,7 +283,7 @@
           <label><input type="radio" name="q14" value="a"> a) Thirteenth Amendment</label>
           <label><input type="radio" name="q14" value="b"> b) Fourteenth Amendment</label>
           <label><input type="radio" name="q14" value="c"> c) Fifteenth Amendment</label>
-          <label><input type="radio" name="q14" value="d" data-correct> d) Equal Rights Amendment (ERA)</label>
+          <label><input type="radio" name="q14" value="d" data-correct> d) Equal Rights Amendment</label>
         </div>
       </section>
 
@@ -352,7 +364,10 @@
       <!-- ================= CATEGORY 3 – TRUE OR FALSE (Q21–Q36) ================= -->
       <section class="card">
         <h3>Category 3 – True or False (Q21–Q36)</h3>
-        <p class="small muted">Decide if each statement is true or false, based on what you learned in class.</p>
+        <p class="small muted">
+          Decide if each statement is true or false. <br>
+          <b>If you choose False, a box will appear for you to explain why.</b>
+        </p>
       </section>
 
       <!-- Q21 -->
@@ -362,6 +377,8 @@
           <label><input type="radio" name="q21" value="T" data-correct> True</label>
           <label><input type="radio" name="q21" value="F"> False</label>
         </div>
+        <textarea name="q21_explain" id="exp-q21" class="writing small" style="display:none"
+          placeholder="If you chose False, explain why you think this statement is false."></textarea>
       </section>
 
       <!-- Q22 -->
@@ -371,7 +388,8 @@
           <label><input type="radio" name="q22" value="T"> True</label>
           <label><input type="radio" name="q22" value="F" data-correct> False</label>
         </div>
-        <p class="small muted">Remember: the Three-Fifths Compromise counted 3/5 of enslaved people, not 3/4.</p>
+        <textarea name="q22_explain" id="exp-q22" class="writing small" style="display:none"
+          placeholder="If you chose False, explain what the delegates actually decided."></textarea>
       </section>
 
       <!-- Q23 -->
@@ -381,6 +399,8 @@
           <label><input type="radio" name="q23" value="T" data-correct> True</label>
           <label><input type="radio" name="q23" value="F"> False</label>
         </div>
+        <textarea name="q23_explain" id="exp-q23" class="writing small" style="display:none"
+          placeholder="If you chose False, explain your reasoning."></textarea>
       </section>
 
       <!-- Q24 -->
@@ -390,6 +410,8 @@
           <label><input type="radio" name="q24" value="T"> True</label>
           <label><input type="radio" name="q24" value="F" data-correct> False</label>
         </div>
+        <textarea name="q24_explain" id="exp-q24" class="writing small" style="display:none"
+          placeholder="If you chose False, explain what urbanization really means."></textarea>
       </section>
 
       <!-- Q25 -->
@@ -399,6 +421,8 @@
           <label><input type="radio" name="q25" value="T" data-correct> True</label>
           <label><input type="radio" name="q25" value="F"> False</label>
         </div>
+        <textarea name="q25_explain" id="exp-q25" class="writing small" style="display:none"
+          placeholder="If you chose False, describe what egalitarianism means."></textarea>
       </section>
 
       <!-- Q26 -->
@@ -408,6 +432,8 @@
           <label><input type="radio" name="q26" value="T"> True</label>
           <label><input type="radio" name="q26" value="F" data-correct> False</label>
         </div>
+        <textarea name="q26_explain" id="exp-q26" class="writing small" style="display:none"
+          placeholder="If you chose False, explain what the Glorious Revolution was."></textarea>
       </section>
 
       <!-- Q27 -->
@@ -417,6 +443,8 @@
           <label><input type="radio" name="q27" value="T"> True</label>
           <label><input type="radio" name="q27" value="F" data-correct> False</label>
         </div>
+        <textarea name="q27_explain" id="exp-q27" class="writing small" style="display:none"
+          placeholder="If you chose False, explain why many Puritans left England."></textarea>
       </section>
 
       <!-- Q28 -->
@@ -426,6 +454,8 @@
           <label><input type="radio" name="q28" value="T"> True</label>
           <label><input type="radio" name="q28" value="F" data-correct> False</label>
         </div>
+        <textarea name="q28_explain" id="exp-q28" class="writing small" style="display:none"
+          placeholder="If you chose False, explain how Missouri entered the Union."></textarea>
       </section>
 
       <!-- Q29 -->
@@ -435,6 +465,8 @@
           <label><input type="radio" name="q29" value="T" data-correct> True</label>
           <label><input type="radio" name="q29" value="F"> False</label>
         </div>
+        <textarea name="q29_explain" id="exp-q29" class="writing small" style="display:none"
+          placeholder="If you chose False, explain what nativism means."></textarea>
       </section>
 
       <!-- Q30 -->
@@ -444,6 +476,8 @@
           <label><input type="radio" name="q30" value="T" data-correct> True</label>
           <label><input type="radio" name="q30" value="F"> False</label>
         </div>
+        <textarea name="q30_explain" id="exp-q30" class="writing small" style="display:none"
+          placeholder="If you chose False, explain your reasoning."></textarea>
       </section>
 
       <!-- Q31 -->
@@ -453,6 +487,8 @@
           <label><input type="radio" name="q31" value="T" data-correct> True</label>
           <label><input type="radio" name="q31" value="F"> False</label>
         </div>
+        <textarea name="q31_explain" id="exp-q31" class="writing small" style="display:none"
+          placeholder="If you chose False, explain your reasoning."></textarea>
       </section>
 
       <!-- Q32 -->
@@ -462,7 +498,8 @@
           <label><input type="radio" name="q32" value="T"> True</label>
           <label><input type="radio" name="q32" value="F" data-correct> False</label>
         </div>
-        <p class="small muted">They first looked mostly to Great Britain (and later also to France).</p>
+        <textarea name="q32_explain" id="exp-q32" class="writing small" style="display:none"
+          placeholder="If you chose False, explain where the Confederacy first looked for support."></textarea>
       </section>
 
       <!-- Q33 -->
@@ -472,6 +509,8 @@
           <label><input type="radio" name="q33" value="T" data-correct> True</label>
           <label><input type="radio" name="q33" value="F"> False</label>
         </div>
+        <textarea name="q33_explain" id="exp-q33" class="writing small" style="display:none"
+          placeholder="If you chose False, explain your reasoning."></textarea>
       </section>
 
       <!-- Q34 -->
@@ -481,6 +520,8 @@
           <label><input type="radio" name="q34" value="T"> True</label>
           <label><input type="radio" name="q34" value="F" data-correct> False</label>
         </div>
+        <textarea name="q34_explain" id="exp-q34" class="writing small" style="display:none"
+          placeholder="If you chose False, explain what Black Tuesday was."></textarea>
       </section>
 
       <!-- Q35 -->
@@ -490,6 +531,8 @@
           <label><input type="radio" name="q35" value="T" data-correct> True</label>
           <label><input type="radio" name="q35" value="F"> False</label>
         </div>
+        <textarea name="q35_explain" id="exp-q35" class="writing small" style="display:none"
+          placeholder="If you chose False, explain what the American System was."></textarea>
       </section>
 
       <!-- Q36 -->
@@ -499,7 +542,8 @@
           <label><input type="radio" name="q36" value="T"> True</label>
           <label><input type="radio" name="q36" value="F" data-correct> False</label>
         </div>
-        <p class="small muted">U-boats were submarines, not surface battleships.</p>
+        <textarea name="q36_explain" id="exp-q36" class="writing small" style="display:none"
+          placeholder="If you chose False, explain what U-boats actually were."></textarea>
       </section>
 
       <!-- ================= GRAPH ITEMS (Q37–Q40) ================= -->
@@ -509,6 +553,9 @@
           Look at the graph with Total Population and Total Enslaved Persons for several states.
           Decide if each statement below is true or false according to the graph.
         </p>
+        <!-- Espaço reservado para o gráfico oficial -->
+        <img src="graphicFinalExam.png" alt="Graph for Final Exam (population and enslaved persons)"
+             style="max-width:100%;border-radius:12px;margin-top:8px">
       </section>
 
       <!-- Q37 -->
@@ -714,10 +761,22 @@
       <section class="card">
         <h3>Q55. Under the Articles of Confederation, how was each state’s voting power in Congress decided?</h3>
         <div class="options">
-          <label><input type="radio" name="q55" value="a" data-correct> a) Each state had one vote, no matter its size.</label>
-          <label><input type="radio" name="q55" value="b"> b) Bigger states got more votes than small states.</label>
-          <label><input type="radio" name="q55" value="c"> c) States with more people got more votes.</label>
-          <label><input type="radio" name="q55" value="d"> d) Only the number of eligible voters in each state counted.</label>
+          <label>
+            <input type="radio" name="q55" value="a" data-correct>
+            a) Each state had one vote in Congress, regardless of its size or population.
+          </label>
+          <label>
+            <input type="radio" name="q55" value="b">
+            b) Larger states received more votes in Congress than smaller states.
+          </label>
+          <label>
+            <input type="radio" name="q55" value="c">
+            c) States with bigger populations were given extra votes in the national legislature.
+          </label>
+          <label>
+            <input type="radio" name="q55" value="d">
+            d) Only the number of eligible voters in each state was used to assign votes.
+          </label>
         </div>
       </section>
 
@@ -828,7 +887,7 @@
   })();
 
   // ===== Config =====
-  const DEFAULT_MINUTES = 60; // 60 minutos para o final exam
+  const DEFAULT_MINUTES = 120; // 2 horas
   const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
 
   // ===== State =====
@@ -905,8 +964,9 @@
     }, {capture:true});
     document.addEventListener('contextmenu', (e)=> e.preventDefault());
 
-    // inicializa contadores de palavras
+    // inicializa contadores de palavras e explicações de FALSE
     setupWordCounters();
+    setupFalseExplanation();
   }
 
   // ===== Contador regressivo de palavras para essays =====
@@ -929,6 +989,27 @@
     });
   }
 
+  // ===== Campos extras quando marcar FALSE (Q21–Q36) =====
+  function setupFalseExplanation(){
+    const tfNames = [];
+    for(let i=21;i<=36;i++){ tfNames.push('q'+i); }
+    tfNames.forEach(name=>{
+      const radios = form.querySelectorAll(`input[type=radio][name="${name}"]`);
+      const textarea = document.getElementById(`exp-${name}`);
+      if(!textarea) return;
+      radios.forEach(r=>{
+        r.addEventListener('change', ()=>{
+          if(r.checked && r.value === 'F'){
+            textarea.style.display = 'block';
+          } else if(r.checked && r.value === 'T'){
+            textarea.style.display = 'none';
+            textarea.value = '';
+          }
+        });
+      });
+    });
+  }
+
   // ===== Correção automática (conta apenas MC/T-F; abertas vão no payload) =====
   function grade(){
     const answers = {}; let totalCorrect = 0, totalPossible = 0;
@@ -943,7 +1024,7 @@
         if (checked && checked === correct) totalCorrect++;
       }
     });
-    // abertas
+    // abertas (inclui essays, short answers e explicações de FALSE)
     const texts = form.querySelectorAll('textarea[name]');
     texts.forEach(t=>{ answers[t.name] = t.value.trim(); });
     return { answers, score: { totalCorrect, totalPossible } };
