@@ -886,6 +886,23 @@
     });
   })();
 
+    // ===== Fullscreen helper =====
+  async function tryEnterFullscreen() {
+    const el = document.documentElement;
+    try {
+      if (el.requestFullscreen) {
+        await el.requestFullscreen();
+      } else if (el.webkitRequestFullscreen) { // Safari
+        el.webkitRequestFullscreen();
+      } else if (el.msRequestFullscreen) { // IE/Edge antigo
+        el.msRequestFullscreen();
+      }
+    } catch (e) {
+      console.warn('Não foi possível entrar em tela cheia:', e);
+    }
+  }
+
+
   // ===== Config =====
   const DEFAULT_MINUTES = 120; // 2 horas
   const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
@@ -1150,7 +1167,7 @@
   modalName.addEventListener('input', ()=>{
     acceptBtnEl.disabled = !isValidFullName(modalName.value);
   });
-  document.getElementById('acceptBtn').addEventListener('click', async ()=>{
+    document.getElementById('acceptBtn').addEventListener('click', async ()=>{
     const fullName = (modalName.value || '').trim();
     const t = fullName.replace(/\s+/g,' ');
     if(!isValidFullName(t)){
@@ -1162,8 +1179,13 @@
     const backdrop = document.getElementById('consentBackdrop');
     if (backdrop) backdrop.remove();
     document.body.style.overflow = '';
+
+    // tenta entrar em tela cheia ao iniciar a prova
+    tryEnterFullscreen();
+
     startTest();
   });
+
   document.getElementById('declineBtn').addEventListener('click', ()=>{
     window.location.href='about:blank';
   });
