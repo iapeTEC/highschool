@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GIA – American History Final Exam</title>
+  <style>
+    :root{
+      --bg:#ffffff; --card:#ffffff; --text:#0b1220; --muted:#6b7280;
+      --accent:#1f6feb; --ok:#16a34a; --ok-weak:#dcfce7; --warn:#b45309; --bad:#dc2626;
+      --border:rgba(0,0,0,.12); --shadow:rgba(0,0,0,.08);
+    }
+    html[data-theme="dark"]{
+      --bg:#000000; --card:#0b0b0f; --text:#f5f7ff; --muted:#a3a7b7;
+      --accent:#7c9bff; --ok:#22c55e; --ok-weak:#062b14; --warn:#ffb02e; --bad:#ff6b6b;
+      --border:rgba(255,255,255,.14); --shadow:rgba(0,0,0,.55);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.75);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border)}
+    html[data-theme="dark"] header{background:rgba(0,0,0,.7)}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    h1{margin:0 0 6px;font-size:clamp(22px,2.6vw,32px)}
+    .sub{color:var(--muted)}
+    .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:10px}
+    input[type=text]{background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;min-width:240px;outline:none}
+    input[type=text]::placeholder{color:var(--muted)}
+    button{background:var(--accent);border:none;color:#fff;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px var(--shadow)}
+    button[disabled]{opacity:.5;cursor:not-allowed}
+    .icon-btn{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);padding:8px 12px;border-radius:999px}
+    .grid{display:grid;gap:16px;grid-template-columns:1fr}
+    @media(min-width:860px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:0 8px 30px var(--shadow)}
+    .card h3{margin:0 0 6px;font-size:18px}
+    .muted{color:var(--muted)}
+    .options{display:grid;gap:8px;margin-top:8px}
+    .options label{
+      display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;
+      padding:10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;background:transparent;
+      transition:transform .08s ease, background .12s ease, border-color .12s ease, color .12s ease;
+      box-shadow:0 2px 0 var(--shadow);
+    }
+    .options label:has(input[type=radio]:checked){
+      background:var(--ok-weak); border-color:var(--ok); transform:translateY(1px);
+      box-shadow:inset 0 2px 0 rgba(0,0,0,.06); color:#064e3b;
+    }
+    .writing{min-height:90px;width:100%;resize:vertical;background:transparent;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px}
+    .small{font-size:12px}
+    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:12px}
+    .notice{border:1px dashed var(--border);padding:10px;border-radius:10px;color:var(--muted)}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:#111827;color:#fff;padding:10px 14px;border-radius:12px;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.35);z-index:9998;display:none}
+    .toast.show{display:block}
+    .strike{opacity:.5;filter:grayscale(.3)}
+    footer{border-top:1px solid var(--border);margin-top:24px;padding:20px;color:var(--muted)}
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9999}
+    .modal{background:var(--card);color:var(--text);width:min(640px,92vw);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 20px 60px var(--shadow)}
+    .modal footer{display:flex;gap:10px;justify-content:flex-end;border:0;padding:0;margin-top:14px}
+  </style>
+</head>
+<body>
+  <!-- Modal de consentimento -->
+  <div id="consentBackdrop" class="modal-backdrop" aria-modal="true" role="dialog">
+    <div class="modal">
+      <h2>GIA – American History Final Exam</h2>
+      <div class="muted">Preencha seu <b>nome completo</b> e clique em “Aceitar e começar”. O cronômetro inicia em seguida.</div>
+      <label class="muted" style="display:block;margin:10px 0 6px">Nome completo</label>
+      <input id="modalName" type="text" placeholder="Ex.: Maria Fernanda Silva" autocomplete="name"
+             style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text)" />
+      <div class="notice small" style="margin-top:12px">
+        <ul>
+          <li>Trocas de aba/janela são registradas.</li>
+          <li>Copiar/colar/recortar e Ctrl/Cmd+F são bloqueados.</li>
+        </ul>
+      </div>
+      <footer>
+        <button id="declineBtn" class="icon-btn">Sair</button>
+        <button id="acceptBtn" disabled>Aceitar e começar</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite">Ação registrada.</div>
+
+  <header>
+    <div class="wrap">
+      <div class="bar">
+        <div>
+          <h1>American History – Final Exam</h1>
+          <div class="sub">GIA • Essays (100 words), True/False, Matching & Multiple Choice.</div>
+        </div>
+        <button id="themeToggle" class="icon-btn">🌓 Tema</button>
+      </div>
+
+      <div class="bar" style="margin-top:8px">
+        <div class="row">
+          <input id="studentName" type="text" placeholder="Nome (preenchido ao aceitar)" autocomplete="name" />
+          <span class="pill"><strong>Tempo:</strong> <span id="timer" class="timer">60:00</span></span>
+          <span id="focusFlag" class="badge">Foco OK</span>
+          <span id="tabCount" class="badge">Contador de Aba: 0</span>
+        </div>
+        <div class="row">
+          <input id="testId" type="text" placeholder="GIA-AmericanHistory-Final-v1" />
+          <button id="submitBtn" disabled>Enviar</button>
+        </div>
+      </div>
+
+      <div class="notice small" id="notes">A prova será enviada automaticamente em 60 minutos.</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <form id="quizForm" class="grid" autocomplete="off">
+      <!-- ================= CATEGORY 1 – ESSAY (Q1–Q4) ================= -->
+      <section class="card" style="grid-column:1/-1">
+        <h3>Category 1 – Essay Questions (Q1–Q4)</h3>
+        <p class="small muted">
+          Choose <b>only TWO (2)</b> of the four questions below. For each one, write a short paragraph of
+          about <b>100 words</b> (around 80–120 words) in English. Use complete sentences.
+        </p>
+
+        <h4>Q1. The United Nations after World War II</h4>
+        <p class="small">
+          In your own words, explain what the <b>United Nations (UN)</b> is. Then describe
+          <b>one main goal</b> it had when it was created after World War II and give an example of how
+          the UN tries to keep peace or solve problems between countries.
+        </p>
+        <textarea name="q1" class="writing" placeholder="Write your mini-essay here (about 100 words)."></textarea>
+        <div class="small muted">Words left (approx.): <span data-counter-for="q1">100</span>/100</div>
+        <hr>
+
+        <h4>Q2. New Deal and minorities</h4>
+        <p class="small">
+          Choose <b>one</b> advance made by women or minority groups during the <b>New Deal</b>.
+          Describe what changed and explain how this change improved life or opportunities for that group.
+        </p>
+        <textarea name="q2" class="writing" placeholder="Write your mini-essay here (about 100 words)."></textarea>
+        <div class="small muted">Words left (approx.): <span data-counter-for="q2">100</span>/100</div>
+        <hr>
+
+        <h4>Q3. The Domino Theory in the Cold War</h4>
+        <p class="small">
+          Explain what the <b>Domino Theory</b> said about the spread of communism.
+          Choose either the <b>Korean War</b> or the <b>Vietnam War</b> and show how this idea was used
+          to justify U.S. actions in that conflict. Mention at least one consequence of this policy.
+        </p>
+        <textarea name="q3" class="writing" placeholder="Write your mini-essay here (about 100 words)."></textarea>
+        <div class="small muted">Words left (approx.): <span data-counter-for="q3">100</span>/100</div>
+        <hr>
+
+        <h4>Q4. Muckrakers and social problems</h4>
+        <p class="small">
+          Define who the <b>muckrakers</b> were during the Progressive Era.
+          Then choose <b>one problem</b> they wrote about (for example: factory work, political corruption,
+          unsafe housing, etc.) and explain how their work helped people see that problem.
+        </p>
+        <textarea name="q4" class="writing" placeholder="Write your mini-essay here (about 100 words)."></textarea>
+        <div class="small muted">Words left (approx.): <span data-counter-for="q4">100</span>/100</div>
+      </section>
+
+      <!-- ================= CATEGORY 2 – FILL IN THE BLANKS (Q5–Q14) ================= -->
+      <section class="card">
+        <h3>Category 2 – Fill in the Blanks (Q5–Q14)</h3>
+        <p class="small muted">For each sentence, pick the option that completes it correctly.</p>
+      </section>
+
+      <!-- Q5 -->
+      <section class="card">
+        <h3>Q5. Which leader helped start the National Organization for Women (NOW)?</h3>
+        <div class="options">
+          <label><input type="radio" name="q5" value="a" data-correct> a) Betty Friedan</label>
+          <label><input type="radio" name="q5" value="b"> b) Gloria Steinem</label>
+          <label><input type="radio" name="q5" value="c"> c) Phyllis Schlafly</label>
+          <label><input type="radio" name="q5" value="d"> d) Fannie Lou Hamer</label>
+        </div>
+      </section>
+
+      <!-- Q6 -->
+      <section class="card">
+        <h3>Q6. Orval Faubus used the National Guard to block Black students from entering a high school in which state?</h3>
+        <div class="options">
+          <label><input type="radio" name="q6" value="a"> a) Alabama</label>
+          <label><input type="radio" name="q6" value="b"> b) Mississippi</label>
+          <label><input type="radio" name="q6" value="c" data-correct> c) Arkansas (Little Rock)</label>
+          <label><input type="radio" name="q6" value="d"> d) Georgia</label>
+        </div>
+      </section>
+
+      <!-- Q7 -->
+      <section class="card">
+        <h3>Q7. The National Urban League tried to support African Americans mainly by</h3>
+        <div class="options">
+          <label><input type="radio" name="q7" value="a"> a) leading only voting-rights marches</label>
+          <label><input type="radio" name="q7" value="b" data-correct> b) offering leadership and education programs to empower them</label>
+          <label><input type="radio" name="q7" value="c"> c) running only soup kitchens in big cities</label>
+          <label><input type="radio" name="q7" value="d"> d) controlling all labor unions in factories</label>
+        </div>
+      </section>
+
+      <!-- Q8 -->
+      <section class="card">
+        <h3>Q8. New patterns in divorce often left women without money and helped create what situation?</h3>
+        <div class="options">
+          <label><input type="radio" name="q8" value="a"> a) The baby boom</label>
+          <label><input type="radio" name="q8" value="b" data-correct> b) The feminization of poverty</label>
+          <label><input type="radio" name="q8" value="c"> c) The Great Migration</label>
+          <label><input type="radio" name="q8" value="d"> d) The Red Scare</label>
+        </div>
+      </section>
+
+      <!-- Q9 -->
+      <section class="card">
+        <h3>Q9. Which new technology let presidential candidates talk directly to millions of voters at home?</h3>
+        <div class="options">
+          <label><input type="radio" name="q9" value="a"> a) Radio</label>
+          <label><input type="radio" name="q9" value="b" data-correct> b) Television</label>
+          <label><input type="radio" name="q9" value="c"> c) Telegraph</label>
+          <label><input type="radio" name="q9" value="d"> d) Internet</label>
+        </div>
+      </section>
+
+      <!-- Q10 -->
+      <section class="card">
+        <h3>Q10. Rock ’n’ roll became a sign of protest and rebellion inside which youth culture?</h3>
+        <div class="options">
+          <label><input type="radio" name="q10" value="a"> a) The New Deal coalition</label>
+          <label><input type="radio" name="q10" value="b"> b) The parents of the baby boomers</label>
+          <label><input type="radio" name="q10" value="c" data-correct> c) The counterculture</label>
+          <label><input type="radio" name="q10" value="d"> d) The Populist movement</label>
+        </div>
+      </section>
+
+      <!-- Q11 -->
+      <section class="card">
+        <h3>Q11. Which group’s report to President Johnson said the U.S. should create more jobs to reduce ghetto conditions?</h3>
+        <div class="options">
+          <label><input type="radio" name="q11" value="a"> a) Warren Commission</label>
+          <label><input type="radio" name="q11" value="b" data-correct> b) Kerner Commission</label>
+          <label><input type="radio" name="q11" value="c"> c) Marshall Commission</label>
+          <label><input type="radio" name="q11" value="d"> d) Brown Commission</label>
+        </div>
+      </section>
+
+      <!-- Q12 -->
+      <section class="card">
+        <h3>Q12. In which place did the Brown Berets first organize protests and activities?</h3>
+        <div class="options">
+          <label><input type="radio" name="q12" value="a"> a) San Antonio</label>
+          <label><input type="radio" name="q12" value="b"> b) Chicago</label>
+          <label><input type="radio" name="q12" value="c" data-correct> c) East Los Angeles</label>
+          <label><input type="radio" name="q12" value="d"> d) Miami</label>
+        </div>
+      </section>
+
+      <!-- Q13 -->
+      <section class="card">
+        <h3>Q13. In the 1950s and 1960s, which type of job was most common for women?</h3>
+        <div class="options">
+          <label><input type="radio" name="q13" value="a"> a) Factory jobs</label>
+          <label><input type="radio" name="q13" value="b" data-correct> b) Clerical work (office work)</label>
+          <label><input type="radio" name="q13" value="c"> c) Military service</label>
+          <label><input type="radio" name="q13" value="d"> d) Construction work</label>
+        </div>
+      </section>
+
+      <!-- Q14 -->
+      <section class="card">
+        <h3>Q14. Which proposed U.S. constitutional amendment was never approved (ratified) by the states?</h3>
+        <div class="options">
+          <label><input type="radio" name="q14" value="a"> a) Thirteenth Amendment</label>
+          <label><input type="radio" name="q14" value="b"> b) Fourteenth Amendment</label>
+          <label><input type="radio" name="q14" value="c"> c) Fifteenth Amendment</label>
+          <label><input type="radio" name="q14" value="d" data-correct> d) Equal Rights Amendment (ERA)</label>
+        </div>
+      </section>
+
+      <!-- ================= CATEGORY 2 – MATCHING (Q15–Q20) ================= -->
+      <section class="card">
+        <h3>Category 2 – Matching (Q15–Q20)</h3>
+        <p class="small muted">
+          Each question describes a war, group, idea, or organization. Choose the option that best matches it.
+        </p>
+      </section>
+
+      <!-- Q15 -->
+      <section class="card">
+        <h3>Q15. Which organization was created to give countries a place to talk and solve conflicts peacefully?</h3>
+        <div class="options">
+          <label><input type="radio" name="q15" value="a"> a) League of Nations</label>
+          <label><input type="radio" name="q15" value="b" data-correct> b) United Nations</label>
+          <label><input type="radio" name="q15" value="c"> c) Warsaw Pact</label>
+          <label><input type="radio" name="q15" value="d"> d) NATO</label>
+        </div>
+      </section>
+
+      <!-- Q16 -->
+      <section class="card">
+        <h3>Q16. Which conflict began when North Korean troops crossed the border into South Korea?</h3>
+        <div class="options">
+          <label><input type="radio" name="q16" value="a" data-correct> a) Korean War</label>
+          <label><input type="radio" name="q16" value="b"> b) Vietnam War</label>
+          <label><input type="radio" name="q16" value="c"> c) World War II</label>
+          <label><input type="radio" name="q16" value="d"> d) Gulf War</label>
+        </div>
+      </section>
+
+      <!-- Q17 -->
+      <section class="card">
+        <h3>Q17. What was the nickname for film workers in Hollywood who refused to answer questions about communism?</h3>
+        <div class="options">
+          <label><input type="radio" name="q17" value="a"> a) The Hollywood Five</label>
+          <label><input type="radio" name="q17" value="b" data-correct> b) The Hollywood Ten</label>
+          <label><input type="radio" name="q17" value="c"> c) The Blacklisted</label>
+          <label><input type="radio" name="q17" value="d"> d) The Silent Screen</label>
+        </div>
+      </section>
+
+      <!-- Q18 -->
+      <section class="card">
+        <h3>Q18. Which weapon used in Vietnam was a burning, gasoline-based substance dropped in bombs?</h3>
+        <div class="options">
+          <label><input type="radio" name="q18" value="a" data-correct> a) Napalm</label>
+          <label><input type="radio" name="q18" value="b"> b) Agent Orange</label>
+          <label><input type="radio" name="q18" value="c"> c) Mustard gas</label>
+          <label><input type="radio" name="q18" value="d"> d) Chlorine gas</label>
+        </div>
+      </section>
+
+      <!-- Q19 -->
+      <section class="card">
+        <h3>Q19. Which U.S. president was accused of practicing “brinkmanship” during the Cuban Missile Crisis?</h3>
+        <div class="options">
+          <label><input type="radio" name="q19" value="a"> a) Dwight D. Eisenhower</label>
+          <label><input type="radio" name="q19" value="b" data-correct> b) John F. Kennedy</label>
+          <label><input type="radio" name="q19" value="c"> c) Richard Nixon</label>
+          <label><input type="radio" name="q19" value="d"> d) Lyndon B. Johnson</label>
+        </div>
+      </section>
+
+      <!-- Q20 -->
+      <section class="card">
+        <h3>Q20. Which group were South Vietnamese communists who fought against their own government?</h3>
+        <div class="options">
+          <label><input type="radio" name="q20" value="a"> a) Vietminh</label>
+          <label><input type="radio" name="q20" value="b" data-correct> b) Vietcong</label>
+          <label><input type="radio" name="q20" value="c"> c) Khmer Rouge</label>
+          <label><input type="radio" name="q20" value="d"> d) Sandinistas</label>
+        </div>
+      </section>
+
+      <!-- ================= CATEGORY 3 – TRUE OR FALSE (Q21–Q36) ================= -->
+      <section class="card">
+        <h3>Category 3 – True or False (Q21–Q36)</h3>
+        <p class="small muted">Decide if each statement is true or false, based on what you learned in class.</p>
+      </section>
+
+      <!-- Q21 -->
+      <section class="card">
+        <h3>Q21. Most indentured servants had to work for a fixed number of years and then they were set free.</h3>
+        <div class="options">
+          <label><input type="radio" name="q21" value="T" data-correct> True</label>
+          <label><input type="radio" name="q21" value="F"> False</label>
+        </div>
+      </section>
+
+      <!-- Q22 -->
+      <section class="card">
+        <h3>Q22. At the Constitutional Convention in 1787, delegates decided to count three-fourths of enslaved people as part of a state’s population.</h3>
+        <div class="options">
+          <label><input type="radio" name="q22" value="T"> True</label>
+          <label><input type="radio" name="q22" value="F" data-correct> False</label>
+        </div>
+        <p class="small muted">Remember: the Three-Fifths Compromise counted 3/5 of enslaved people, not 3/4.</p>
+      </section>
+
+      <!-- Q23 -->
+      <section class="card">
+        <h3>Q23. The Bill of Rights was added to the Constitution mainly to protect individual freedoms and liberties.</h3>
+        <div class="options">
+          <label><input type="radio" name="q23" value="T" data-correct> True</label>
+          <label><input type="radio" name="q23" value="F"> False</label>
+        </div>
+      </section>
+
+      <!-- Q24 -->
+      <section class="card">
+        <h3>Q24. “Urbanization” is a word used for the growth of farming areas in the countryside.</h3>
+        <div class="options">
+          <label><input type="radio" name="q24" value="T"> True</label>
+          <label><input type="radio" name="q24" value="F" data-correct> False</label>
+        </div>
+      </section>
+
+      <!-- Q25 -->
+      <section class="card">
+        <h3>Q25. The idea of “egalitarianism” is that people are basically equal and should be treated that way.</h3>
+        <div class="options">
+          <label><input type="radio" name="q25" value="T" data-correct> True</label>
+          <label><input type="radio" name="q25" value="F"> False</label>
+        </div>
+      </section>
+
+      <!-- Q26 -->
+      <section class="card">
+        <h3>Q26. The Glorious Revolution was a slave revolt started by about twenty enslaved people near Charleston, South Carolina.</h3>
+        <div class="options">
+          <label><input type="radio" name="q26" value="T"> True</label>
+          <label><input type="radio" name="q26" value="F" data-correct> False</label>
+        </div>
+      </section>
+
+      <!-- Q27 -->
+      <section class="card">
+        <h3>Q27. The main reason many Puritans left England for the colonies was to gain political power in Parliament.</h3>
+        <div class="options">
+          <label><input type="radio" name="q27" value="T"> True</label>
+          <label><input type="radio" name="q27" value="F" data-correct> False</label>
+        </div>
+      </section>
+
+      <!-- Q28 -->
+      <section class="card">
+        <h3>Q28. Under the Missouri Compromise, Missouri joined the Union as a free (non-slave) state.</h3>
+        <div class="options">
+          <label><input type="radio" name="q28" value="T"> True</label>
+          <label><input type="radio" name="q28" value="F" data-correct> False</label>
+        </div>
+      </section>
+
+      <!-- Q29 -->
+      <section class="card">
+        <h3>Q29. “Nativism” means open favoritism toward people who were born in the United States.</h3>
+        <div class="options">
+          <label><input type="radio" name="q29" value="T" data-correct> True</label>
+          <label><input type="radio" name="q29" value="F"> False</label>
+        </div>
+      </section>
+
+      <!-- Q30 -->
+      <section class="card">
+        <h3>Q30. Alexander Hamilton served as the first Secretary of the Treasury for the United States.</h3>
+        <div class="options">
+          <label><input type="radio" name="q30" value="T" data-correct> True</label>
+          <label><input type="radio" name="q30" value="F"> False</label>
+        </div>
+      </section>
+
+      <!-- Q31 -->
+      <section class="card">
+        <h3>Q31. During Reconstruction, churches became some of the first major institutions fully controlled by African Americans.</h3>
+        <div class="options">
+          <label><input type="radio" name="q31" value="T" data-correct> True</label>
+          <label><input type="radio" name="q31" value="F"> False</label>
+        </div>
+      </section>
+
+      <!-- Q32 -->
+      <section class="card">
+        <h3>Q32. At the start of the Civil War, the Confederacy mainly tried to win support from the nation of France.</h3>
+        <div class="options">
+          <label><input type="radio" name="q32" value="T"> True</label>
+          <label><input type="radio" name="q32" value="F" data-correct> False</label>
+        </div>
+        <p class="small muted">They first looked mostly to Great Britain (and later also to France).</p>
+      </section>
+
+      <!-- Q33 -->
+      <section class="card">
+        <h3>Q33. The Thirteenth Amendment ended legal slavery throughout the United States.</h3>
+        <div class="options">
+          <label><input type="radio" name="q33" value="T" data-correct> True</label>
+          <label><input type="radio" name="q33" value="F"> False</label>
+        </div>
+      </section>
+
+      <!-- Q34 -->
+      <section class="card">
+        <h3>Q34. “Black Tuesday” was the day when President Hoover forced the Bonus Army to leave Washington, D.C.</h3>
+        <div class="options">
+          <label><input type="radio" name="q34" value="T"> True</label>
+          <label><input type="radio" name="q34" value="F" data-correct> False</label>
+        </div>
+      </section>
+
+      <!-- Q35 -->
+      <section class="card">
+        <h3>Q35. The “American System” was a plan meant to connect different regions of the country and build a strong national economy.</h3>
+        <div class="options">
+          <label><input type="radio" name="q35" value="T" data-correct> True</label>
+          <label><input type="radio" name="q35" value="F"> False</label>
+        </div>
+      </section>
+
+      <!-- Q36 -->
+      <section class="card">
+        <h3>Q36. German “U-boats” in World War I and II were large battleships on the surface of the water.</h3>
+        <div class="options">
+          <label><input type="radio" name="q36" value="T"> True</label>
+          <label><input type="radio" name="q36" value="F" data-correct> False</label>
+        </div>
+        <p class="small muted">U-boats were submarines, not surface battleships.</p>
+      </section>
+
+      <!-- ================= GRAPH ITEMS (Q37–Q40) ================= -->
+      <section class="card">
+        <h3>Graph Items (Q37–Q40)</h3>
+        <p class="small muted">
+          Look at the graph with Total Population and Total Enslaved Persons for several states.
+          Decide if each statement below is true or false according to the graph.
+        </p>
+      </section>
+
+      <!-- Q37 -->
+      <section class="card">
+        <h3>Q37. On the graph, Massachusetts has the smallest number of enslaved people compared to the other states.</h3>
+        <div class="options">
+          <label><input type="radio" name="q37" value="T"> True</label>
+          <label><input type="radio" name="q37" value="F" data-correct> False</label>
+        </div>
+      </section>
+
+      <!-- Q38 -->
+      <section class="card">
+        <h3>Q38. On the graph, New York appears as the state with the highest total population.</h3>
+        <div class="options">
+          <label><input type="radio" name="q38" value="T" data-correct> True</label>
+          <label><input type="radio" name="q38" value="F"> False</label>
+        </div>
+      </section>
+
+      <!-- Q39 -->
+      <section class="card">
+        <h3>Q39. According to the graph, there are two states where the number of enslaved people is higher than the number of free white people.</h3>
+        <div class="options">
+          <label><input type="radio" name="q39" value="T" data-correct> True</label>
+          <label><input type="radio" name="q39" value="F"> False</label>
+        </div>
+      </section>
+
+      <!-- Q40 -->
+      <section class="card">
+        <h3>Q40. The graph shows Vermont as the smallest state in total population, with the lowest number of people overall.</h3>
+        <div class="options">
+          <label><input type="radio" name="q40" value="T"> True</label>
+          <label><input type="radio" name="q40" value="F" data-correct> False</label>
+        </div>
+      </section>
+
+      <!-- ================= CATEGORY 4 – MULTIPLE CHOICE (Q41–Q60) ================= -->
+      <section class="card">
+        <h3>Category 4 – Multiple Choice (Q41–Q60)</h3>
+        <p class="small muted">
+          Choose the <b>best answer</b> for each question.
+          <br>At least one item uses <b>“NOT / Except – choose the incorrect statement”</b> (see Q60).
+        </p>
+      </section>
+
+      <!-- Q41 -->
+      <section class="card">
+        <h3>Q41. In early contacts, Europeans and many Native American groups did not think about land in the same way. Which option best describes this difference?</h3>
+        <div class="options">
+          <label><input type="radio" name="q41" value="a"> a) Natives thought land sales were written legal contracts; Europeans did not.</label>
+          <label><input type="radio" name="q41" value="b" data-correct> b) Europeans believed land sales were permanent; Natives saw them as temporary sharing.</label>
+          <label><input type="radio" name="q41" value="c"> c) Natives saw land as a gift to use freely; Europeans wanted to protect it above all.</label>
+          <label><input type="radio" name="q41" value="d"> d) Europeans saw land as only community property; Natives wanted private property for each person.</label>
+        </div>
+      </section>
+
+      <!-- Q42 -->
+      <section class="card">
+        <h3>Q42. Which person helped organize the group known as the Sons of Liberty in the years before the American Revolution?</h3>
+        <div class="options">
+          <label><input type="radio" name="q42" value="a"> a) George Washington</label>
+          <label><input type="radio" name="q42" value="b"> b) King George III</label>
+          <label><input type="radio" name="q42" value="c" data-correct> c) Samuel Adams</label>
+          <label><input type="radio" name="q42" value="d"> d) William Franklin</label>
+        </div>
+      </section>
+
+      <!-- Q43 -->
+      <section class="card">
+        <h3>Q43. When Thomas Jefferson wrote the Declaration of Independence, whose ideas about natural rights influenced him the most?</h3>
+        <div class="options">
+          <label><input type="radio" name="q43" value="a" data-correct> a) John Locke</label>
+          <label><input type="radio" name="q43" value="b"> b) Benjamin Franklin</label>
+          <label><input type="radio" name="q43" value="c"> c) Samuel Adams</label>
+          <label><input type="radio" name="q43" value="d"> d) Marquis de Lafayette</label>
+        </div>
+      </section>
+
+      <!-- Q44 -->
+      <section class="card">
+        <h3>Q44. During World War I, in which year did Brazil officially enter the conflict?</h3>
+        <div class="options">
+          <label><input type="radio" name="q44" value="a"> a) 1914</label>
+          <label><input type="radio" name="q44" value="b"> b) 1915</label>
+          <label><input type="radio" name="q44" value="c"> c) 1916</label>
+          <label><input type="radio" name="q44" value="d" data-correct> d) 1917</label>
+        </div>
+      </section>
+
+      <!-- Q45 -->
+      <section class="card">
+        <h3>Q45. Before large cities and complex civilizations appeared in the Americas, what condition was most necessary?</h3>
+        <div class="options">
+          <label><input type="radio" name="q45" value="a"> a) Plenty of empty land</label>
+          <label><input type="radio" name="q45" value="b" data-correct> b) A reliable surplus of food</label>
+          <label><input type="radio" name="q45" value="c"> c) A very big population first</label>
+          <label><input type="radio" name="q45" value="d"> d) Easy access to gold and silver</label>
+        </div>
+      </section>
+
+      <!-- Q46 -->
+      <section class="card">
+        <h3>Q46. What was the main purpose of the United Nations when it was created?</h3>
+        <div class="options">
+          <label><input type="radio" name="q46" value="a"> a) To let countries take land from their neighbors</label>
+          <label><input type="radio" name="q46" value="b" data-correct> b) To give nations a place to discuss problems and avoid war</label>
+          <label><input type="radio" name="q46" value="c"> c) To create new rules for declaring war quickly</label>
+          <label><input type="radio" name="q46" value="d"> d) To send economic and military aid only to rich nations</label>
+        </div>
+      </section>
+
+      <!-- Q47 -->
+      <section class="card">
+        <h3>Q47. Who wrote the pamphlet <i>Common Sense</i>, arguing strongly that the American colonies should become independent from Britain?</h3>
+        <div class="options">
+          <label><input type="radio" name="q47" value="a"> a) General Thomas Gage</label>
+          <label><input type="radio" name="q47" value="b"> b) John Locke</label>
+          <label><input type="radio" name="q47" value="c"> c) Samuel Adams</label>
+          <label><input type="radio" name="q47" value="d" data-correct> d) Thomas Paine</label>
+        </div>
+      </section>
+
+      <!-- Q48 -->
+      <section class="card">
+        <h3>Q48. A policy that tries to fix the effects of earlier discrimination by giving extra support to disadvantaged groups is called</h3>
+        <div class="options">
+          <label><input type="radio" name="q48" value="a"> a) Civil Rights Act of 1968</label>
+          <label><input type="radio" name="q48" value="b"> b) Black Panthers</label>
+          <label><input type="radio" name="q48" value="c"> c) Civil Rights Act of 1964</label>
+          <label><input type="radio" name="q48" value="d" data-correct> d) Affirmative action</label>
+        </div>
+      </section>
+
+      <!-- Q49 -->
+      <section class="card">
+        <h3>Q49. What was the main purpose of the Chinese Exclusion Act passed in the United States?</h3>
+        <div class="options">
+          <label><input type="radio" name="q49" value="a" data-correct> a) To sharply reduce immigration from China</label>
+          <label><input type="radio" name="q49" value="b"> b) To create separate classrooms for Chinese students</label>
+          <label><input type="radio" name="q49" value="c"> c) To solve a diplomatic conflict between China and the U.S.</label>
+          <label><input type="radio" name="q49" value="d"> d) To prevent Chinese Americans from going to school</label>
+        </div>
+      </section>
+
+      <!-- Q50 -->
+      <section class="card">
+        <h3>Q50. During the Great Depression, coffee exports from Brazil dropped. How did the Brazilian government react?</h3>
+        <div class="options">
+          <label><input type="radio" name="q50" value="a"> a) By nationalizing many international companies affected by the crisis</label>
+          <label><input type="radio" name="q50" value="b" data-correct> b) By encouraging domestic industry to replace imported goods</label>
+          <label><input type="radio" name="q50" value="c"> c) By selling land cheaply to small farmers</label>
+          <label><input type="radio" name="q50" value="d"> d) By offering credit especially for textile factories</label>
+        </div>
+      </section>
+
+      <!-- Q51 -->
+      <section class="card">
+        <h3>Q51. Under the system of sharecropping after the Civil War, which group usually gained the least from the arrangement?</h3>
+        <div class="options">
+          <label><input type="radio" name="q51" value="a"> a) Bankers</label>
+          <label><input type="radio" name="q51" value="b"> b) Merchants</label>
+          <label><input type="radio" name="q51" value="c"> c) Landowners</label>
+          <label><input type="radio" name="q51" value="d" data-correct> d) Sharecroppers</label>
+        </div>
+      </section>
+
+      <!-- Q52 -->
+      <section class="card">
+        <h3>Q52. What was the main goal of the abolition movement in the United States?</h3>
+        <div class="options">
+          <label><input type="radio" name="q52" value="a"> a) Move African Americans back to Africa</label>
+          <label><input type="radio" name="q52" value="b"> b) Prohibit the use of alcoholic drinks</label>
+          <label><input type="radio" name="q52" value="c"> c) Push Native Americans out of eastern states</label>
+          <label><input type="radio" name="q52" value="d" data-correct> d) End the institution of slavery</label>
+        </div>
+      </section>
+
+      <!-- Q53 -->
+      <section class="card">
+        <h3>Q53. When a politician uses his or her position to get personal money or favors in an illegal way, this is called</h3>
+        <div class="options">
+          <label><input type="radio" name="q53" value="a"> a) Nativism</label>
+          <label><input type="radio" name="q53" value="b"> b) Civil service</label>
+          <label><input type="radio" name="q53" value="c"> c) Gentlemen’s agreement</label>
+          <label><input type="radio" name="q53" value="d" data-correct> d) Graft</label>
+        </div>
+      </section>
+
+      <!-- Q54 -->
+      <section class="card">
+        <h3>Q54. The temperance movement focused on which main concern?</h3>
+        <div class="options">
+          <label><input type="radio" name="q54" value="a"> a) Full equality between men and women in all areas</label>
+          <label><input type="radio" name="q54" value="b"> b) The political role of black churches</label>
+          <label><input type="radio" name="q54" value="c" data-correct> c) The damage that alcohol abuse caused to families</label>
+          <label><input type="radio" name="q54" value="d"> d) The idea that truth is found only in nature and imagination</label>
+        </div>
+      </section>
+
+      <!-- Q55 -->
+      <section class="card">
+        <h3>Q55. Under the Articles of Confederation, how was each state’s voting power in Congress decided?</h3>
+        <div class="options">
+          <label><input type="radio" name="q55" value="a" data-correct> a) Each state had one vote, no matter its size.</label>
+          <label><input type="radio" name="q55" value="b"> b) Bigger states got more votes than small states.</label>
+          <label><input type="radio" name="q55" value="c"> c) States with more people got more votes.</label>
+          <label><input type="radio" name="q55" value="d"> d) Only the number of eligible voters in each state counted.</label>
+        </div>
+      </section>
+
+      <!-- Q56 -->
+      <section class="card">
+        <h3>Q56. What is the word for when a state chooses to leave (break away from) the United States?</h3>
+        <div class="options">
+          <label><input type="radio" name="q56" value="a"> a) Confederacy</label>
+          <label><input type="radio" name="q56" value="b"> b) Compromise</label>
+          <label><input type="radio" name="q56" value="c" data-correct> c) Secession</label>
+          <label><input type="radio" name="q56" value="d"> d) Popular sovereignty</label>
+        </div>
+      </section>
+
+      <!-- Q57 -->
+      <section class="card">
+        <h3>Q57. Why did the United States Senate not approve (ratify) the Treaty of Versailles after World War I?</h3>
+        <div class="options">
+          <label><input type="radio" name="q57" value="a" data-correct> a) Many members feared U.S. soldiers would be sent to fight in future wars overseas.</label>
+          <label><input type="radio" name="q57" value="b"> b) President Wilson refused to send Americans to any international meetings.</label>
+          <label><input type="radio" name="q57" value="c"> c) Wilson wanted to stay completely isolated from all events in other countries.</label>
+          <label><input type="radio" name="q57" value="d"> d) Congress wanted more money from Germany to pay U.S. war costs.</label>
+        </div>
+      </section>
+
+      <!-- Q58 -->
+      <section class="card">
+        <h3>Q58. During World War I, why did the Allies use the convoy system in the Atlantic Ocean?</h3>
+        <div class="options">
+          <label><input type="radio" name="q58" value="a"> a) To escort U.S. submarines safely across the ocean</label>
+          <label><input type="radio" name="q58" value="b"> b) To stop German U-boats from leaving their ports</label>
+          <label><input type="radio" name="q58" value="c"> c) To place mines across the North Sea</label>
+          <label><input type="radio" name="q58" value="d" data-correct> d) To protect supply ships from submarine attacks</label>
+        </div>
+      </section>
+
+      <!-- Q59 -->
+      <section class="card">
+        <h3>Q59. President Hoover’s slow and careful reaction to the Great Depression was most influenced by</h3>
+        <div class="options">
+          <label><input type="radio" name="q59" value="a"> a) His personal religious views</label>
+          <label><input type="radio" name="q59" value="b" data-correct> b) His belief that government should not interfere too much in the economy</label>
+          <label><input type="radio" name="q59" value="c"> c) His limited education</label>
+          <label><input type="radio" name="q59" value="d"> d) His lack of leadership experience</label>
+        </div>
+      </section>
+
+      <!-- Q60 – NOT / EXCEPT QUESTION -->
+      <section class="card">
+        <h3>Q60. Muckrakers in the Progressive Era wrote about many problems in society. <br><span class="small">Which statement about muckrakers is <b>NOT</b> correct?</span></h3>
+        <div class="options">
+          <label><input type="radio" name="q60" value="a"> a) They helped the public learn about unfair and unsafe conditions.</label>
+          <label><input type="radio" name="q60" value="b"> b) They used articles and books to expose corruption and social problems.</label>
+          <label><input type="radio" name="q60" value="c" data-correct> c) They worked to protect political machines and hide their corruption.</label>
+          <label><input type="radio" name="q60" value="d"> d) Their investigations often pushed leaders to pass reform laws.</label>
+        </div>
+      </section>
+
+      <!-- ================= CATEGORY 5 – SHORT ANSWER (Q61–Q62) ================= -->
+      <section class="card">
+        <h3>Category 5 – Short Answer (Q61–Q62)</h3>
+        <p class="small muted">
+          Answer in <b>10–20 words</b>. Use complete sentences in English.
+        </p>
+      </section>
+
+      <!-- Q61 -->
+      <section class="card">
+        <h3>Q61. Choose one Civil Rights activist and briefly say who he or she was and what they are known for.</h3>
+        <p class="small muted">
+          (For example: Thurgood Marshall, Rosa Parks, Martin Luther King Jr., James Meredith, Fannie Lou Hamer, Malcolm X, Stokely Carmichael, etc.)
+        </p>
+        <textarea name="q61" class="writing" placeholder="10–20 words about one Civil Rights activist."></textarea>
+      </section>
+
+      <!-- Q62 -->
+      <section class="card">
+        <h3>Q62. Mention one positive change for women or minority groups that happened during the New Deal.</h3>
+        <p class="small muted">
+          (For example: more control over reservation lands, new roles in government, or new education opportunities.)
+        </p>
+        <textarea name="q62" class="writing" placeholder="10–20 words describing one advance."></textarea>
+      </section>
+
+      <!-- Admin -->
+      <section class="card">
+        <h3>Results &amp; Admin</h3>
+        <p class="muted small">Teacher only.</p>
+        <div class="row" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="downloadCsvBtn" disabled>Download CSV</button>
+          <button id="resetBtn" class="icon-btn">Reset</button>
+        </div>
+      </section>
+    </form>
+  </main>
+
+  <script>
+  // ===== Tema =====
+  (function(){
+    const root = document.documentElement;
+    const saved = localStorage.getItem('theme') || 'light';
+    root.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+  })();
+
+  // ===== Config =====
+  const DEFAULT_MINUTES = 60; // 60 minutos para o final exam
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
+
+  // ===== State =====
+  let started = false, ended = false;
+  let startTime = null, endTime = null, timerInterval = null;
+  let secondsLeft = DEFAULT_MINUTES * 60;
+
+  // Anti-cheat
+  let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
+  let copyCount = 0, pasteCount = 0, findCount = 0;
+
+  // DOM
+  const submitBtn = document.getElementById('submitBtn');
+  const timerEl = document.getElementById('timer');
+  const form = document.getElementById('quizForm');
+  const nameInput = document.getElementById('studentName');
+  const testIdInput = document.getElementById('testId');
+  const focusFlag = document.getElementById('focusFlag');
+  const tabCountEl = document.getElementById('tabCount');
+  const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const toast = document.getElementById('toast');
+
+  // Modal
+  const modalName = document.getElementById('modalName');
+  const acceptBtnEl = document.getElementById('acceptBtn');
+  document.body.style.overflow = 'hidden';
+
+  // trava form até iniciar
+  [...form.elements].forEach(el=>el.disabled = true);
+
+  function showToast(msg){
+    toast.textContent = msg || 'Ação registrada.';
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 1500);
+  }
+  function fmt(secs){
+    const m=String(Math.floor(secs/60)).padStart(2,'0');
+    const s=String(secs%60).padStart(2,'0');
+    return `${m}:${s}`;
+  }
+  timerEl.textContent = fmt(secondsLeft);
+  function tick(){
+    secondsLeft--;
+    if(secondsLeft<0) secondsLeft=0;
+    timerEl.textContent = fmt(secondsLeft);
+    if(secondsLeft===0){ autoSubmit('time'); }
+  }
+  function startTimer(){
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  function startTest(){
+    started = true; startTime = new Date();
+    nameInput.disabled = true; testIdInput.disabled = true;
+    submitBtn.disabled = false;
+    // habilita formulário
+    [...form.elements].forEach(el=>el.disabled = false);
+    setTimeout(()=>{ [...form.elements].forEach(el=>el.disabled=false); }, 0);
+    startTimer();
+
+    // bloqueios
+    document.addEventListener('copy', (e)=>{ copyCount++; e.preventDefault(); showToast('Cópia bloqueada.'); });
+    document.addEventListener('cut', (e)=>{ e.preventDefault(); showToast('Recorte bloqueado.'); });
+    document.addEventListener('paste', (e)=>{ pasteCount++; e.preventDefault(); showToast('Colagem bloqueada.'); });
+    document.addEventListener('keydown', (e)=>{
+      const k=e.key.toLowerCase(); const ctrl=e.ctrlKey||e.metaKey;
+      if (ctrl && (k==='c'||k==='v'||k==='x'||k==='s'||k==='p'||k==='f')) {
+        if(k==='f') findCount++;
+        e.preventDefault(); showToast('Atalho bloqueado.');
+      }
+      if (k==='f11'){ e.preventDefault(); showToast('F11 bloqueado.'); }
+    }, {capture:true});
+    document.addEventListener('contextmenu', (e)=> e.preventDefault());
+
+    // inicializa contadores de palavras
+    setupWordCounters();
+  }
+
+  // ===== Contador regressivo de palavras para essays =====
+  const WORD_LIMIT = 100;
+  function setupWordCounters(){
+    const spans = document.querySelectorAll('[data-counter-for]');
+    spans.forEach(span=>{
+      const name = span.getAttribute('data-counter-for');
+      const field = form.querySelector(`textarea[name="${name}"]`);
+      if(!field) return;
+      function update(){
+        const text = field.value.trim();
+        const words = text ? text.split(/\s+/).length : 0;
+        let remaining = WORD_LIMIT - words;
+        if(remaining < 0) remaining = 0;
+        span.textContent = remaining;
+      }
+      field.addEventListener('input', update);
+      update();
+    });
+  }
+
+  // ===== Correção automática (conta apenas MC/T-F; abertas vão no payload) =====
+  function grade(){
+    const answers = {}; let totalCorrect = 0, totalPossible = 0;
+    const radios = form.querySelectorAll('input[type=radio]');
+    const groups = new Set([...radios].map(r=>r.name));
+    groups.forEach(name=>{
+      const checked = form.querySelector(`input[type=radio][name="${name}"]:checked`);
+      const correct = form.querySelector(`input[type=radio][name="${name}"][data-correct]`);
+      answers[name] = checked ? checked.value : null;
+      if (correct){
+        totalPossible++;
+        if (checked && checked === correct) totalCorrect++;
+      }
+    });
+    // abertas
+    const texts = form.querySelectorAll('textarea[name]');
+    texts.forEach(t=>{ answers[t.name] = t.value.trim(); });
+    return { answers, score: { totalCorrect, totalPossible } };
+  }
+
+  function collectPayload(reason='manual'){
+    const g = grade();
+    const now = new Date();
+    const studentNameSafe = (nameInput.value || '').trim() || '(no name)';
+    return {
+      testId: (testIdInput.value.trim() || 'GIA-AmericanHistory-Final-v1'),
+      studentName: studentNameSafe,
+      startISO: startTime?.toISOString() || null,
+      endISO: now.toISOString(),
+      durationSec: startTime ? Math.round((now - startTime)/1000) : null,
+      reason,
+      score: g.score,
+      answers: g.answers,
+      focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount }
+    };
+  }
+
+  function toCSV(obj){
+    const s = obj;
+    const row = [
+      new Date().toISOString(), s.testId, JSON.stringify(s.studentName), s.startISO, s.endISO, s.durationSec,
+      s.score.totalCorrect, s.score.totalPossible,
+      JSON.stringify(s.answers)
+    ];
+    const header = [
+      'timestamp','testId','studentName','startISO','endISO','durationSec',
+      'correct','possible','answers'
+    ];
+    return header.join(',') + '\n' + row.join(',');
+  }
+
+  // ===== Envio robusto (fallback de Content-Type) =====
+  async function sendResults(payload){
+    async function tryPost(contentType){
+      try{
+        const res = await fetch(ENDPOINT, {
+          method:'POST',
+          headers:{ 'Content-Type': contentType },
+          body: JSON.stringify(payload)
+        });
+        return { ok: res.ok, status: res.status, text: await res.text() };
+      }catch(err){
+        return { ok:false, status:'FETCH_ERR', text:String(err) };
+      }
+    }
+    let r = await tryPost('text/plain'); // compatível com muitos doPost
+    if(!r.ok){
+      console.warn('POST text/plain falhou, tentando application/json…', r);
+      r = await tryPost('application/json');
+    }
+    if(r.ok){
+      showToast('Enviado ✔ (HTTP ' + r.status + ')');
+    } else {
+      showToast('Falha no envio ✖ (HTTP ' + r.status + ')');
+    }
+    console.log('POST result:', r.status, r.text?.slice(0,300));
+    return { posted: r.ok, status: r.status, responseText: r.text };
+  }
+
+  function downloadCSV(name, csv){
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_AmericanHistory_Final.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  function lockTest(){
+    [...form.elements].forEach(el=>el.disabled = true);
+    submitBtn.disabled = true; downloadCsvBtn.disabled = false;
+    document.getElementById('notes').textContent = 'Locked. Answers recorded.';
+    document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
+  }
+
+  async function finalize(reason){
+    if(ended) return;
+    ended = true; endTime = new Date(); clearInterval(timerInterval);
+    const payload = collectPayload(reason);
+    const csv = toCSV(payload);
+    const postRes = await sendResults(payload);
+    downloadCSV(payload.studentName || 'anonymous', csv);
+    lockTest();
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+    console.log('Result payload:', payload, 'POST:', postRes);
+  }
+  function autoSubmit(reason){ finalize(reason); }
+
+  // Eventos básicos
+  submitBtn.addEventListener('click', ()=> finalize('manual'));
+  downloadCsvBtn.addEventListener('click', ()=>{
+    const csv = toCSV(collectPayload('download-only'));
+    downloadCSV((nameInput.value || '').trim() || 'anonymous', csv);
+  });
+  resetBtn.addEventListener('click', ()=> location.reload());
+
+  // Anti-cheat leve
+  document.addEventListener('visibilitychange', ()=>{
+    if(!started || ended) return;
+    if(document.visibilityState === 'hidden'){
+      tabSwitches++;
+      blurCount++;
+      tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+      focusFlag.textContent = 'Focus LOST';
+      isBlurred = true; blurStart = Date.now();
+      showToast('Troca de aba registrada.');
+    } else {
+      focusFlag.textContent = 'Foco OK';
+      if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+    }
+  });
+
+  // Modal: valida o nome e inicia
+  function isValidFullName(n){
+    const t=(n||'').trim().replace(/\s+/g,' ');
+    const parts=t.split(' ').filter(p=>p.length>=2);
+    return parts.length>=2;
+  }
+  modalName.addEventListener('input', ()=>{
+    acceptBtnEl.disabled = !isValidFullName(modalName.value);
+  });
+  document.getElementById('acceptBtn').addEventListener('click', async ()=>{
+    const fullName = (modalName.value || '').trim();
+    const t = fullName.replace(/\s+/g,' ');
+    if(!isValidFullName(t)){
+      modalName.setAttribute('aria-invalid','true');
+      modalName.focus();
+      return;
+    }
+    document.getElementById('studentName').value = t;
+    const backdrop = document.getElementById('consentBackdrop');
+    if (backdrop) backdrop.remove();
+    document.body.style.overflow = '';
+    startTest();
+  });
+  document.getElementById('declineBtn').addEventListener('click', ()=>{
+    window.location.href='about:blank';
+  });
+  </script>
+</body>
+</html>
