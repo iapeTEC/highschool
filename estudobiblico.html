@@ -1,0 +1,387 @@
+<script>
+// ===== Tema =====
+(function(){
+  const root = document.documentElement;
+  const saved = localStorage.getItem('theme') || 'light';
+  root.setAttribute('data-theme', saved);
+  document.getElementById('themeToggle').addEventListener('click', ()=>{
+    const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+})();
+
+// ===== Fullscreen helper =====
+async function tryEnterFullscreen() {
+  const el = document.documentElement;
+  try {
+    if (el.requestFullscreen) {
+      await el.requestFullscreen();
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else if (el.msRequestFullscreen) {
+      el.msRequestFullscreen();
+    }
+  } catch (e) {
+    console.warn('Não foi possível entrar em tela cheia:', e);
+  }
+}
+
+// ===== Config =====
+const DEFAULT_MINUTES = 120; // 2 horas
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzWovrGHidKrd0HCXmH5BgGn-7_D-T_-VhWQ1IKXh68W1cvp4Q1s9d8WVLckKvy5fn96g/exec';
+
+// ===== State =====
+let started = false, ended = false;
+let startTime = null, endTime = null, timerInterval = null;
+let secondsLeft = DEFAULT_MINUTES * 60;
+
+// Anti-cheat
+let tabSwitches = 0, blurCount = 0, isBlurred = false, blurStart = null, totalBlurMs = 0;
+let copyCount = 0, pasteCount = 0, findCount = 0;
+
+// Rastreio de IP + client
+let clientIp = null;
+const clientMeta = {
+  ua: navigator.userAgent || '',
+  lang: navigator.language || '',
+  platform: navigator.platform || '',
+  tzOffset: new Date().getTimezoneOffset()
+};
+
+// DOM
+const submitBtn = document.getElementById('submitBtn');
+const timerEl = document.getElementById('timer');
+const form = document.getElementById('quizForm');
+const nameInput = document.getElementById('studentName');
+const testIdInput = document.getElementById('testId');
+const focusFlag = document.getElementById('focusFlag');
+const tabCountEl = document.getElementById('tabCount');
+const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+const resetBtn = document.getElementById('resetBtn');
+const toast = document.getElementById('toast');
+
+// Modal
+const modalName = document.getElementById('modalName');
+const acceptBtnEl = document.getElementById('acceptBtn');
+document.body.style.overflow = 'hidden';
+
+// trava form até iniciar
+[...form.elements].forEach(el=>el.disabled = true);
+
+function showToast(msg){
+  toast.textContent = msg || 'Ação registrada.';
+  toast.classList.add('show');
+  setTimeout(()=> toast.classList.remove('show'), 1500);
+}
+function fmt(secs){
+  const m=String(Math.floor(secs/60)).padStart(2,'0');
+  const s=String(secs%60).padStart(2,'0');
+  return `${m}:${s}`;
+}
+timerEl.textContent = fmt(secondsLeft);
+function tick(){
+  secondsLeft--;
+  if(secondsLeft<0) secondsLeft=0;
+  timerEl.textContent = fmt(secondsLeft);
+  if(secondsLeft===0){ autoSubmit('time'); }
+}
+function startTimer(){
+  clearInterval(timerInterval);
+  timerInterval = setInterval(tick, 1000);
+}
+
+// ===== busca IP público do aluno =====
+async function fetchClientIp(){
+  try{
+    const res = await fetch('https://api.ipify.org?format=json');
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    clientIp = data.ip || null;
+  }catch(err){
+    console.warn('Falha ao obter IP:', err);
+    clientIp = null;
+  }
+}
+
+// ===== envia evento “leve” de rastreio (visitas etc.) =====
+async function trackEvent(eventType, extra){
+  const payload = {
+    eventType,
+    reason: extra?.reason || '',
+    testId: (testIdInput.value.trim() || 'GIA-AmericanHistory-Final-v1'),
+    studentName: (nameInput.value || '').trim() || '(no name yet)',
+    startISO: extra?.startISO || null,
+    endISO: extra?.endISO || null,
+    ip: clientIp,
+    client: clientMeta,
+    // o resto fica vazio mesmo
+    score: { totalCorrect: null, totalPossible: null },
+    focus: {}
+  };
+  try{
+    await fetch(ENDPOINT, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain' },
+      body: JSON.stringify(payload)
+    });
+  }catch(err){
+    console.warn('trackEvent falhou:', err);
+  }
+}
+
+// ===== início real da prova =====
+function startTest(){
+  started = true; startTime = new Date();
+  nameInput.disabled = true; testIdInput.disabled = true;
+  submitBtn.disabled = false;
+  [...form.elements].forEach(el=>el.disabled = false);
+  setTimeout(()=>{ [...form.elements].forEach(el=>el.disabled=false); }, 0);
+  startTimer();
+
+  // bloqueios
+  document.addEventListener('copy', (e)=>{ copyCount++; e.preventDefault(); showToast('Cópia bloqueada.'); });
+  document.addEventListener('cut', (e)=>{ e.preventDefault(); showToast('Recorte bloqueada.'); });
+  document.addEventListener('paste', (e)=>{ pasteCount++; e.preventDefault(); showToast('Colagem bloqueada.'); });
+  document.addEventListener('keydown', (e)=>{
+    const k=e.key.toLowerCase(); const ctrl=e.ctrlKey||e.metaKey;
+    if (ctrl && (k==='c'||k==='v'||k==='x'||k==='s'||k==='p'||k==='f')) {
+      if(k==='f') findCount++;
+      e.preventDefault(); showToast('Atalho bloqueado.');
+    }
+    if (k==='f11'){ e.preventDefault(); showToast('F11 bloqueado.'); }
+  }, {capture:true});
+  document.addEventListener('contextmenu', (e)=> e.preventDefault());
+
+  // inicializa contadores de palavras e explicações de FALSE
+  setupWordCounters();
+  setupFalseExplanation();
+
+  // rastreio: início da prova
+  trackEvent('visit-start', {
+    reason: 'accepted-and-started',
+    startISO: startTime.toISOString()
+  });
+}
+
+// ===== Contador regressivo de palavras para essays =====
+const WORD_LIMIT = 100;
+function setupWordCounters(){
+  const spans = document.querySelectorAll('[data-counter-for]');
+  spans.forEach(span=>{
+    const name = span.getAttribute('data-counter-for');
+    const field = form.querySelector(`textarea[name="${name}"]`);
+    if(!field) return;
+    function update(){
+      const text = field.value.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      let remaining = WORD_LIMIT - words;
+      if(remaining < 0) remaining = 0;
+      span.textContent = remaining;
+    }
+    field.addEventListener('input', update);
+    update();
+  });
+}
+
+// ===== Campos extras quando marcar FALSE (Q21–Q36) =====
+function setupFalseExplanation(){
+  const tfNames = [];
+  for(let i=21;i<=36;i++){ tfNames.push('q'+i); }
+  tfNames.forEach(name=>{
+    const radios = form.querySelectorAll(`input[type=radio][name="${name}"]`);
+    const textarea = document.getElementById(`exp-${name}`);
+    if(!textarea) return;
+    radios.forEach(r=>{
+      r.addEventListener('change', ()=>{
+        if(r.checked && r.value === 'F'){
+          textarea.style.display = 'block';
+        } else if(r.checked && r.value === 'T'){
+          textarea.style.display = 'none';
+          textarea.value = '';
+        }
+      });
+    });
+  });
+}
+
+// ===== Correção automática (conta apenas MC/T-F; abertas vão no payload) =====
+function grade(){
+  const answers = {}; let totalCorrect = 0, totalPossible = 0;
+  const radios = form.querySelectorAll('input[type=radio]');
+  const groups = new Set([...radios].map(r=>r.name));
+  groups.forEach(name=>{
+    const checked = form.querySelector(`input[type=radio][name="${name}"]:checked`);
+    const correct = form.querySelector(`input[type=radio][name="${name}"][data-correct]`);
+    answers[name] = checked ? checked.value : null;
+    if (correct){
+      totalPossible++;
+      if (checked && checked === correct) totalCorrect++;
+    }
+  });
+  // abertas (inclui essays, short answers e explicações de FALSE)
+  const texts = form.querySelectorAll('textarea[name]');
+  texts.forEach(t=>{ answers[t.name] = t.value.trim(); });
+  return { answers, score: { totalCorrect, totalPossible } };
+}
+
+function collectPayload(reason='manual'){
+  const g = grade();
+  const now = new Date();
+  const studentNameSafe = (nameInput.value || '').trim() || '(no name)';
+  return {
+    eventType: 'submit',
+    reason,
+    testId: (testIdInput.value.trim() || 'GIA-AmericanHistory-Final-v1'),
+    studentName: studentNameSafe,
+    startISO: startTime?.toISOString() || null,
+    endISO: now.toISOString(),
+    durationSec: startTime ? Math.round((now - startTime)/1000) : null,
+    score: g.score,
+    answers: g.answers,
+    focus: { tabSwitches, blurCount, totalBlurMs, copyCount, pasteCount, findCount },
+    ip: clientIp,
+    client: clientMeta
+  };
+}
+
+function toCSV(obj){
+  const s = obj;
+  const row = [
+    new Date().toISOString(),
+    s.testId,
+    JSON.stringify(s.studentName),
+    s.startISO,
+    s.endISO,
+    s.durationSec,
+    s.score.totalCorrect,
+    s.score.totalPossible,
+    JSON.stringify(s.answers)
+  ];
+  const header = [
+    'timestamp','testId','studentName','startISO','endISO','durationSec',
+    'correct','possible','answers'
+  ];
+  return header.join(',') + '\n' + row.join(',');
+}
+
+// ===== Envio robusto (fallback de Content-Type) =====
+async function sendResults(payload){
+  async function tryPost(contentType){
+    try{
+      const res = await fetch(ENDPOINT, {
+        method:'POST',
+        headers:{ 'Content-Type': contentType },
+        body: JSON.stringify(payload)
+      });
+      return { ok: res.ok, status: res.status, text: await res.text() };
+    }catch(err){
+      return { ok:false, status:'FETCH_ERR', text:String(err) };
+    }
+  }
+  let r = await tryPost('text/plain');
+  if(!r.ok){
+    console.warn('POST text/plain falhou, tentando application/json…', r);
+    r = await tryPost('application/json');
+  }
+  if(r.ok){
+    showToast('Enviado ✔ (HTTP ' + r.status + ')');
+  } else {
+    showToast('Falha no envio ✖ (HTTP ' + r.status + ')');
+  }
+  console.log('POST result:', r.status, r.text?.slice(0,300));
+  return { posted: r.ok, status: r.status, responseText: r.text };
+}
+
+function downloadCSV(name, csv){
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${(name||'anonymous').replace(/\s+/g,'_')}_AmericanHistory_Final.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+function lockTest(){
+  [...form.elements].forEach(el=>el.disabled = true);
+  submitBtn.disabled = true; downloadCsvBtn.disabled = false;
+  document.getElementById('notes').textContent = 'Locked. Answers recorded.';
+  document.querySelectorAll('section.card').forEach(sec=>sec.classList.add('strike'));
+}
+
+async function finalize(reason){
+  if(ended) return;
+  ended = true; endTime = new Date(); clearInterval(timerInterval);
+  const payload = collectPayload(reason);
+  const csv = toCSV(payload);
+  const postRes = await sendResults(payload);
+  downloadCSV(payload.studentName || 'anonymous', csv);
+  lockTest();
+  try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+  console.log('Result payload:', payload, 'POST:', postRes);
+}
+function autoSubmit(reason){ finalize(reason); }
+
+// Eventos básicos
+submitBtn.addEventListener('click', ()=> finalize('manual'));
+downloadCsvBtn.addEventListener('click', ()=>{
+  const csv = toCSV(collectPayload('download-only'));
+  downloadCSV((nameInput.value || '').trim() || 'anonymous', csv);
+});
+resetBtn.addEventListener('click', ()=> location.reload());
+
+// Anti-cheat leve
+document.addEventListener('visibilitychange', ()=>{
+  if(!started || ended) return;
+  if(document.visibilityState === 'hidden'){
+    tabSwitches++;
+    blurCount++;
+    tabCountEl.textContent = `Contador de Aba: ${tabSwitches}`;
+    focusFlag.textContent = 'Focus LOST';
+    isBlurred = true; blurStart = Date.now();
+    showToast('Troca de aba registrada.');
+  } else {
+    focusFlag.textContent = 'Foco OK';
+    if(isBlurred){ totalBlurMs += Date.now() - (blurStart||Date.now()); isBlurred=false; }
+  }
+});
+
+// Modal: valida o nome e inicia
+function isValidFullName(n){
+  const t=(n||'').trim().replace(/\s+/g,' ');
+  const parts=t.split(' ').filter(p=>p.length>=2);
+  return parts.length>=2;
+}
+modalName.addEventListener('input', ()=>{
+  acceptBtnEl.disabled = !isValidFullName(modalName.value);
+});
+document.getElementById('acceptBtn').addEventListener('click', async ()=>{
+  const fullName = (modalName.value || '').trim();
+  const t = fullName.replace(/\s+/g,' ');
+  if(!isValidFullName(t)){
+    modalName.setAttribute('aria-invalid','true');
+    modalName.focus();
+    return;
+  }
+  document.getElementById('studentName').value = t;
+  const backdrop = document.getElementById('consentBackdrop');
+  if (backdrop) backdrop.remove();
+  document.body.style.overflow = '';
+
+  // tenta entrar em tela cheia ao iniciar a prova
+  tryEnterFullscreen();
+
+  startTest();
+});
+
+document.getElementById('declineBtn').addEventListener('click', ()=>{
+  window.location.href='about:blank';
+});
+
+// ===== Ao carregar a página: pega IP e registra visita =====
+fetchClientIp().then(()=>{
+  trackEvent('visit-open', {
+    reason: 'page-load',
+    endISO: new Date().toISOString()
+  });
+});
+</script>
