@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Community Service • Downloads</title>
+  <title>Community Service</title>
   <meta name="description" content="Downloads de PDFs de Community Service" />
   <style>
     :root{
@@ -48,14 +48,21 @@
       min-width:0;
     }
     .logo{
-      width:38px;height:38px;
-      border:2px solid rgba(255,255,255,.85);
-      border-radius:10px;
-      display:grid;
-      place-items:center;
-      font-weight:900;
-      letter-spacing:.5px;
-      user-select:none;
+  width:38px;height:38px;
+  border:2px solid rgba(255,255,255,.85);
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  overflow:hidden; /* importante */
+  background: rgba(255,255,255,.08);
+}
+.logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain; /* ou cover */
+  display:block;
+}
+
     }
     .brand h1{
       font-size:16px;
@@ -341,7 +348,10 @@
 <header>
   <div class="topbar">
     <div class="brand">
-      <div class="logo">CS</div>
+      <div class="logo">
+  <img src="logo.png" alt="Community Service" />
+      </div>
+
       <div style="min-width:0">
         <h1>Community Service • PDF Downloads</h1>
         <p>Selecione arquivos e baixe em ZIP (ou clique para baixar individualmente)</p>
@@ -361,7 +371,7 @@
         <div class="folder-title">
           <div class="folder-icon" aria-hidden="true"></div>
           <div style="min-width:0">
-            <h2>Community Service</h2>
+            <h2>Community Service - 2025</h2>
             <span id="countLabel">Carregando lista…</span>
           </div>
         </div>
@@ -411,7 +421,7 @@
 </main>
 
 <footer>
-  Visual inspirado em páginas institucionais (estilo MIT). Funciona bem em GitHub Pages.
+  Teacher Bruno development.
 </footer>
 
 <!-- JSZip (ZIP no navegador) -->
@@ -644,3 +654,4 @@
 </script>
 </body>
 </html>
+
