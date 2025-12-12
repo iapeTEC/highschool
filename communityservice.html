@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Community Service • Downloads</title>
+  <meta name="description" content="Downloads de PDFs de Community Service" />
+  <style>
+    :root{
+      --mit-red:#a31f34;
+      --ink:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --bg:#f6f7f8;
+      --card:#ffffff;
+      --btn:#0f172a;
+      --btn2:#111827;
+      --focus: rgba(163,31,52,.25);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--ink);
+      background:linear-gradient(180deg,#fff 0%, var(--bg) 100%);
+    }
+
+    /* Top bar (MIT-like) */
+    header{
+      background:var(--mit-red);
+      color:#fff;
+      padding:14px 18px;
+      border-bottom:1px solid rgba(255,255,255,.2);
+    }
+    .topbar{
+      max-width:1060px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      justify-content:space-between;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+    .logo{
+      width:38px;height:38px;
+      border:2px solid rgba(255,255,255,.85);
+      border-radius:10px;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      letter-spacing:.5px;
+      user-select:none;
+    }
+    .brand h1{
+      font-size:16px;
+      margin:0;
+      line-height:1.1;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .brand p{
+      margin:0;
+      font-size:12px;
+      opacity:.9;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    nav{
+      display:flex; gap:14px; align-items:center;
+      font-size:13px;
+      opacity:.95;
+    }
+    nav a{
+      color:#fff; text-decoration:none;
+      border-bottom:1px solid rgba(255,255,255,.0);
+      padding-bottom:2px;
+    }
+    nav a:hover{border-bottom-color:rgba(255,255,255,.75)}
+
+    main{
+      max-width:1060px;
+      margin:26px auto 60px;
+      padding:0 16px;
+    }
+
+    .hero{
+      display:flex;
+      justify-content:center;
+      margin-top:18px;
+    }
+
+    /* Folder card center */
+    .folder-card{
+      width:min(860px, 100%);
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow: 0 10px 25px rgba(0,0,0,.06);
+      overflow:hidden;
+    }
+    .folder-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:16px 16px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg,#fff 0%, #fbfbfb 100%);
+    }
+    .folder-title{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      min-width:0;
+    }
+    .folder-icon{
+      width:44px;height:34px;
+      position:relative;
+      flex:0 0 auto;
+    }
+    .folder-icon:before{
+      content:"";
+      position:absolute; inset:0;
+      background:#f3f4f6;
+      border:1px solid #d1d5db;
+      border-radius:10px;
+      box-shadow: inset 0 -10px 0 rgba(0,0,0,.03);
+    }
+    .folder-icon:after{
+      content:"";
+      position:absolute; left:6px; top:-8px;
+      width:22px; height:14px;
+      background:#e5e7eb;
+      border:1px solid #d1d5db;
+      border-bottom:none;
+      border-radius:8px 8px 0 0;
+    }
+    .folder-title h2{
+      margin:0;
+      font-size:18px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .folder-title span{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .toggle-btn{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--btn2);
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:700;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .toggle-btn:hover{background:#fafafa}
+    .toggle-btn:focus{outline:3px solid var(--focus); outline-offset:2px;}
+
+    .folder-body{
+      padding:14px 16px 16px;
+      display:none;
+    }
+    .folder-body.open{display:block;}
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .left-tools,.right-tools{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+
+    .search{
+      position:relative;
+    }
+    .search input{
+      width:min(360px, 74vw);
+      padding:10px 12px 10px 38px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      font-size:14px;
+      background:#fff;
+    }
+    .search input:focus{outline:3px solid var(--focus); outline-offset:2px;}
+    .search:before{
+      content:"🔎";
+      position:absolute;
+      left:12px; top:50%;
+      transform:translateY(-50%);
+      font-size:14px;
+      opacity:.75;
+    }
+
+    .btn{
+      border:none;
+      background:var(--btn);
+      color:#fff;
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:800;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btn:hover{filter:brightness(1.08)}
+    .btn:disabled{
+      opacity:.55; cursor:not-allowed;
+      filter:none;
+    }
+    .btn.secondary{
+      background:#fff;
+      color:var(--btn);
+      border:1px solid var(--line);
+      font-weight:800;
+    }
+    .btn.secondary:hover{background:#fafafa}
+
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin-left:2px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      border:1px solid var(--line);
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+    }
+    thead th{
+      text-align:left;
+      font-size:12px;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+      color:#374151;
+      background:#f9fafb;
+      border-bottom:1px solid var(--line);
+      padding:10px 12px;
+    }
+    tbody td{
+      padding:10px 12px;
+      border-bottom:1px solid #f1f5f9;
+      vertical-align:middle;
+      font-size:14px;
+    }
+    tbody tr:hover{background:#fbfbfb}
+    tbody tr:last-child td{border-bottom:none}
+
+    .filecell{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .pdfbadge{
+      flex:0 0 auto;
+      font-size:12px;
+      font-weight:900;
+      color:var(--mit-red);
+      border:1px solid rgba(163,31,52,.35);
+      background:rgba(163,31,52,.06);
+      padding:2px 8px;
+      border-radius:999px;
+    }
+    a.filelink{
+      color:#111827;
+      text-decoration:none;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 58ch;
+    }
+    a.filelink:hover{text-decoration:underline}
+
+    .status{
+      margin-top:10px;
+      padding:10px 12px;
+      border:1px dashed var(--line);
+      border-radius:12px;
+      color:#374151;
+      font-size:13px;
+      background:#fcfcfd;
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .spinner{
+      width:16px;height:16px;
+      border:2px solid #d1d5db;
+      border-top-color: var(--mit-red);
+      border-radius:999px;
+      animation:spin .9s linear infinite;
+      margin-top:2px;
+      display:none;
+      flex:0 0 auto;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    footer{
+      max-width:1060px;
+      margin:16px auto 28px;
+      padding:0 16px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    @media (max-width:560px){
+      nav{display:none}
+      .folder-title h2{font-size:16px}
+      a.filelink{max-width: 34ch}
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">CS</div>
+      <div style="min-width:0">
+        <h1>Community Service • PDF Downloads</h1>
+        <p>Selecione arquivos e baixe em ZIP (ou clique para baixar individualmente)</p>
+      </div>
+    </div>
+    <nav>
+      <a href="#" id="openFolderLink">Abrir pasta</a>
+      <a href="#" id="downloadAllLink">Baixar tudo (ZIP)</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <section class="folder-card" aria-label="Pasta de downloads">
+      <div class="folder-head">
+        <div class="folder-title">
+          <div class="folder-icon" aria-hidden="true"></div>
+          <div style="min-width:0">
+            <h2>Community Service</h2>
+            <span id="countLabel">Carregando lista…</span>
+          </div>
+        </div>
+        <button class="toggle-btn" id="toggleFolder" type="button" aria-expanded="false">
+          <span id="toggleIcon" aria-hidden="true">📁</span>
+          <span id="toggleText">Abrir</span>
+        </button>
+      </div>
+
+      <div class="folder-body" id="folderBody">
+        <div class="toolbar">
+          <div class="left-tools">
+            <div class="search">
+              <input id="searchInput" type="search" placeholder="Buscar por nome (ex.: Maria, Felipe)..." autocomplete="off" />
+            </div>
+            <span class="hint" id="selectedHint">0 selecionado(s)</span>
+          </div>
+
+          <div class="right-tools">
+            <button class="btn secondary" id="selectAllBtn" type="button">Selecionar todos</button>
+            <button class="btn secondary" id="clearBtn" type="button">Limpar</button>
+            <button class="btn" id="zipSelectedBtn" type="button" disabled>Baixar selecionados (ZIP)</button>
+            <button class="btn" id="zipAllBtn" type="button">Baixar tudo (ZIP)</button>
+          </div>
+        </div>
+
+        <table aria-label="Lista de PDFs">
+          <thead>
+            <tr>
+              <th style="width:56px">Sel.</th>
+              <th>Arquivo</th>
+              <th style="width:120px">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="fileTbody">
+            <!-- JS injeta as linhas -->
+          </tbody>
+        </table>
+
+        <div class="status" id="statusBox" role="status" aria-live="polite">
+          <div class="spinner" id="spinner"></div>
+          <div id="statusText">Dica: clique no nome do arquivo para baixar individualmente, ou use ZIP para baixar vários de uma vez.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Visual inspirado em páginas institucionais (estilo MIT). Funciona bem em GitHub Pages.
+</footer>
+
+<!-- JSZip (ZIP no navegador) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-k+VQH7iSx2p4x9gJbG4Z2W9O6o1lLZp9lW6yq5uZl9xv8P3m0aWm0q0GQd6tqg8vQv+oXqfM5uA3k3GmUeY2bA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  // ✅ Seus arquivos (mesma pasta do index.html).
+  // O código abaixo filtra automaticamente só os PDFs.
+  const RAW_FILES = [
+    "Anna Beatriz.pdf",
+    "Bianca Menegazzo.pdf",
+    "Carlos Neto.pdf",
+    "Davi Nascimento.pdf",
+    "Elisa Barbosa.pdf",
+    "Felipe Melo.pdf",
+    "Grazielle Venceslau.pdf",
+    "Henry Regis.pdf",
+    "Joao Arthur Ribeiro.pdf",
+    "Julya Melo.pdf",
+    "ListarArquivos.py",
+    "Lucas Tashiro.pdf",
+    "Maria Luiza Menezes.pdf",
+    "Maria Paula Medeiros.pdf",
+    "Marina Martins.pdf",
+    "Nicolas Lima.pdf",
+    "Nicolly Leite.pdf",
+    "Paulo Frota.pdf",
+    "Rodar_Lista_Arquivos.bat",
+    "Sophia Monteiro.pdf",
+    "Thiago Aciole.pdf"
+  ];
+
+  // Se em vez da mesma pasta você quiser colocar dentro de uma subpasta, ex: "pdfs/",
+  // basta mudar aqui:
+  const BASE_PATH = "./";
+
+  const FILES = RAW_FILES.filter(n => n.toLowerCase().endsWith(".pdf"));
+
+  const el = (id) => document.getElementById(id);
+  const tbody = el("fileTbody");
+  const countLabel = el("countLabel");
+  const selectedHint = el("selectedHint");
+  const zipSelectedBtn = el("zipSelectedBtn");
+  const zipAllBtn = el("zipAllBtn");
+  const selectAllBtn = el("selectAllBtn");
+  const clearBtn = el("clearBtn");
+  const searchInput = el("searchInput");
+  const statusText = el("statusText");
+  const spinner = el("spinner");
+  const toggleFolder = el("toggleFolder");
+  const folderBody = el("folderBody");
+  const toggleText = el("toggleText");
+  const toggleIcon = el("toggleIcon");
+  const openFolderLink = el("openFolderLink");
+  const downloadAllLink = el("downloadAllLink");
+
+  function setStatus(msg, busy=false){
+    statusText.textContent = msg;
+    spinner.style.display = busy ? "block" : "none";
+  }
+
+  function encodePath(p){
+    // evita problemas com espaços e acentos
+    return p.split("/").map(encodeURIComponent).join("/");
+  }
+
+  function renderRows(filter=""){
+    tbody.innerHTML = "";
+    const q = filter.trim().toLowerCase();
+
+    const filtered = FILES.filter(name => name.toLowerCase().includes(q));
+    countLabel.textContent = `${filtered.length} PDF(s) nesta pasta`;
+
+    for (const name of filtered){
+      const tr = document.createElement("tr");
+
+      const tdSel = document.createElement("td");
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.className = "rowcheck";
+      cb.dataset.file = name;
+      cb.addEventListener("change", updateSelectedUI);
+      tdSel.appendChild(cb);
+
+      const tdFile = document.createElement("td");
+      const wrap = document.createElement("div");
+      wrap.className = "filecell";
+
+      const badge = document.createElement("span");
+      badge.className = "pdfbadge";
+      badge.textContent = "PDF";
+
+      const link = document.createElement("a");
+      link.className = "filelink";
+      link.href = encodePath(BASE_PATH + name);
+      link.setAttribute("download", name);
+      link.textContent = name;
+
+      wrap.appendChild(badge);
+      wrap.appendChild(link);
+      tdFile.appendChild(wrap);
+
+      const tdAction = document.createElement("td");
+      const btn = document.createElement("a");
+      btn.className = "btn secondary";
+      btn.style.padding = "8px 10px";
+      btn.style.borderRadius = "10px";
+      btn.style.textDecoration = "none";
+      btn.href = encodePath(BASE_PATH + name);
+      btn.setAttribute("download", name);
+      btn.textContent = "Baixar";
+      tdAction.appendChild(btn);
+
+      tr.appendChild(tdSel);
+      tr.appendChild(tdFile);
+      tr.appendChild(tdAction);
+      tbody.appendChild(tr);
+    }
+
+    updateSelectedUI();
+  }
+
+  function getVisibleChecks(){
+    return Array.from(document.querySelectorAll(".rowcheck"));
+  }
+
+  function getSelectedFiles(){
+    return getVisibleChecks().filter(c => c.checked).map(c => c.dataset.file);
+  }
+
+  function updateSelectedUI(){
+    const selected = getSelectedFiles();
+    selectedHint.textContent = `${selected.length} selecionado(s)`;
+    zipSelectedBtn.disabled = selected.length === 0;
+  }
+
+  function selectAllVisible(){
+    for (const c of getVisibleChecks()) c.checked = true;
+    updateSelectedUI();
+  }
+
+  function clearVisible(){
+    for (const c of getVisibleChecks()) c.checked = false;
+    updateSelectedUI();
+  }
+
+  async function zipDownload(fileNames, zipName){
+    if (!fileNames.length) return;
+
+    setStatus("Preparando ZIP… (baixando PDFs no navegador)", true);
+    zipSelectedBtn.disabled = true;
+    zipAllBtn.disabled = true;
+    selectAllBtn.disabled = true;
+    clearBtn.disabled = true;
+
+    const zip = new JSZip();
+    const failed = [];
+
+    // baixa um por um (mais compatível)
+    for (let i = 0; i < fileNames.length; i++){
+      const name = fileNames[i];
+      setStatus(`Baixando (${i+1}/${fileNames.length}): ${name}`, true);
+
+      try{
+        const res = await fetch(encodePath(BASE_PATH + name), { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        zip.file(name, blob);
+      }catch(err){
+        failed.push(name);
+      }
+    }
+
+    setStatus("Gerando ZIP…", true);
+    const blob = await zip.generateAsync({ type: "blob" });
+
+    // dispara download
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = zipName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+
+    if (failed.length){
+      setStatus(`ZIP gerado, mas falhou ao incluir ${failed.length} arquivo(s): ${failed.join(", ")}`, false);
+    } else {
+      setStatus("ZIP pronto! ✅", false);
+    }
+
+    zipSelectedBtn.disabled = getSelectedFiles().length === 0;
+    zipAllBtn.disabled = false;
+    selectAllBtn.disabled = false;
+    clearBtn.disabled = false;
+  }
+
+  function openCloseFolder(forceOpen=null){
+    const isOpen = folderBody.classList.contains("open");
+    const next = (forceOpen === null) ? !isOpen : forceOpen;
+
+    folderBody.classList.toggle("open", next);
+    toggleFolder.setAttribute("aria-expanded", String(next));
+    toggleText.textContent = next ? "Fechar" : "Abrir";
+    toggleIcon.textContent = next ? "📂" : "📁";
+    if (next) searchInput.focus();
+  }
+
+  // Eventos
+  toggleFolder.addEventListener("click", () => openCloseFolder());
+  openFolderLink.addEventListener("click", (e) => { e.preventDefault(); openCloseFolder(true); });
+  downloadAllLink.addEventListener("click", (e) => { e.preventDefault(); openCloseFolder(true); zipDownload(FILES, "CommunityService_Todos.zip"); });
+
+  searchInput.addEventListener("input", () => renderRows(searchInput.value));
+  selectAllBtn.addEventListener("click", selectAllVisible);
+  clearBtn.addEventListener("click", clearVisible);
+
+  zipSelectedBtn.addEventListener("click", async () => {
+    const selected = getSelectedFiles();
+    await zipDownload(selected, "CommunityService_Selecionados.zip");
+  });
+
+  zipAllBtn.addEventListener("click", async () => {
+    await zipDownload(FILES, "CommunityService_Todos.zip");
+  });
+
+  // Inicializa
+  renderRows("");
+  countLabel.textContent = `${FILES.length} PDF(s) nesta pasta`;
+  setStatus("Pronto. Selecione os PDFs e baixe em ZIP — ou clique no nome para baixar individualmente.");
+</script>
+</body>
+</html>
