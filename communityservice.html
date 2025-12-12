@@ -63,7 +63,7 @@
   display:block;
 }
 
-    }
+    
     .brand h1{
       font-size:16px;
       margin:0;
@@ -421,11 +421,12 @@
 </main>
 
 <footer>
-  Teacher Bruno development.
+  Developed by Teacher Bruno.
 </footer>
 
 <!-- JSZip (ZIP no navegador) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-k+VQH7iSx2p4x9gJbG4Z2W9O6o1lLZp9lW6yq5uZl9xv8P3m0aWm0q0GQd6tqg8vQv+oXqfM5uA3k3GmUeY2bA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"></script>
+
 <script>
   // ✅ Seus arquivos (mesma pasta do index.html).
   // O código abaixo filtra automaticamente só os PDFs.
@@ -576,6 +577,12 @@
     selectAllBtn.disabled = true;
     clearBtn.disabled = true;
 
+    if (typeof JSZip === "undefined") {
+  setStatus("Erro: a biblioteca JSZip não carregou. Verifique se o <script> do JSZip está correto (sem integrity) e recarregue a página.", false);
+  return;
+}
+
+
     const zip = new JSZip();
     const failed = [];
 
@@ -654,4 +661,5 @@
 </script>
 </body>
 </html>
+
 
